@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
@@ -63,5 +64,6 @@ public class Animal {
         inverseJoinColumns = @JoinColumn(name = "idEmpleado")
     )
     private List<Empleado> cuidadores;
+    
 }
     
