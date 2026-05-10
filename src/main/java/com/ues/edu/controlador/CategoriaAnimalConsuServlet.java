@@ -16,15 +16,15 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
 /**
  *
  * @author MINED
  */
 @WebServlet(name = "CategoriaAnimalConsuServlet", urlPatterns = {"/CategoriaAnimalConsuServlet"})
 public class CategoriaAnimalConsuServlet extends HttpServlet {
-    
-    ConsultaAnimalCategoriaDao dao= new ConsultaAnimalCategoriaDao();
+
+    ConsultaAnimalCategoriaDao dao = new ConsultaAnimalCategoriaDao();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -42,7 +42,7 @@ public class CategoriaAnimalConsuServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet CategoriaAnimalConsuServlet</title>");            
+            out.println("<title>Servlet CategoriaAnimalConsuServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet CategoriaAnimalConsuServlet at " + request.getContextPath() + "</h1>");
@@ -61,40 +61,56 @@ public class CategoriaAnimalConsuServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
-    PrintWriter out = response.getWriter();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-    try {
-        List<Object[]> animales = dao.getAnimalesPorNombre(null);
+        response.setContentType("application/json");
 
-        if (animales == null) {
-            out.print("[]"); // Devolver array vacío si hay error
-            return;
+        PrintWriter out = response.getWriter();
+
+        try {
+
+            List<Object[]> animales = dao.getAnimalesPorNombre(null);
+
+            JSONArray jsonArray = new JSONArray();
+
+            for (Object[] a : animales) {
+
+                System.out.println("COLUMNAS: " + a.length);
+
+                for (Object valor : a) {
+                    System.out.println(valor);
+                }
+
+                JSONObject obj = new JSONObject();
+
+                obj.put("id", a[0]);
+                obj.put("nombre", a[1]);
+                obj.put("edad", a[2]);
+                obj.put("categoria", a[3]);
+
+                if (a.length > 4) {
+                    obj.put("descripcion",
+                            a[4] != null ? a[4].toString() : "");
+                }
+
+                jsonArray.put(obj);
+            }
+
+            out.print(jsonArray);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            JSONObject error = new JSONObject();
+            error.put("error", e.getMessage());
+
+            out.print(error);
         }
 
-        JSONArray jsonArray = new JSONArray();
-        for (Object[] a : animales) {
-            JSONObject obj = new JSONObject();
-            obj.put("id", a[0]);
-            obj.put("nombre", a[1]);
-            obj.put("edad", a[2]);
-            obj.put("categoria", a[3]);
-            jsonArray.put(obj);
-        }
-        
-        out.print(jsonArray.toString());
-        out.flush(); // Asegura que los datos se envíen
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        response.setStatus(500);
-        out.print("{\"error\":\"" + e.getMessage() + "\"}");
+        out.flush();
     }
-}
-    
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -119,10 +135,10 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-    
+
     @Override
-public void init() {
-    System.out.println(">>> CategoriaAnimalConsuServlet CARGADO");
-}
+    public void init() {
+        System.out.println(">>> CategoriaAnimalConsuServlet CARGADO");
+    }
 
 }

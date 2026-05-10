@@ -6,6 +6,9 @@
 
         <meta charset="UTF-8">
         <title>Lista de Animales</title>
+            <script src="js/ConsultaAnimalCategoria.js"></script>
+
+        
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -69,13 +72,6 @@
             </div>
 
         </div>
-
-        <script>
-            const CONTEXT_PATH = "<%=request.getContextPath()%>";
-            console.log("CONTEXT:", CONTEXT_PATH);
-        </script>
-
-        <script src="js/ConsultaAnimalCategoria.js"></script>
 
     </body>
 

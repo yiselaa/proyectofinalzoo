@@ -9,42 +9,48 @@ import java.util.List;
 public class ConsultaAnimalCategoriaDao {
 
     private EntityManagerFactory emf
-            = Persistence.createEntityManagerFactory("proyectofinalPU");
+            = Persistence.createEntityManagerFactory("profinalPU");
 
-public List<Object[]> getAnimalesPorNombre(String filtro) {
+    public List<Object[]> getAnimalesPorNombre(String filtro) {
 
-    EntityManager em = null;
+        EntityManager em = null;
 
-    try {
+        try {
 
-        em = emf.createEntityManager();
+            em = emf.createEntityManager();
 
-        String sql = "SELECT a.id, a.nombre_animal, a.edad, c.nombre_categoria "
-                + "FROM animal a "
-                + "INNER JOIN categoria c ON a.idcategoria = c.id ";
+            String sql = "SELECT "
+                    + "a.id AS id, "
+                    + "a.nombre_animal AS nombre, "
+                    + "a.edad AS edad, "
+                    + "c.nombre_categoria AS categoria, "
+                    + "c.descripcion AS descripcion "
+                    + "FROM animal a "
+                    + "INNER JOIN categoria c "
+                    + "ON a.idcategoria = c.id ";
 
-        if (filtro != null && !filtro.trim().isEmpty()) {
-            sql += "WHERE a.nombre_animal LIKE :filtro";
-        }
+           if (filtro != null && !filtro.trim().isEmpty()) {
+    sql += " WHERE a.nombre_animal LIKE :filtro"; // Agregado espacio antes de WHERE
+}
 
-        Query query = em.createNativeQuery(sql);
+            Query query = em.createNativeQuery(sql);
 
-        if (filtro != null && !filtro.trim().isEmpty()) {
-            query.setParameter("filtro", "%" + filtro + "%");
-        }
+            if (filtro != null && !filtro.trim().isEmpty()) {
+                query.setParameter("filtro", "%" + filtro + "%");
+            }
 
-        return query.getResultList();
+            return query.getResultList();
 
-    } catch (Exception e) {
+        } catch (Exception e) {
 
-        e.printStackTrace();
-        return null;
+            e.printStackTrace();
+            return null;
 
-    } finally {
+        } finally {
 
-        if (em != null && em.isOpen()) {
-            em.close();
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
-}
 }

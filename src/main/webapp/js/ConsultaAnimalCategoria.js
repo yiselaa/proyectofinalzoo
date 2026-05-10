@@ -1,46 +1,37 @@
 function buscarAnimalesPorFiltro() {
 
-    fetch(CONTEXT_PATH + "/CategoriaAnimalConsuServlet")
+    fetch("CategoriaAnimalConsuServlet")
 
-        .then(response => {
+    .then(response => response.json())
 
-            console.log("STATUS:", response.status);
+    .then(data => {
 
-            if (!response.ok) {
-                throw new Error("Error en servidor");
-            }
+        console.log(data);
 
-            return response.json();
-        })
+        const tbody = document.querySelector("#tablaAnimales tbody");
 
-        .then(data => {
+        tbody.innerHTML = "";
 
-            console.log("DATOS:", data);
+        data.forEach(animal => {
 
-            const tbody = document.querySelector("#tablaAnimales tbody");
-
-            tbody.innerHTML = "";
-
-            data.forEach(animal => {
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${animal.id}</td>
-                        <td>${animal.nombre}</td>
-                        <td>${animal.edad}</td>
-                        <td>${animal.categoria}</td>
-                        <td>---</td>
-                    </tr>
-                `;
-            });
-
-        })
-
-        .catch(error => {
-
-            console.error("ERROR:", error);
-
+            tbody.innerHTML += `
+                <tr>
+                    <td>${animal.id}</td>
+                    <td>${animal.nombre}</td>
+                    <td>${animal.edad}</td>
+                    <td>${animal.categoria}</td>
+                    <td>${animal.descripcion}</td>
+                </tr>
+            `;
         });
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+    });
 }
 
 window.onload = buscarAnimalesPorFiltro;
