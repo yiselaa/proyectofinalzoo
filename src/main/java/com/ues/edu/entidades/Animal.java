@@ -16,7 +16,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
@@ -38,18 +37,19 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class Animal {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @NotBlank
     @Column(name = "nombre_animal", nullable = false, length = 70)
     private String nombre;
-    
+
     @NotNull
-    @Column(name = "edad", nullable = false)
-    private Integer edad;
-    
+    @Column(name = "fecha_nacimiento")
+    private Date fechaNacimiento;
+
     @Temporal(TemporalType.DATE)
     private Date fechaIngreso;
 
@@ -59,11 +59,10 @@ public class Animal {
 
     @ManyToMany
     @JoinTable(
-        name = "animal_cuidador",
-        joinColumns = @JoinColumn(name = "idAnimal"),
-        inverseJoinColumns = @JoinColumn(name = "idEmpleado")
+            name = "animal_cuidador",
+            joinColumns = @JoinColumn(name = "idAnimal"),
+            inverseJoinColumns = @JoinColumn(name = "idEmpleado")
     )
     private List<Empleado> cuidadores;
-    
+
 }
-    

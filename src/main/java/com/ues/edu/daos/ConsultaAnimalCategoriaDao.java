@@ -11,46 +11,47 @@ public class ConsultaAnimalCategoriaDao {
     private EntityManagerFactory emf
             = Persistence.createEntityManagerFactory("profinalPU");
 
-    public List<Object[]> getAnimalesPorNombre(String filtro) {
+   public List<Object[]> buscarFiltro(String filtro) {
 
-        EntityManager em = null;
+    EntityManager em = null;
 
-        try {
+    try {
+        em = emf.createEntityManager();
 
-            em = emf.createEntityManager();
+        String sql =
+                "SELECT " +
+                "a.id AS col0, " +
+                "a.nombre_animal AS col1, " +
+                "TO_CHAR(a.fechaingreso, 'YYYY-MM-DD') AS col2, " +
+                "TO_CHAR(a.fecha_nacimiento, 'YYYY-MM-DD') AS col3, " +
+                "CAST(EXTRACT(YEAR FROM AGE(a.fecha_nacimiento)) AS INTEGER) AS col4, " +
+                "c.nombre_categoria AS col5, " +
+                "c.descripcion AS col6 " +
+                "FROM animal a " +
+                "INNER JOIN categoria c ON a.idcategoria = c.id " +
+                "WHERE 1=1 ";
 
-            String sql = "SELECT "
-                    + "a.id AS id, "
-                    + "a.nombre_animal AS nombre, "
-                    + "a.edad AS edad, "
-                    + "c.nombre_categoria AS categoria, "
-                    + "c.descripcion AS descripcion "
-                    + "FROM animal a "
-                    + "INNER JOIN categoria c "
-                    + "ON a.idcategoria = c.id ";
+        if (filtro != null && !filtro.trim().isEmpty()) {
+            sql += " AND (LOWER(a.nombre_animal) LIKE LOWER(:filtro) " +
+                   " OR LOWER(c.nombre_categoria) LIKE LOWER(:filtro)) ";
+        }
 
-           if (filtro != null && !filtro.trim().isEmpty()) {
-    sql += " WHERE a.nombre_animal LIKE :filtro"; // Agregado espacio antes de WHERE
-}
+        Query query = em.createNativeQuery(sql);
 
-            Query query = em.createNativeQuery(sql);
+        if (filtro != null && !filtro.trim().isEmpty()) {
+            query.setParameter("filtro", "%" + filtro + "%");
+        }
 
-            if (filtro != null && !filtro.trim().isEmpty()) {
-                query.setParameter("filtro", "%" + filtro + "%");
-            }
+        return query.getResultList();
 
-            return query.getResultList();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
 
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return null;
-
-        } finally {
-
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
         }
     }
+}
 }
