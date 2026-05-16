@@ -1,70 +1,65 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Lista de Animales</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                background: #f1f8e9;
-            }
-            .header {
-                background: linear-gradient(90deg, #2e7d32, #43a047);
-                color: white;
-                padding: 25px;
-                text-align: center;
-                border-radius: 0 0 20px 20px;
-            }
-            .card-custom {
-                border: none;
-                border-radius: 15px;
-                box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
-            }
-            table thead {
-                background-color: #2e7d32;
-                color: white;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>🐾 Lista de Animales</h1>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Animales</title>
 
-        <div class="container mt-5">
-            <div class="card card-custom">
-                <div class="card-body">
-                   <div class="row mb-3">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <div class="mb-3">
-    <input type="text" id="buscar"
-           class="form-control"
-           placeholder="🔎 Buscar por nombre o categoría...">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+    <!-- CSS EXTERNO -->
+<link rel="stylesheet" href="css/ConsultasCss.css"></head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>🐾 LISTA DE ANIMALES</h1>
 </div>
 
-</div>
-                    <table id="tablaAnimales" class="table table-hover" border="1">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Fecha Ingreso</th>
-                                <th>Fecha Nacimiento</th>
-                                <th>Edad</th>
-                                <th>Categoría</th>
-                                <th>Descripción</th>
-                            </tr>
-                        </thead>
+<div class="container">
 
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="card card-clean shadow-sm">
+
+        <div class="table-responsive">
+
+            <table id="tablaAnimales" class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Ingreso</th>
+                        <th>Nacimiento</th>
+                        <th>Edad</th>
+                        <th>Categoría</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
         </div>
 
-        <!-- Script al final del body para que el DOM ya esté listo -->
-        <script src="js/ConsultaAnimalCategoria.js"></script>
-    </body>
+        <!-- BOTÓN -->
+        <div class="mt-4 text-end">
+            <a href="index.html" class="btn-back">
+                ← Volver al inicio
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<script src="js/ConsultaAnimalCategoria.js"></script>
+
+</body>
 </html>
+

@@ -1,67 +1,50 @@
-<%-- 
-    Document   : ConsultaCuidadorAnimal
-    Created on : 15 may 2026, 10:48:23
-    Author     : MINED
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Cuidadores por Animal</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Animales y Cuidadores</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
 
-    <style>
-        body { background: #f1f8e9; }
+        <link rel="stylesheet" href="css/ConsultasCss.css">
+    </head>
 
-        .header {
-            background: linear-gradient(90deg, #2e7d32, #66bb6a);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
+    <body>
 
-        .card-custom {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
-        }
+        <div class="header">
+            <h1>🐾 LISTA DE ANIMALES Y CUIDADORES</h1>
+        </div>
 
-        table thead {
-            background: #2e7d32;
-            color: white;
-        }
-    </style>
-</head>
+        <div class="container">
 
-<body>
+            <div class="card card-clean shadow-sm">
 
-<div class="header">
-    <h2>🐾 Cuidadores de Animales</h2>
-</div>
+                <div class="table-responsive">
+                    <table id="tablaAC" class="table table-hover">
+                        <thead>
+                        <th>Animal</th>
+                        <th>Empleado</th>
+                        <th>Apellido</th>
+                        <th>DUI</th>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
 
-<div class="container mt-5">
+                <div class="mt-3 text-end">
+                    <a href="index.html" class="btn-back">← </a>
+                </div>
 
-    <div class="card card-custom p-3">
+            </div>
 
-        <table id="tablaCuidador" class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Animal</th>
-                    <th>Nombre Cuidador</th>
-                    <th>Apellido</th>
-                </tr>
-            </thead>
+        </div>
 
-            <tbody></tbody>
-        </table>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 
-    </div>
-</div>
+        <script src="js/ConsultaCuidadorAnimal.js"></script>
 
-<script src="js/ConsultaCuidador.js"></script>
-
-</body>
+    </body>
 </html>

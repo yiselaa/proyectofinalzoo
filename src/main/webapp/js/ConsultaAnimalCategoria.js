@@ -1,17 +1,29 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const input = document.getElementById("buscar");
     const tbody = document.querySelector("#tablaAnimales tbody");
 
-    console.log("🔥 JS activo");
+    let table = null;
 
-    function cargar(valor) {
+    function initDataTable() {
+        table = $('#tablaAnimales').DataTable({
+            pageLength: 5,
+            lengthMenu: [5, 10, 25, 50],
+            language: {
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                paginate: {
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+        });
+    }
 
-        fetch("/ProyectoFinalZoo/CategoriaAnimalConsuServlet?filtro=" + encodeURIComponent(valor))
+    function cargar() {
+
+        fetch("/ProyectoFinalZoo/CategoriaAnimalConsuServlet")
             .then(res => res.json())
             .then(data => {
-
-                console.log("DATA:", data);
 
                 let html = "";
 
@@ -30,15 +42,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
                 tbody.innerHTML = html;
-            })
-            .catch(err => console.error("ERROR FETCH:", err));
+
+                // ✔ inicializar SOLO UNA VEZ
+                if (!$.fn.DataTable.isDataTable("#tablaAnimales")) {
+                    initDataTable();
+                } else {
+                    table.clear().destroy();
+                    initDataTable();
+                }
+            });
     }
 
-    // 🔥 FORZAR EVENTO DIRECTO
-    input.onkeyup = function () {
-        cargar(this.value);
-    };
-
-    // carga inicial
-    cargar("");
+    cargar();
 });

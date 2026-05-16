@@ -4,6 +4,7 @@
  */
 package com.ues.edu.entidades;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ import lombok.Setter;
 
 /**
  *
- * @author MINED
+ * @author
  */
 @Setter
 @Getter
@@ -29,6 +30,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DetalleVisita {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -39,17 +41,16 @@ public class DetalleVisita {
 
     @NotNull
     @Column(name = "subtotal", nullable = false)
-    private double subtotal; // Se calcula como cantidad * ticket.precio
+    private double subtotal;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idvisita")
     private Visita visita;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idticket")
     private Ticket ticket;
 
-    
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
         if (this.ticket != null) {

@@ -19,7 +19,7 @@ public class TestBase {
      */
     public static void main(String[] args) {
  
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("proyectofinalPU");
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("profinalPU");
     EntityManager em = emf.createEntityManager();
     
     // 2. Prueba rápida: Crear una categoría

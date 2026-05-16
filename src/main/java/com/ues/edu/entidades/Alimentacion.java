@@ -4,6 +4,7 @@
  */
 package com.ues.edu.entidades;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,24 +31,25 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Alimentacion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @NotBlank
     @Column(name = "tipo_alimento", nullable = false, length = 70)
     private String tipoAlimento;
-    
+
     @NotBlank
     @Column(name = "horario", nullable = false, length = 70)
     private String horario;
-    
+
     @NotNull
     @Column(name = "cantidad", nullable = false)
     private double cantidad;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idanimal")
     private Animal animal;
-    
+
 }

@@ -32,19 +32,20 @@ import lombok.Setter;
 @Table(name = "visita")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Visita {   
+public class Visita {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    
-     @NotBlank
+
+    @NotBlank
     @Column(name = "nombre_visitante", nullable = false, length = 70)
     private String nombreVisitante;
-    
+
     @Temporal(TemporalType.DATE)
     private Date fecha;
 
-    @OneToMany(mappedBy = "visita", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "visita", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVisita> detalles;
-    
+
 }

@@ -1,9 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.ues.edu.entidades;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,39 +19,35 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- *
- * @author MINED
- */
 @Setter
 @Getter
 @Entity
 @Table(name = "historial_medico")
 @AllArgsConstructor
 @NoArgsConstructor
-public class HistorialMedico {   
+public class HistorialMedico {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @Temporal(TemporalType.DATE)
     private Date fecha;
-    
+
     @NotBlank
     @Column(name = "diagnostico", nullable = false, length = 70)
     private String diagnostico;
-    
+
     @NotBlank
     @Column(name = "tratamiento", nullable = false, length = 70)
     private String tratamiento;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idAnimal")
     private Animal animal;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idVeterinario")
-    private Empleado veterinario; // Empleado con rol VETERINARIO
+    private Empleado veterinario;
+
 }
-    
-    

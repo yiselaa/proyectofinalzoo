@@ -27,18 +27,18 @@ import lombok.Setter;
 @Table(name = "ticket")
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class Ticket {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @NotBlank
     @Column(name = "tipo", nullable = false, length = 70)
-    private String tipo; // "Niño", "Adulto"
-    
+    private String tipo;
+
     @NotNull
     @Column(name = "precio", nullable = false)
     private double precio;
-    
+
 }

@@ -4,6 +4,7 @@
  */
 package com.ues.edu.entidades;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +23,6 @@ import lombok.Setter;
  *
  * @author Yiss
  */
-
 @Setter
 @Getter
 @Entity
@@ -30,19 +30,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Categoria {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @NotBlank
-    @Column(name = "nombre_categoria",unique = true, nullable = false, length = 70)
+    @Column(name = "nombre_categoria", unique = true, nullable = false, length = 70)
     private String nombre;
-    
+
     @NotBlank
     @Column(name = "descripcion", nullable = false, length = 70)
     private String descripcion;
 
-    @OneToMany(mappedBy = "categoria")
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Animal> listaAnimales;
-    
+
 }
