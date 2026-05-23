@@ -12,9 +12,7 @@ public class EmpleadoDao {
     private EntityManagerFactory emf =
             Persistence.createEntityManagerFactory("profinalPU");
 
-    // ==========================
-    // GUARDAR
-    // ==========================
+    
     public void guardar(Empleado empleado) {
 
         EntityManager em = emf.createEntityManager();
@@ -28,15 +26,7 @@ public class EmpleadoDao {
         em.close();
     }
 
-    // ==========================
-    // ACTUALIZAR
-    // ==========================
-    // ==========================
-// ACTUALIZAR
-// ==========================
-// ==========================
-// ACTUALIZAR
-// ==========================
+  
 public void actualizar(Empleado empleado) {
 
     EntityManager em = emf.createEntityManager();
@@ -58,9 +48,7 @@ public void actualizar(Empleado empleado) {
     em.close();
 }
 
-    // ==========================
-    // ELIMINAR
-    // ==========================
+  
     public void eliminar(long id) {
 
         EntityManager em = emf.createEntityManager();
@@ -78,9 +66,6 @@ public void actualizar(Empleado empleado) {
         em.close();
     }
 
-    // ==========================
-    // LISTAR TODOS
-    // ==========================
     public List<Empleado> listar() {
 
         EntityManager em = emf.createEntityManager();
@@ -98,9 +83,6 @@ public void actualizar(Empleado empleado) {
         return lista;
     }
 
-    // ==========================
-    // BUSCAR POR ID
-    // ==========================
     public Empleado buscarPorId(long id) {
 
         EntityManager em = emf.createEntityManager();
@@ -112,9 +94,7 @@ public void actualizar(Empleado empleado) {
         return e;
     }
 
-    // ==========================
-    // BUSCAR POR NOMBRE
-    // ==========================
+  
     public List<Empleado> buscarPorNombre(String nombre) {
 
         EntityManager em = emf.createEntityManager();
@@ -135,9 +115,7 @@ public void actualizar(Empleado empleado) {
         return lista;
     }
 
-    // ==========================
-    // FILTRAR POR ROL
-    // ==========================
+  
     public List<Empleado> filtrarPorRol(String rol) {
 
         EntityManager em = emf.createEntityManager();
@@ -158,9 +136,7 @@ public void actualizar(Empleado empleado) {
         return lista;
     }
 
-    // ==========================
-    // PAGINACIÓN
-    // ==========================
+   
     public List<Empleado> listarPaginado(int pagina, int size) {
 
         EntityManager em = emf.createEntityManager();

@@ -16,27 +16,27 @@ public class EmpleadosService {
     
    private EmpleadoDao dao = new EmpleadoDao();
 
-    // 🔥 CREAR
+    // CREAR
     public void crearEmpleado(Empleado e) {
         dao.guardar(e);
     }
 
-    // 🔥 ACTUALIZAR
+    // ACTUALIZAR
     public void editarEmpleado(Empleado e) {
         dao.actualizar(e);
     }
 
-    // 🔥 ELIMINAR
+    // ELIMINAR
     public void eliminarEmpleado(long id) {
         dao.eliminar(id);
     }
 
-    // 🔥 LISTAR TODOS
+    // LISTAR TODOS
     public List<Empleado> obtenerEmpleados() {
         return dao.listar();
     }
 
-    // 🔥 BUSCAR POR ID
+    // BUSCAR POR ID
     public Empleado buscarEmpleado(long id) {
         return dao.buscarPorId(id);
     }
