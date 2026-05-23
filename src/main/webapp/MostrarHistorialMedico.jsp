@@ -8,33 +8,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Historial Médico</title>
-
+  
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        body { background: #f1f8e9; }
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
 
-        .header {
-            background: linear-gradient(90deg, #2e7d32, #66bb6a);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .card-custom {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
-        }
-
-        table thead {
-            background: #2e7d32;
-            color: white;
-        }
-    </style>
-</head>
+    <!-- CSS EXTERNO -->
+<link rel="stylesheet" href="css/ConsultasCss.css"></head>
 
 <body>
 
@@ -42,11 +24,13 @@
     <h2>🩺 Historial Médico de Animales</h2>
 </div>
 
-<div class="container mt-5">
+<div class="container">
 
-    <div class="card card-custom p-3">
+    <div class="card card-clean shadow-sm">
 
-        <table id="tablaHistorial" class="table table-hover">
+        <div class="table-responsive">
+           
+             <table id="tablaHistorial" class="table table-hover">
             <thead>
                 <tr>
                     <th>Animal</th>
@@ -59,11 +43,24 @@
 
             <tbody></tbody>
         </table>
+            
+        </div>
+
+        <!-- BOTÓN -->
+        <div class="mt-4 text-end">
+            <a href="index.html" class="btn-back">
+                ← Volver al inicio
+            </a>
+        </div>
 
     </div>
 </div>
 
-<script src="js/ConsultaHistorial.js"></script>
+    <!-- SCRIPTS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<script src="js/ConsultaHistorialMedico.js"></script>
 
 </body>
 </html>
