@@ -6,6 +6,7 @@ package com.ues.edu.daos;
 
 import com.ues.edu.entidades.Animal;
 import jakarta.persistence.EntityManager;
+import com.ues.edu.entidades.Categoria;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
@@ -24,23 +25,52 @@ private EntityManagerFactory emf =
     // GUARDAR
     // ==========================
     public void guardar(Animal animal) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.persist(animal);
-        em.getTransaction().commit();
-        em.close();
+
+    EntityManager em = emf.createEntityManager();
+
+    em.getTransaction().begin();
+
+    // 🔥 RE-ATTACH de categoría
+    if (animal.getCategoria() != null
+            && animal.getCategoria().getId() != null) {
+
+        animal.setCategoria(
+                em.find(Categoria.class,
+                        animal.getCategoria().getId())
+        );
     }
+
+    em.persist(animal);
+
+    em.getTransaction().commit();
+
+    em.close();
+}
 
     // ==========================
     // ACTUALIZAR
     // ==========================
-    public void actualizar(Animal animal) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.merge(animal); // más limpio que actualizar campo por campo
-        em.getTransaction().commit();
-        em.close();
+ public void actualizar(Animal animal) {
+
+    EntityManager em = emf.createEntityManager();
+
+    em.getTransaction().begin();
+
+    if (animal.getCategoria() != null
+            && animal.getCategoria().getId() != null) {
+
+        animal.setCategoria(
+                em.find(Categoria.class,
+                        animal.getCategoria().getId())
+        );
     }
+
+    em.merge(animal);
+
+    em.getTransaction().commit();
+
+    em.close();
+}
 
     // ==========================
     // ELIMINAR
