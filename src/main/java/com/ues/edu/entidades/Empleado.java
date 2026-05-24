@@ -1,4 +1,4 @@
-package com.ues.edu.entidades;
+ package com.ues.edu.entidades;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
