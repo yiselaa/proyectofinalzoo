@@ -174,7 +174,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Fecha Nacimiento</th>
+                            <th>Fecha Nacimiento</th>  
+                            <th>Edad</th>
                             <th>Fecha Ingreso</th>
                             <th>Categoría</th>
                             <th>Acciones</th>

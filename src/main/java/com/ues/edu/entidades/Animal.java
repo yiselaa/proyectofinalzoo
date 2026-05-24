@@ -4,7 +4,6 @@
  */
 package com.ues.edu.entidades;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -47,22 +46,22 @@ public class Animal {
     private String nombre;
 
     @NotNull
+    @Temporal(TemporalType.DATE)
     @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
 
     @Temporal(TemporalType.DATE)
     private Date fechaIngreso;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "idcategoria")
     private Categoria categoria;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(
-        name = "animal_cuidador",
-        joinColumns = @JoinColumn(name = "idAnimal"),
-        inverseJoinColumns = @JoinColumn(name = "idEmpleado")
+            name = "animal_cuidador",
+            joinColumns = @JoinColumn(name = "idAnimal"),
+            inverseJoinColumns = @JoinColumn(name = "idEmpleado")
     )
     private List<Empleado> cuidadores;
-
 }

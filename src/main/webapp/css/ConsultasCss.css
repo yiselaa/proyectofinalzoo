@@ -1,19 +1,12 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : 15 may 2026, 17:06:04
-    Author     : MINED
-*/
-
 /* ====== ESTILO GENERAL ====== */
 body {
     background: #f4fbf6;
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-/* ====== HEADER VERDE ====== */
+/* ====== HEADER ====== */
 .header {
     background: #1b5e20;
     color: white;
@@ -21,54 +14,63 @@ body {
     text-align: center;
     border-bottom: 4px solid #43a047;
 }
-
 .header h1 {
-    font-size: 30px;
-    font-weight: 800;
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
     letter-spacing: 2px;
     text-transform: uppercase;
-    text-shadow: 0px 2px 5px rgba(0,0,0,0.2);
 }
 
-/* ====== TARJETA CONTENEDORA ====== */
+/* ====== CONTENEDOR ====== */
+.container {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+/* ====== TARJETA ====== */
 .card-clean {
     background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 20px;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #dcdcdc;
 }
 
 /* ====== TABLA ====== */
-table thead {
-    background: #e8f5e9;
+#tablaAnimales {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-table thead th {
-    color: #1b5e20;
-    font-weight: 600;
+/* ESPACIADO CELDAS */
+#tablaAnimales td {
     padding: 12px;
+    vertical-align: middle;
 }
 
-table tbody tr:hover {
-    background: #f1f8e9;
+/* QUITAR LÍNEAS VERTICALES */
+#tablaAnimales td,
+#tablaAnimales th {
+    border-left: none !important;
+    border-right: none !important;
 }
 
-table td {
-    padding: 10px;
+/* HOVER FILAS */
+#tablaAnimales tbody tr:hover td {
+    background-color: #f1f8e9 !important;
 }
 
-/* ====== BOTÓN VOLVER ====== */
+/* ====== BOTÓN ====== */
 .btn-back {
     background: #43a047;
     color: white;
-    border-radius: 20px;
-    padding: 6px 18px;
+    padding: 10px 20px;
+    border-radius: 25px;
     text-decoration: none;
-    transition: 0.2s;
+    font-weight: bold;
+    transition: 0.3s;
     display: inline-block;
 }
-
 .btn-back:hover {
     background: #2e7d32;
     color: white;
@@ -76,18 +78,92 @@ table td {
 
 /* ====== DATATABLES ====== */
 .dataTables_wrapper {
-    padding: 15px;
+    padding-top: 10px;
 }
 
+/* INPUTS */
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
-    border-radius: 6px;
     border: 1px solid #c8e6c9;
-    padding: 5px 8px;
+    border-radius: 6px;
+    padding: 5px 10px;
 }
 
-/* ====== ESPACIADO GENERAL ====== */
-.container {
-    margin-top: 25px;
-    margin-bottom: 25px;
+/* BUSCAR MÁS ANCHO */
+.dataTables_wrapper .dataTables_filter input {
+    width: 250px !important;
 }
+
+/* PAGINACIÓN VERDE */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #1b5e20 !important;
+    background-color: #1b5e20 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+}
+
+/* ====== ENCABEZADO VERDE ====== */
+table.dataTable > thead > tr > th,
+table.dataTable thead th,
+table.dataTable thead td {
+    background-color: #1b5e20 !important;
+    color: white !important;
+    background-image: none !important;
+    border-bottom: none !important;
+}
+
+/* COLUMNAS DE ORDENAMIENTO */
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background-color: #1b5e20 !important;
+    color: white !important;
+}
+
+/* QUITAR LÍNEAS VERTICALES GLOBAL */
+table.dataTable td,
+table.dataTable th {
+    border-left: none !important;
+    border-right: none !important;
+}
+
+/* TRUCO AGREGADO: Oculta el "Buscar:" nativo de Bootstrap y pone "Buscar " */
+.dataTables_filter label {
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+.dataTables_filter label::before {
+    content: "Buscar ";
+    color: #212529 !important;
+    font-size: 1rem !important;
+    margin-right: 5px;
+}
+
+.dataTables_filter label input {
+    color: initial !important;
+    font-size: 1rem !important;
+    display: inline-block !important;
+}
+
+/* PAGINACIÓN VERDE CONFIGURADA PARA BOOTSTRAP 5 */
+.dataTables_wrapper .pagination .page-item.active .page-link {
+    background-color: #43a047 !important; /* Verde claro como el botón de regresar */
+    border-color: #43a047 !important;     /* Borde del mismo verde */
+    color: white !important;              /* Texto blanco */
+}
+
+/* Color verde oscuro cuando pasas el mouse por encima de los otros números */
+.dataTables_wrapper .pagination .page-link:hover {
+    color: #1b5e20 !important;
+    background-color: #e8f5e9 !important; /* Un fondo verde muy sutil */
+}
+
+/* Color gris/verde para los números que no están seleccionados */
+.dataTables_wrapper .pagination .page-link {
+    color: #43a047 !important;
+    box-shadow: none !important; /* Quita el molesto destello azul de Bootstrap al hacer clic */
+}
+

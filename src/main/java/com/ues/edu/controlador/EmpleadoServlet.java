@@ -134,7 +134,7 @@ public class EmpleadoServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-            response.setContentType("application/json"); // ← agrega esta línea
+            response.setContentType("application/json");
 
 
         Empleado empleado = gson.fromJson(request.getReader(), Empleado.class);
@@ -166,7 +166,7 @@ public class EmpleadoServlet extends HttpServlet {
         response.getWriter().write("{\"mensaje\":\"Empleado eliminado\"}");
     }
 
-    // 🔥 VALIDACIÓN
+    // VALIDACIÓN
     private String validarEmpleado(Empleado e) {
 
         if (e == null) {

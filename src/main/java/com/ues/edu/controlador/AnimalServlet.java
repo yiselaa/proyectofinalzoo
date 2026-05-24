@@ -26,21 +26,17 @@ public class AnimalServlet extends HttpServlet {
     
      private AnimalService animalService = new AnimalService();
 
-  private Gson gson = new GsonBuilder()
+ private Gson gson = new GsonBuilder()
+    .setDateFormat("yyyy-MM-dd")
     .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
     .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
-
         @Override
-        public boolean shouldSkipField(
-                com.google.gson.FieldAttributes f) {
-
+        public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
             return f.getName().equals("cuidadores")
                 || f.getName().equals("listaAnimales");
         }
-
         @Override
         public boolean shouldSkipClass(Class<?> clazz) {
-
             return false;
         }
     })
