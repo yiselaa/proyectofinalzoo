@@ -6,9 +6,6 @@
 /* * HistorialMedico.js
  */
 
-/* * HistorialMedico.js
- */
-
 console.log("JS HISTORIAL MÉDICO CARGADO");
 
 let paginaActual = 1;
@@ -135,7 +132,7 @@ function mostrarHistoriales(lista) {
                 <td>${h.diagnostico}</td>
                 <td>${h.treatment || h.tratamiento}</td>
                 <td>${nombreAnimal || "Sin animal"}</td>
-                <td><strong>${especieReal}</strong></td>
+                <td>${especieReal}</td>
                 <td>${h.veterinario ? h.veterinario.nombre + ' ' + h.veterinario.apellido : "Sin veterinario"}</td>
                 <td class="acciones">
                     <button class="btnEditar" onclick="editarHistorial(${h.id})">

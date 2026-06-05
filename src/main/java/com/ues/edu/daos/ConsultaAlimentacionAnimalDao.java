@@ -33,7 +33,7 @@ public class ConsultaAlimentacionAnimalDao {
 
             String sql =
                     "SELECT " +
-                    "a.nombre_animal AS col0, " +
+                    "a.especie AS col0, " +
                     "al.tipo_alimento AS col1, " +
                     "al.cantidad AS col2, " +
                     "al.horario AS col3 " +
@@ -43,7 +43,7 @@ public class ConsultaAlimentacionAnimalDao {
 
             if (filtro != null && !filtro.trim().isEmpty()) {
 
-                sql += " AND (LOWER(a.nombre_animal) LIKE LOWER(:filtro) " +
+                sql += " AND (LOWER(a.especie) LIKE LOWER(:filtro) " +
                        " OR LOWER(al.tipo_alimento) LIKE LOWER(:filtro)) ";
             }
 
