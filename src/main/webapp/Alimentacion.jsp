@@ -50,10 +50,10 @@
 
             .header{
                 background:linear-gradient(
-                        90deg,
-                        var(--verde-oscuro),
-                        var(--verde-medio)
-                        );
+                    90deg,
+                    var(--verde-oscuro),
+                    var(--verde-medio)
+                    );
                 color:white;
                 padding:35px;
                 text-align:center;
@@ -244,15 +244,18 @@
                         </div>
 
                         <div class="campo">
-
                             <label>Cantidad</label>
-
-                            <input type="number"
-                                   step="0.01"
-                                   id="cantidad"
-                                   placeholder="Ingrese cantidad"
-                                   required>
-
+                            <div style="display: flex; width: 100%;">
+                                <input type="number"
+                                       step="0.01"
+                                       id="cantidad"
+                                       placeholder="Ingrese cantidad"
+                                       required
+                                       style="border-radius: 12px 0 0 12px; border-right: none; flex: 1;">
+                                <span style="display: flex; align-items: center; padding: 0 15px; background: var(--verde-suave); border: 2px solid #cce3de; border-left: none; border-radius: 0 12px 12px 0; color: var(--verde-oscuro); font-weight: bold; font-size: 15px;">
+                                    kg
+                                </span>
+                            </div>
                         </div>
 
                         <div class="campo">
@@ -304,7 +307,7 @@
 
                             <th>Horario</th>
 
-                            <th>Cantidad</th>
+                            <th>Cantidad (kg)</th>
 
                             <th>Animal</th>
 
@@ -324,7 +327,7 @@
 
         </div>
 
-        <script src="${pageContext.request.contextPath}/js/Alimentacion.js"></script>
+        <script src="${pageContext.request.contextPath}/js/Alimentacion.js?v=1.1"></script>
 
     </body>
 

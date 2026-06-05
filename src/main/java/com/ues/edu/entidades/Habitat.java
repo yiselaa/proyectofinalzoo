@@ -10,9 +10,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,24 +30,31 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "categoria")
+@Table(name = "habitat")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Categoria {
+public class Habitat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotBlank
-    @Column(name = "nombre_categoria", unique = true, nullable = false, length = 70)
-    private String nombre;
+    @Column(name = "tipo_terreno", nullable = false, length = 70)
+    private String tipoTerreno;
 
-    @NotBlank
-    @Column(name = "descripcion", nullable = false, length = 70)
-    private String descripcion;
+    @NotNull
+    @Column(name = "capacidad", nullable = false)
+    private Integer capacidad;
 
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "habitat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Animal> listaAnimales;
 
+    @ManyToMany
+    @JoinTable(
+            name = "habitat_cuidador",
+            joinColumns = @JoinColumn(name = "idHabitat"),
+            inverseJoinColumns = @JoinColumn(name = "idEmpleado")
+    )
+    private List<Empleado> cuidadores;
 }

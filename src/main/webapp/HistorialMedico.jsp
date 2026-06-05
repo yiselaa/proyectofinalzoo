@@ -11,7 +11,6 @@
         <title>Gestión de Historial Médico</title>
 
         <style>
-            /* Reutilizamos la misma paleta y estilos de empleados */
             :root{
                 --verde-oscuro:#1b4332;
                 --verde-medio:#2d6a4f;
@@ -87,7 +86,7 @@
                 font-size:15px;
                 transition:0.3s;
                 background:#f8fff9;
-                width:100%;
+                width:90%;
             }
 
             .botones{
@@ -197,27 +196,27 @@
                         <div class="campo">
                             <label>Animal</label>
                             <select id="idAnimal" required>
-                                <option value="">Seleccione un animal</option>
+                                <option value="">Seleccione un animal...</option>
                             </select>
                         </div>
 
-                        <div class="campo">
-                            <label>Veterinario</label>
-                            <select id="idVeterinario" required>
-                                <option value="">Seleccione un veterinario</option>
-                            </select>
-                        </div>
-
-                        <div class="botones">
-                            <button type="submit" class="guardar">Guardar Historial</button>
-                            <button type="button" class="cancelar" onclick="limpiarFormularioHistorial()">Cancelar</button>
-                        </div>
+                    <div class="campo">
+                        <label>Veterinario</label>
+                        <select id="idVeterinario" required>
+                            <option value="">Seleccione un veterinario</option>
+                        </select>
                     </div>
 
+                    <div class="botones">
+                        <button type="submit" class="guardar">Guardar</button>
+                        <button type="button" class="cancelar" onclick="limpiarFormularioHistorial()">Cancelar</button>
+                    </div>
             </div>
         </form>
 
-        <table id="tablaHistoriales">
+        <br><br>
+
+        <table>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -225,16 +224,18 @@
                     <th>Diagnóstico</th>
                     <th>Tratamiento</th>
                     <th>Animal</th>
+                    <th>Especie</th>
                     <th>Veterinario</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody id="tbodyHistoriales"></tbody>
+            <tbody id="tbodyHistoriales">
+            </tbody>
         </table>
     </div>
 </div>
 
+<%-- Opción recomendada y segura en Jakarta EE / Servlets --%>
 <script src="${pageContext.request.contextPath}/js/HistorialMedico.js"></script>
 </body>
 </html>
-
