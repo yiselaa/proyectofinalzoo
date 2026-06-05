@@ -1,0 +1,200 @@
+package com.ues.edu.controlador;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.ues.edu.entidades.DetalleVisita;
+import com.ues.edu.entidades.Ticket;
+import com.ues.edu.entidades.Usuario;
+import com.ues.edu.service.DetalleVisitaService;
+import com.ues.edu.service.TicketService;
+import com.ues.edu.util.LocalDateAdapter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+
+@WebServlet(name = "DetalleVisitaServlet", urlPatterns = {"/DetalleVisitaServlet"})
+public class DetalleVisitaServlet extends HttpServlet {
+
+    DetalleVisitaService service = new DetalleVisitaService();
+    TicketService ticketService = new TicketService();
+
+    private Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+            .create();
+
+    // =========================
+    // GET
+    // =========================
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        String idParam = request.getParameter("id");
+
+        if (idParam != null && !idParam.isEmpty()) {
+
+            int id = Integer.parseInt(idParam);
+            DetalleVisita detalleVisita = service.buscarDetalleVisita(id);
+
+            if (detalleVisita == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"error\":\"Registro no encontrado\"}");
+                return;
+            }
+
+            response.getWriter().write(gson.toJson(detalleVisita));
+            return;
+        }
+
+        List<DetalleVisita> lista = service.listarDetalleVisita();
+        response.getWriter().write(gson.toJson(lista));
+    }
+
+    // =========================
+    // POST
+    // =========================
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+
+        DetalleVisita detalleVisita = gson.fromJson(request.getReader(), DetalleVisita.class);
+
+        // Buscar el ticket real por tipo para tener precio e id
+        if (detalleVisita.getTicket() != null
+                && detalleVisita.getTicket().getTipo() != null) {
+
+            Ticket ticketReal = ticketService.buscarPorTipo(
+                    detalleVisita.getTicket().getTipo()
+            );
+
+            if (ticketReal == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Ticket no encontrado\"}");
+                return;
+            }
+
+            detalleVisita.setTicket(ticketReal);
+
+            // Recalcular subtotal con precio real
+            detalleVisita.setSubtotal(
+                    detalleVisita.getCantidad() * ticketReal.getPrecio()
+            );
+        }
+
+        String error = validarDetalleVisita(detalleVisita);
+
+        if (error != null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"error\":\"" + error + "\"}");
+            return;
+        }
+        // Usuario que inició sesión
+        Usuario usuarioLogueado
+                = (Usuario) request.getSession().getAttribute("usuario");
+
+detalleVisita.setEmpleado(usuarioLogueado.getEmpleado());
+service.guardarDetalleVisita(detalleVisita);
+        response.getWriter().write("{\"mensaje\":\"Visita guardada\"}");
+    }
+
+    // =========================
+    // PUT
+    // =========================
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+
+        try {
+            DetalleVisita detalleVisita = gson.fromJson(request.getReader(), DetalleVisita.class);
+
+            if (detalleVisita.getTicket() != null
+                    && detalleVisita.getTicket().getTipo() != null) {
+
+                Ticket ticketReal = ticketService.buscarPorTipo(
+                        detalleVisita.getTicket().getTipo()
+                );
+
+                if (ticketReal == null) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\":\"Ticket no encontrado\"}");
+                    return;
+                }
+
+                detalleVisita.setTicket(ticketReal);
+                detalleVisita.setSubtotal(
+                        detalleVisita.getCantidad() * ticketReal.getPrecio()
+                );
+            }
+
+            String error = validarDetalleVisita(detalleVisita);
+            if (error != null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"" + error + "\"}");
+                return;
+            }
+
+            service.actualizar(detalleVisita);
+            response.getWriter().write("{\"mensaje\":\"Visita actualizada\"}");
+
+        } catch (Exception e) {
+            // ✅ Devuelve JSON en lugar de HTML cuando hay error
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            e.printStackTrace();
+        }
+    }
+
+    // =========================
+    // DELETE
+    // =========================
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        service.EliminarDetalleVisita(id);
+        response.getWriter().write("{\"mensaje\":\"Eliminado\"}");
+    }
+
+    // =========================
+    // VALIDAR
+    // =========================
+    private String validarDetalleVisita(DetalleVisita d) {
+
+        if (d == null) {
+            return "Datos inválidos";
+        }
+
+        if (d.getNombreVisitante() == null
+                || d.getNombreVisitante().trim().length() < 3) {
+            return "Nombre mínimo 3 caracteres";
+        }
+
+        if (d.getTelefono() == null
+                || !d.getTelefono().matches("\\d{8}")) {
+            return "Teléfono debe tener 8 dígitos";
+        }
+
+        if (d.getCantidad() == null || d.getCantidad() <= 0) {
+            return "Cantidad debe ser mayor que 0";
+        }
+
+        if (d.getTicket() == null) {
+            return "Debe seleccionar un ticket";
+        }
+
+        return null;
+    }
+}

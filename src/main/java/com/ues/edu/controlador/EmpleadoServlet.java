@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+
 ;
 
 /**
@@ -24,24 +25,27 @@ import java.util.List;
  */
 @WebServlet(name = "EmpleadoServlet", urlPatterns = {"/EmpleadoServlet"})
 public class EmpleadoServlet extends HttpServlet {
-    
-     private EmpleadosService empleadoService = new EmpleadosService();
+
+    private EmpleadosService empleadoService = new EmpleadosService();
 
     private Gson gson = new GsonBuilder()
-        .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
-        .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
-                return f.getName().equals("animalesAsignados")
-                    || f.getName().equals("cuidadores")
-                    || f.getName().equals("historiales")
-                    || f.getName().equals("usuario")
-                    || f.getName().equals("listaAnimales");
-            }
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) { return false; }
-        })
-        .create();
+            .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
+            .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
+                    return f.getName().equals("animalesAsignados")
+                            || f.getName().equals("cuidadores")
+                            || f.getName().equals("historiales")
+                            || f.getName().equals("usuario")
+                            || f.getName().equals("listaAnimales");
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> clazz) {
+                    return false;
+                }
+            })
+            .create();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -60,7 +64,7 @@ public class EmpleadoServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet EmpleadoServlet</title>");            
+            out.println("<title>Servlet EmpleadoServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet EmpleadoServlet at " + request.getContextPath() + "</h1>");
@@ -78,8 +82,6 @@ public class EmpleadoServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-  
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -89,7 +91,7 @@ public class EmpleadoServlet extends HttpServlet {
         // 🔥 BUSCAR POR ID
         if (idParam != null && !idParam.isEmpty()) {
 
-            long id = Long.parseLong(idParam);
+            int id = Integer.parseInt(idParam);
             Empleado empleado = empleadoService.buscarEmpleado(id);
 
             if (empleado == null) {
@@ -114,28 +116,53 @@ public class EmpleadoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        Empleado empleado = gson.fromJson(request.getReader(), Empleado.class);
-
-        String error = validarEmpleado(empleado);
-
-        if (error != null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\":\"" + error + "\"}");
-            return;
-        }
-
-        empleadoService.crearEmpleado(empleado);
-
         response.setContentType("application/json");
-        response.getWriter().write("{\"mensaje\":\"Empleado guardado\"}");
+
+        try {
+
+            Empleado empleado
+                    = gson.fromJson(request.getReader(), Empleado.class);
+
+            String error = validarEmpleado(empleado);
+
+            if (error != null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(
+                        "{\"error\":\"" + error + "\"}"
+                );
+                return;
+            }
+
+            empleadoService.crearEmpleado(empleado);
+
+            response.getWriter().write(
+                    "{\"mensaje\":\"Empleado guardado correctamente\"}"
+            );
+
+        } catch (RuntimeException e) {
+
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            response.getWriter().write(
+                    "{\"error\":\"" + e.getMessage() + "\"}"
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            response.getWriter().write(
+                    "{\"error\":\"Error interno del servidor\"}"
+            );
+        }
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-            response.setContentType("application/json");
-
+        response.setContentType("application/json");
 
         Empleado empleado = gson.fromJson(request.getReader(), Empleado.class);
 
@@ -155,15 +182,32 @@ public class EmpleadoServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-
-        long id = Long.parseLong(request.getParameter("id"));
-
-        empleadoService.eliminarEmpleado(id);
+    protected void doDelete(HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
 
         response.setContentType("application/json");
-        response.getWriter().write("{\"mensaje\":\"Empleado eliminado\"}");
+
+        try {
+
+            int id = Integer.parseInt(request.getParameter("id"));
+
+            empleadoService.eliminarEmpleado(id);
+
+            response.getWriter().write(
+                    "{\"mensaje\":\"Empleado eliminado correctamente\"}"
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            response.getWriter().write(
+                    "{\"error\":\"" + e.getMessage() + "\"}"
+            );
+        }
     }
 
     // VALIDACIÓN
@@ -173,7 +217,7 @@ public class EmpleadoServlet extends HttpServlet {
             return "Empleado inválido";
         }
 
-        if (e.getNombre()== null || e.getNombre().trim().length() < 3) {
+        if (e.getNombre() == null || e.getNombre().trim().length() < 3) {
             return "Nombre mínimo 3 caracteres";
         }
 
@@ -181,8 +225,10 @@ public class EmpleadoServlet extends HttpServlet {
             return "Apellido mínimo 3 caracteres";
         }
 
-        if (e.getDui()== null || e.getDui().trim().length() < 9) {
-            return "DUI inválido";
+        if (e.getDui() == null
+                || !e.getDui().matches("^\\d{8}-\\d$")) {
+
+            return "El DUI debe tener el formato ########-#";
         }
 
         return null;

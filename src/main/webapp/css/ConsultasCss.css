@@ -1,25 +1,43 @@
-/* ====== ESTILO GENERAL ====== */
-body {
-    background: #f4fbf6;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+/* ==========================================================================
+   PALETA UNIFICADA (Inspirada en image_10b3d7.png)
+   ========================================================================== */
+:root {
+    --fondo-general: #F1FAEE;   /* Blanco Menta Base */
+    --texto-oscuro: #081C15;    /* Verde Profundo Absoluto */
+    --color-consultas: #143629; /* Verde Bosque Alto */
+    --color-crud: #22523D;      /* Verde Medio */
+    --color-reportes: #2D6A4F;  /* Verde Esmeralda Bajito */
+    --blanco-puro: #ffffff;
 }
 
-/* ====== HEADER ====== */
+/* ====== ESTILO GENERAL ====== */
+body {
+    background: var(--fondo-general);
+    font-family: 'DM Sans', sans-serif; /* Tipografía unificada del ecosistema */
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ====== HEADER (Hace juego con el menú principal) ====== */
 .header {
-    background: #1b5e20;
-    color: white;
+    background: linear-gradient(135deg, #081C15 0%, #1B4332 60%, #2D6A4F 100%);
+    color: var(--fondo-general);
     padding: 25px;
     text-align: center;
-    border-bottom: 4px solid #43a047;
+    box-shadow: 0 4px 15px rgba(8, 28, 21, 0.12);
 }
 .header h1 {
     margin: 0;
     font-size: 32px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    font-weight: 800; /* Extra bold para verse imponente */
+    letter-spacing: -0.5px;
+}
+
+.header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    opacity: 0.8;
 }
 
 /* ====== CONTENEDOR ====== */
@@ -28,15 +46,16 @@ body {
     margin-bottom: 30px;
 }
 
-/* ====== TARJETA ====== */
+/* ====== TARJETA LIMPIA ====== */
 .card-clean {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid #dcdcdc;
+    background: var(--blanco-puro);
+    border-radius: 20px; /* Bordes suaves modernos */
+    padding: 24px;
+    border: 1px solid rgba(27, 67, 50, 0.08);
+    box-shadow: 0 4px 16px rgba(8, 28, 21, 0.03);
 }
 
-/* ====== TABLA ====== */
+/* ====== TABLA PERSONALIZADA ====== */
 #tablaAnimales {
     width: 100%;
     border-collapse: collapse;
@@ -44,8 +63,10 @@ body {
 
 /* ESPACIADO CELDAS */
 #tablaAnimales td {
-    padding: 12px;
+    padding: 14px;
     vertical-align: middle;
+    color: #2b3a34;
+    font-size: 15px;
 }
 
 /* QUITAR LÍNEAS VERTICALES */
@@ -53,27 +74,34 @@ body {
 #tablaAnimales th {
     border-left: none !important;
     border-right: none !important;
+    border-bottom: 1px solid rgba(27, 67, 50, 0.06);
 }
 
-/* HOVER FILAS */
+/* HOVER FILAS (Sutil verde claro al pasar el cursor) */
 #tablaAnimales tbody tr:hover td {
-    background-color: #f1f8e9 !important;
+    background-color: rgba(45, 106, 79, 0.05) !important;
+    transition: background-color 0.2s ease;
 }
 
-/* ====== BOTÓN ====== */
+/* ====== BOTÓN REGRESAR GHOST ELEGANTE ====== */
 .btn-back {
-    background: #43a047;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--color-crud);
+    color: var(--color-consultas);
+    padding: 10px 22px;
+    border-radius: 10px;
     text-decoration: none;
-    font-weight: bold;
-    transition: 0.3s;
-    display: inline-block;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.25s ease;
 }
 .btn-back:hover {
-    background: #2e7d32;
-    color: white;
+    background: rgba(34, 82, 61, 0.08);
+    color: var(--texto-oscuro);
+    transform: translateX(-3px); /* Pequeño empuje dinámico hacia la izquierda */
 }
 
 /* ====== DATATABLES ====== */
@@ -81,45 +109,49 @@ body {
     padding-top: 10px;
 }
 
-/* INPUTS */
+/* INPUTS DE BÚSQUEDA Y SELECCIÓN */
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
-    border: 1px solid #c8e6c9;
-    border-radius: 6px;
-    padding: 5px 10px;
+    border: 1px solid rgba(34, 82, 61, 0.25);
+    border-radius: 8px;
+    padding: 6px 12px;
+    background-color: #fbfdfb;
+    outline: none;
+    transition: 0.2s;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus,
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: var(--color-reportes);
+    box-shadow: 0 0 8px rgba(45, 106, 79, 0.15);
 }
 
 /* BUSCAR MÁS ANCHO */
 .dataTables_wrapper .dataTables_filter input {
-    width: 250px !important;
+    width: 260px !important;
 }
 
-/* PAGINACIÓN VERDE */
-.dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-    background: #1b5e20 !important;
-    background-color: #1b5e20 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 4px !important;
-}
-
-/* ====== ENCABEZADO VERDE ====== */
+/* ====== ENCABEZADO DE TABLA VERDE BOSQUE ====== */
 table.dataTable > thead > tr > th,
 table.dataTable thead th,
 table.dataTable thead td {
-    background-color: #1b5e20 !important;
-    color: white !important;
+    background-color: var(--color-consultas) !important; /* Mismo color alto del menú */
+    color: var(--blanco-puro) !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    padding: 16px !important;
     background-image: none !important;
     border-bottom: none !important;
 }
 
-/* COLUMNAS DE ORDENAMIENTO */
+/* COLUMNAS DE ORDENAMIENTO DE DATATABLES */
 table.dataTable thead .sorting,
 table.dataTable thead .sorting_asc,
 table.dataTable thead .sorting_desc {
-    background-color: #1b5e20 !important;
-    color: white !important;
+    background-color: var(--color-consultas) !important;
+    color: var(--blanco-puro) !important;
 }
 
 /* QUITAR LÍNEAS VERTICALES GLOBAL */
@@ -129,41 +161,44 @@ table.dataTable th {
     border-right: none !important;
 }
 
-/* TRUCO AGREGADO: Oculta el "Buscar:" nativo de Bootstrap y pone "Buscar " */
+/* TRUCO: Oculta el "Buscar:" nativo de Bootstrap y pone "Buscar " */
 .dataTables_filter label {
     color: transparent !important;
     font-size: 0 !important;
+    font-weight: 700;
 }
 
 .dataTables_filter label::before {
     content: "Buscar ";
-    color: #212529 !important;
-    font-size: 1rem !important;
-    margin-right: 5px;
+    color: var(--color-consultas) !important;
+    font-size: 14px !important;
+    margin-right: 8px;
 }
 
 .dataTables_filter label input {
     color: initial !important;
-    font-size: 1rem !important;
+    font-size: 14px !important;
     display: inline-block !important;
 }
 
-/* PAGINACIÓN VERDE CONFIGURADA PARA BOOTSTRAP 5 */
+/* PAGINACIÓN CONFIGURADA PARA BOOTSTRAP 5 */
 .dataTables_wrapper .pagination .page-item.active .page-link {
-    background-color: #43a047 !important; /* Verde claro como el botón de regresar */
-    border-color: #43a047 !important;     /* Borde del mismo verde */
-    color: white !important;              /* Texto blanco */
+    background-color: var(--color-crud) !important; /* Color de transición elegante */
+    border-color: var(--color-crud) !important;
+    color: var(--blanco-puro) !important;
+    font-weight: 700;
 }
 
-/* Color verde oscuro cuando pasas el mouse por encima de los otros números */
+/* Color verde al pasar el mouse por encima de los otros números */
 .dataTables_wrapper .pagination .page-link:hover {
-    color: #1b5e20 !important;
-    background-color: #e8f5e9 !important; /* Un fondo verde muy sutil */
+    color: var(--texto-oscuro) !important;
+    background-color: rgba(34, 82, 61, 0.08) !important;
 }
 
-/* Color gris/verde para los números que no están seleccionados */
+/* Color para los números que no están seleccionados */
 .dataTables_wrapper .pagination .page-link {
-    color: #43a047 !important;
-    box-shadow: none !important; /* Quita el molesto destello azul de Bootstrap al hacer clic */
+    color: var(--color-reportes) !important;
+    font-weight: 500;
+    border: 1px solid rgba(45, 106, 79, 0.15);
+    box-shadow: none !important; /* Elimina el foco azul por defecto de Bootstrap */
 }
-

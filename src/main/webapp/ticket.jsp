@@ -8,129 +8,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gestión de Tickets</title>
-
-    <script src="js/tickets.js" defer></script>
-
-    <style>
-
-        :root{
-            --verdeOscuro:#1b4332;
-            --verdeMedio:#2d6a4f;
-            --verdeClaro:#52b788;
-            --verdeSuave:#d8f3dc;
-            --blanco:#ffffff;
-            --rojo:#d62828;
-        }
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
-
-        body{
-            font-family:Arial, Helvetica, sans-serif;
-            background:linear-gradient(135deg,#d8f3dc,#95d5b2);
-            padding:40px;
-        }
-
-        .contenedor{
-            max-width:1200px;
-            margin:auto;
-            background:white;
-            border-radius:20px;
-            overflow:hidden;
-            box-shadow:0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        .header{
-            background:linear-gradient(90deg,var(--verdeOscuro),var(--verdeMedio));
-            color:white;
-            text-align:center;
-            padding:30px;
-        }
-
-        .contenido{
-            padding:30px;
-        }
-
-        .formulario{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-            gap:20px;
-            margin-bottom:35px;
-        }
-
-        .campo{
-            display:flex;
-            flex-direction:column;
-        }
-
-        .campo label{
-            margin-bottom:8px;
-            font-weight:bold;
-            color:var(--verdeOscuro);
-        }
-
-        .campo input,
-        .campo select{
-            padding:13px;
-            border:2px solid #cce3de;
-            border-radius:10px;
-            background:#f8fff9;
-        }
-
-        .campo input:focus,
-        .campo select:focus{
-            outline:none;
-            border-color:var(--verdeClaro);
-        }
-
-        .botones{
-            grid-column:1/-1;
-            display:flex;
-            gap:15px;
-        }
-
-        button{
-            padding:12px 18px;
-            border:none;
-            border-radius:10px;
-            cursor:pointer;
-            font-weight:bold;
-        }
-
-        .guardar{
-            background:var(--verdeMedio);
-            color:white;
-        }
-
-        .cancelar{
-            background:#b7e4c7;
-        }
-
-        table{
-            width:100%;
-            border-collapse:collapse;
-        }
-
-        thead{
-            background:var(--verdeMedio);
-            color:white;
-        }
-
-        th,td{
-            padding:15px;
-            text-align:center;
-            border-bottom:1px solid #ddd;
-        }
-
-        tbody tr:nth-child(even){
-            background:var(--verdeSuave);
-        }
-
-    </style>
+    <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WILD ZOO MK - Gestión de Tickets</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/Crud.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
 </head>
 
@@ -169,14 +51,6 @@
                            required>
                 </div>
 
-                <div class="campo">
-                    <label>Estado</label>
-
-                    <select id="estado">
-                        <option value="Disponible">Disponible</option>
-                        <option value="No Disponible">No Disponible</option>
-                    </select>
-                </div>
 
                 <div class="botones">
 
@@ -213,10 +87,18 @@
             </tbody>
 
         </table>
+        
+        <div style="margin-top: 24px; text-align: right;">
+                    <a href="index.html" class="btn-back">
+                        <i class="ti ti-arrow-left"></i> 
+                    </a>
+                </div>
 
     </div>
 
 </div>
-
-</body>
+    <!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="${pageContext.request.contextPath}/js/Ticket.js"></script>
+    </body>
 </html>

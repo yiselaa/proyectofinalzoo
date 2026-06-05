@@ -1,0 +1,198 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 2 jun 2026, 21:19:26
+    Author     : MINED
+*/
+/* ===============================
+   SECCIÓN DE TICKETS
+   =============================== */
+.tickets-section {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #f9fafb;
+    margin-bottom: 1rem;
+}
+
+.tickets-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+/* ===============================
+   FILA DE AGREGAR TICKET
+   =============================== */
+.tickets-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.tickets-row .campo {
+    flex: 1;
+    min-width: 140px;
+    margin-bottom: 0;
+}
+
+.btn-agregar {
+    background: #2d4a3e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    height: 38px;
+    white-space: nowrap;
+    align-self: flex-end;
+}
+
+.btn-agregar:hover {
+    background: #3a6050;
+}
+
+/* ===============================
+   LISTA DE TICKETS AGREGADOS
+   =============================== */
+.ticket-lista {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ticket-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.ticket-item-left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* ===============================
+   BADGES
+   =============================== */
+.badge-verde{
+    background:#d1fae5;
+    color:#065f46;
+}
+
+.badge-azul{
+    background:#dbeafe;
+    color:#1e40af;
+}
+
+.badge-amarillo{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.badge-morado{
+    background:#ede9fe;
+    color:#6d28d9;
+}
+
+.badge-rosa{
+    background:#fce7f3;
+    color:#be185d;
+}
+.badge{
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ===============================
+   BOTÓN QUITAR TICKET
+   =============================== */
+.btn-quitar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.btn-quitar:hover {
+    color: #e24b4a;
+}
+
+/* ===============================
+   FILA TOTAL
+   =============================== */
+.total-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px 0;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 8px;
+}
+
+.total-fila span:first-child {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.total-fila span:last-child {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d4a3e;
+}
+
+/* ===============================
+   ERROR TICKET
+   =============================== */
+.error-ticket {
+    color: #e24b4a;
+    font-size: 12px;
+    margin-top: 6px;
+    display: none;
+}
+
+    .swal2-popup {
+        font-size: 13px !important;
+        width: 300px !important;
+        padding: 20px !important;
+    }
+
+    .swal2-title {
+        font-size: 16px !important;
+    }
+
+    .swal2-html-container {
+        font-size: 13px !important;
+    }
+
+    .swal2-confirm, .swal2-cancel {
+        font-size: 13px !important;
+        padding: 8px 16px !important;
+    }
+
+    .swal2-icon {
+        width: 45px !important;
+        height: 45px !important;
+        margin: 10px auto !important;
+    }
+
+    .swal2-icon .swal2-icon-content {
+        font-size: 28px !important;
+    }

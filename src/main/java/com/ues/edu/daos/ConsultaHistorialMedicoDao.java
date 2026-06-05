@@ -6,7 +6,6 @@ package com.ues.edu.daos;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
 import java.util.List;
 
@@ -16,8 +15,8 @@ import java.util.List;
  */
 public class ConsultaHistorialMedicoDao {
  
-private EntityManagerFactory emf
-            = Persistence.createEntityManagerFactory("profinalPU");
+private EntityManagerFactory emf = JPAUtil.getEMF();
+
 
     public List<Object[]> buscarFiltro(String filtro) {
 
