@@ -48,8 +48,7 @@ public class Alimentacion {
     @Column(name = "cantidad", nullable = false)
     private double cantidad;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "idanimal")
     private Animal animal;
-
 }

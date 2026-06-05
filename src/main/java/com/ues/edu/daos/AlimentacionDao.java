@@ -5,6 +5,7 @@
 package com.ues.edu.daos;
 
 import com.ues.edu.entidades.Alimentacion;
+import com.ues.edu.entidades.Animal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -26,13 +27,33 @@ public class AlimentacionDao {
 
         EntityManager em = emf.createEntityManager();
 
-        em.getTransaction().begin();
+        try {
 
-        em.persist(alimentacion);
+            em.getTransaction().begin();
 
-        em.getTransaction().commit();
+            // 🔥 BUSCAR EL ANIMAL REAL EN LA BD
+            Animal animal = em.find(
+                    Animal.class,
+                    alimentacion.getAnimal().getId()
+            );
 
-        em.close();
+            // 🔥 ASIGNAR EL ANIMAL ADMINISTRADO
+            alimentacion.setAnimal(animal);
+
+            em.persist(alimentacion);
+
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+
+            em.getTransaction().rollback();
+
+            e.printStackTrace();
+
+        } finally {
+
+            em.close();
+        }
     }
 
     // ==========================
@@ -42,29 +63,45 @@ public class AlimentacionDao {
 
         EntityManager em = emf.createEntityManager();
 
-        em.getTransaction().begin();
+        try {
 
-        Alimentacion existente =
-                em.find(Alimentacion.class, alimentacion.getId());
+            em.getTransaction().begin();
 
-        if (existente != null) {
+            Alimentacion existente =
+                    em.find(Alimentacion.class,
+                            alimentacion.getId());
 
-            existente.setTipoAlimento(
-                    alimentacion.getTipoAlimento());
+            if (existente != null) {
 
-            existente.setHorario(
-                    alimentacion.getHorario());
+                Animal animal = em.find(
+                        Animal.class,
+                        alimentacion.getAnimal().getId()
+                );
 
-            existente.setCantidad(
-                    alimentacion.getCantidad());
+                existente.setTipoAlimento(
+                        alimentacion.getTipoAlimento());
 
-            existente.setAnimal(
-                    alimentacion.getAnimal());
+                existente.setHorario(
+                        alimentacion.getHorario());
+
+                existente.setCantidad(
+                        alimentacion.getCantidad());
+
+                existente.setAnimal(animal);
+            }
+
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+
+            em.getTransaction().rollback();
+
+            e.printStackTrace();
+
+        } finally {
+
+            em.close();
         }
-
-        em.getTransaction().commit();
-
-        em.close();
     }
 
     // ==========================
@@ -74,18 +111,29 @@ public class AlimentacionDao {
 
         EntityManager em = emf.createEntityManager();
 
-        em.getTransaction().begin();
+        try {
 
-        Alimentacion a =
-                em.find(Alimentacion.class, id);
+            em.getTransaction().begin();
 
-        if (a != null) {
-            em.remove(a);
+            Alimentacion a =
+                    em.find(Alimentacion.class, id);
+
+            if (a != null) {
+                em.remove(a);
+            }
+
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+
+            em.getTransaction().rollback();
+
+            e.printStackTrace();
+
+        } finally {
+
+            em.close();
         }
-
-        em.getTransaction().commit();
-
-        em.close();
     }
 
     // ==========================

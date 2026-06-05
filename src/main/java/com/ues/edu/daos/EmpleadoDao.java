@@ -82,6 +82,21 @@ public void actualizar(Empleado empleado) {
 
         return lista;
     }
+    
+    public List<Empleado> obtenerSoloVeterinarios() {
+        EntityManager em = emf.createEntityManager(); 
+        try {
+            return em.createQuery("SELECT e FROM Empleado e WHERE e.rol = 'Veterinario'", Empleado.class)
+                     .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
+    }
 
     public Empleado buscarPorId(long id) {
 

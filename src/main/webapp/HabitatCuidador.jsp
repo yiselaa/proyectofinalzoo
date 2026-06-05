@@ -1,6 +1,6 @@
 <%-- 
-    Document   : Categoria
-    Created on : 16 may. 2026, 21:31:56
+    Document   : Cuidador
+    Created on : 31 may. 2026, 16:18:47
     Author     : coc44
 --%>
 
@@ -8,10 +8,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Gestión de Categorías</title>
+        <title>Gestión de Categorías y sus Cuidadores</title>
 
         <style>
-
             :root{
                 --verde-oscuro:#1b4332;
                 --verde-medio:#2d6a4f;
@@ -86,7 +85,7 @@
             }
 
             .campo input,
-            .campo textarea{
+            .campo select{
                 padding:14px;
                 border:2px solid #cce3de;
                 border-radius:12px;
@@ -96,8 +95,14 @@
                 width:100%;
             }
 
+            /* Estilo personalizado para el selector múltiple */
+            .campo select[multiple] {
+                height: 140px;
+                padding: 10px;
+            }
+
             .campo input:focus,
-            .campo textarea:focus{
+            .campo select:focus{
                 outline:none;
                 border-color:var(--verde-claro);
                 box-shadow:0 0 10px rgba(82,183,136,0.4);
@@ -206,7 +211,6 @@
             }
 
             @media(max-width:768px){
-
                 body{
                     padding:15px;
                 }
@@ -223,9 +227,7 @@
                     flex-direction:column;
                 }
             }
-
         </style>
-
     </head>
 
     <body>
@@ -234,39 +236,36 @@
 
             <div class="header">
                 <h1>WILD ZOO MK</h1>
-                <p>Sistema de Gestión de Categorías</p>
+                <p>Sistema de Gestión de Categorías y Cuidadores</p>
             </div>
 
             <div class="contenido">
 
-                <form id="formCategoria">
+                <form id="formCategoriaCuidador">
 
-                    <input type="hidden" id="idCategoria">
+                    <input type="hidden" id="idAsignacionOculta">
 
                     <div class="formulario">
 
                         <div class="campo">
-                            <label>Nombre Categoría</label>
-
-                            <input type="text"
-                                   id="nombreCategoria"
-                                   placeholder="Ingrese categoría"
-                                   required>
+                            <label>Categoria</label>
+                            <select id="idHabitatSelect" required>
+                                <option value="">Cargando habitar...</option>
+                            </select>
                         </div>
 
                         <div class="campo">
-                            <label>Descripción</label>
-
-                            <textarea id="descripcion"
-                                      placeholder="Ingrese descripción"
-                                      required>
-                            </textarea>
+                            <label>Cuidador</label>
+                            
+                            <select id="idEmpleadoSelect" required>
+                                <option value="">Seleccione cuidador...</option>
+                                
+                            </select>
                         </div>
 
                         <div class="botones">
-
                             <button type="submit" class="guardar">
-                                Guardar Categoría
+                                Guardar Asignación
                             </button>
 
                             <button type="button"
@@ -274,35 +273,30 @@
                                     onclick="limpiarFormulario()">
                                 Cancelar
                             </button>
-
                         </div>
 
                     </div>
 
                 </form>
 
-                <table id="tablaCategorias">
-
+                <table id="tablaCategoriaCuidador">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Categoría</th>
-                            <th>Descripción</th>
-                            <th>Acciones</th>
+                            <th style="">ID</th>
+                            <th style="">Habitat </th>
+                            <th style=";">Cuidadores Responsables</th>
+                            <th style="">Acciones</th>
                         </tr>
                     </thead>
 
-                    <tbody id="tbodyCategorias">
-
-                    </tbody>
-
+                    <tbody id="tbodyCategoriaCuidador">
+                        </tbody>
                 </table>
 
             </div>
 
         </div>
 
-<script src="${pageContext.request.contextPath}/js/Categoria.js"></script>
-
+        <script src="${pageContext.request.contextPath}/js/HabitatCuidador.js"></script>
     </body>
 </html>

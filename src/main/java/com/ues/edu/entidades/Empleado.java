@@ -54,7 +54,7 @@ public class Empleado {
     private Usuario usuario;
 
     @ManyToMany(mappedBy = "cuidadores")
-    private transient List<Animal> animalesAsignados;
+    private transient List<Habitat> habitatAsignada;
 
     @OneToMany(mappedBy = "veterinario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HistorialMedico> historiales;

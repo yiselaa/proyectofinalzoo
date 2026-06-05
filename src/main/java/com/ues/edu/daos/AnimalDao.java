@@ -6,7 +6,7 @@ package com.ues.edu.daos;
 
 import com.ues.edu.entidades.Animal;
 import jakarta.persistence.EntityManager;
-import com.ues.edu.entidades.Categoria;
+import com.ues.edu.entidades.Habitat;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
@@ -18,59 +18,40 @@ import java.util.List;
  */
 public class AnimalDao {
     
-private EntityManagerFactory emf =
+    private EntityManagerFactory emf =
             Persistence.createEntityManagerFactory("profinalPU");
 
     // ==========================
     // GUARDAR
     // ==========================
     public void guardar(Animal animal) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
 
-    EntityManager em = emf.createEntityManager();
+        if (animal.getHabitat() != null && animal.getHabitat().getId() != null) {
+            animal.setHabitat(em.find(Habitat.class, animal.getHabitat().getId()));
+        }
 
-    em.getTransaction().begin();
-
-    // 🔥 RE-ATTACH de categoría
-    if (animal.getCategoria() != null
-            && animal.getCategoria().getId() != null) {
-
-        animal.setCategoria(
-                em.find(Categoria.class,
-                        animal.getCategoria().getId())
-        );
+        em.persist(animal);
+        em.getTransaction().commit();
+        em.close();
     }
-
-    em.persist(animal);
-
-    em.getTransaction().commit();
-
-    em.close();
-}
 
     // ==========================
     // ACTUALIZAR
     // ==========================
- public void actualizar(Animal animal) {
+    public void actualizar(Animal animal) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
 
-    EntityManager em = emf.createEntityManager();
+        if (animal.getHabitat() != null && animal.getHabitat().getId() != null) {
+            animal.setHabitat(em.find(Habitat.class, animal.getHabitat().getId()));
+        }
 
-    em.getTransaction().begin();
-
-    if (animal.getCategoria() != null
-            && animal.getCategoria().getId() != null) {
-
-        animal.setCategoria(
-                em.find(Categoria.class,
-                        animal.getCategoria().getId())
-        );
+        em.merge(animal);
+        em.getTransaction().commit();
+        em.close();
     }
-
-    em.merge(animal);
-
-    em.getTransaction().commit();
-
-    em.close();
-}
 
     // ==========================
     // ELIMINAR
@@ -87,24 +68,24 @@ private EntityManagerFactory emf =
     }
 
     // ==========================
-    // LISTAR TODOS (con categoría)
+    // LISTAR TODOS (con hábitat)
     // ==========================
     public List<Animal> listar() {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Animal> query =
-                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.categoria", Animal.class);
+                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.habitat", Animal.class);
         List<Animal> lista = query.getResultList();
         em.close();
         return lista;
     }
 
     // ==========================
-    // BUSCAR POR ID (con categoría)
+    // BUSCAR POR ID (con hábitat)
     // ==========================
     public Animal buscarPorId(int id) {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Animal> query =
-                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.categoria WHERE a.id = :id", Animal.class);
+                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.habitat WHERE a.id = :id", Animal.class);
         query.setParameter("id", id);
         Animal a = null;
         try {
@@ -117,13 +98,13 @@ private EntityManagerFactory emf =
     }
 
     // ==========================
-    // BUSCAR POR NOMBRE (con categoría)
+    // BUSCAR POR NOMBRE (con hábitat)
     // ==========================
     public List<Animal> buscarPorNombre(String nombre) {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Animal> query =
                 em.createQuery(
-                        "SELECT a FROM Animal a JOIN FETCH a.categoria WHERE LOWER(a.nombre) LIKE LOWER(:nombre)",
+                        "SELECT a FROM Animal a JOIN FETCH a.habitat WHERE LOWER(a.nombre) LIKE LOWER(:nombre)",
                         Animal.class
                 );
         query.setParameter("nombre", "%" + nombre + "%");
@@ -133,28 +114,28 @@ private EntityManagerFactory emf =
     }
 
     // ==========================
-    // FILTRAR POR CATEGORÍA
+    // FILTRAR POR HÁBITAT
     // ==========================
-    public List<Animal> filtrarPorCategoria(int idCategoria) {
+    public List<Animal> filtrarPorHabitat(int idHabitat) {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Animal> query =
                 em.createQuery(
-                        "SELECT a FROM Animal a JOIN FETCH a.categoria WHERE a.categoria.id = :idCategoria",
+                        "SELECT a FROM Animal a JOIN FETCH a.habitat WHERE a.habitat.id = :idHabitat",
                         Animal.class
                 );
-        query.setParameter("idCategoria", idCategoria);
+        query.setParameter("idHabitat", idHabitat);
         List<Animal> lista = query.getResultList();
         em.close();
         return lista;
     }
 
     // ==========================
-    // PAGINACIÓN (con categoría)
+    // PAGINACIÓN (con hábitat)
     // ==========================
     public List<Animal> listarPaginado(int pagina, int size) {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Animal> query =
-                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.categoria", Animal.class);
+                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.habitat", Animal.class);
         query.setFirstResult((pagina - 1) * size);
         query.setMaxResults(size);
         List<Animal> lista = query.getResultList();

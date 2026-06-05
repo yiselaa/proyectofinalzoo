@@ -40,4 +40,8 @@ public class EmpleadosService {
     public Empleado buscarEmpleado(long id) {
         return dao.buscarPorId(id);
     }
+    
+    public List<Empleado> obtenerSoloVeterinarios() {
+        return dao.obtenerSoloVeterinarios(); 
+    }
 }
