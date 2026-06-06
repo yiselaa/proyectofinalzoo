@@ -1,0 +1,254 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 28 may 2026, 20:39:43
+    Author     : MINED
+*/
+
+/* ==========================================================================
+   DEGRADADO VISIBLE PERO EQUILIBRADO (Inspirado en image_10b3d7.png)
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #F1FAEE;
+    font-family: 'DM Sans', sans-serif; /* Tipografía unificada para todo el sistema */
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER */
+.zoo-header {
+    background: linear-gradient(135deg, #081C15 0%, #1B4332 60%, #2D6A4F 100%);
+    padding: 28px 36px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(8, 28, 21, 0.15);
+}
+
+.zoo-header::before {
+    content: '🌿';
+    position: absolute;
+    right: 130px;
+    top: -10px;
+    font-size: 90px;
+    opacity: 0.07;
+    pointer-events: none;
+}
+
+.zoo-header::after {
+    content: '🐾';
+    position: absolute;
+    right: 24px;
+    bottom: -14px;
+    font-size: 100px;
+    opacity: 0.06;
+    pointer-events: none;
+}
+
+.zoo-title {
+    font-size: 35px;
+    font-weight: 800; /* Peso extra-bold para el título */
+    color: #F1FAEE;
+    margin: 0 0 2px;
+    letter-spacing: -0.5px;
+}
+
+.zoo-subtitle {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(241, 250, 238, 0.75);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(241, 250, 238, 0.75);
+}
+
+.usuario-info i {
+    font-size: 17px;
+    color: rgba(241, 250, 238, 0.75);
+}
+
+/* BOTON CERRAR SESION */
+.btn-logout {
+    font-weight: 700;
+    background: rgba(241, 250, 238, 0.12);
+    border: 1px solid rgba(241, 250, 238, 0.4);
+    color: #F1FAEE;
+    padding: 9px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: .2s;
+}
+
+.btn-logout:hover {
+    background: #F1FAEE;
+    color: #081C15;
+    border-color: #F1FAEE;
+}
+
+/* CARDS PRINCIPALES */
+.zoo-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 26px 24px 22px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: all .25s ease;
+    box-shadow: 0 4px 16px rgba(8, 28, 21, 0.04);
+    border: 1px solid rgba(27, 67, 50, 0.08);
+}
+
+.zoo-card:hover {
+    box-shadow: 0 12px 28px rgba(8, 28, 21, 0.08);
+    transform: translateY(-4px);
+}
+
+/* ICONOS CONTENEDORES */
+.card-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.iw-consultas { background: rgba(20, 54, 41, 0.1); color: #143629; }
+.iw-crud { background: rgba(34, 82, 61, 0.11); color: #22523D; }
+.iw-reportes { background: rgba(45, 106, 79, 0.12); color: #2D6A4F; }
+
+/* TEXTOS INTERNOS */
+.card-label {
+    font-size: 22px;
+    font-weight: 700; /* Destaca el encabezado del bloque */
+    color: #081C15;
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
+}
+
+.card-desc {
+    font-size: 13px;
+    color: #1B4332;
+    opacity: 0.75;
+    margin: 0 0 16px;
+}
+
+/* SEPARADORES DIVIDER */
+.divider {
+    height: 2px;
+    margin-bottom: 16px;
+    border-radius: 2px;
+}
+.div-consultas { background: #143629; }
+.div-crud { background: #22523D; }
+.div-reportes { background: #2D6A4F; }
+
+/* BOTONES PRINCIPALES (SÓLIDOS) */
+.btn-action-main {
+    font-weight: 700;
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 11px 0;
+    border-radius: 10px;
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 10px;
+    border: none;
+    transition: .2s;
+    cursor: pointer;
+}
+
+.btn-consultas { background: #143629; color: #FFF; }
+.btn-crud { background: #22523D; color: #FFF; }
+.btn-reportes { background: #2D6A4F; color: #FFF; }
+
+.btn-action-main:hover {
+    opacity: 0.9;
+    color: #FFF;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* BOTONES SECUNDARIOS (GHOST) */
+.btn-ghost {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 0;
+    border-radius: 10px;
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 8px;
+    background: transparent;
+    transition: .2s;
+    cursor: pointer;
+}
+
+.gh-consultas { border: 1px solid #143629; color: #143629; }
+.gh-consultas:hover { background: rgba(20, 54, 41, 0.06); color: #081C15; }
+
+.gh-crud { border: 1px solid #22523D; color: #22523D; }
+.gh-crud:hover { background: rgba(34, 82, 61, 0.06); color: #081C15; }
+
+.gh-reportes { border: 1px solid #2D6A4F; color: #2D6A4F; }
+.gh-reportes:hover { background: rgba(45, 106, 79, 0.06); color: #081C15; }
+
+.btn-ghost i {
+    font-size: 15px;
+}
+
+.swal2-popup {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+}
+
+.swal2-toast {
+  padding: 10px 14px !important;
+  gap: 8px !important;
+}
+
+.swal2-toast .swal2-icon {
+  width: 22px !important;
+  height: 22px !important;
+  margin: 0 !important;
+}
+
+.swal2-toast .swal2-title {
+  font-size: 13px !important;
+  margin: 0 !important;
+}
+
+.swal-btn-small {
+  font-size: 13px !important;
+  padding: 6px 16px !important;
+  border-radius: 8px !important;
+}

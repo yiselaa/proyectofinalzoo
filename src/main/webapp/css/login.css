@@ -1,0 +1,202 @@
+/* ==========================================================================
+   1. ALINEACIÓN Y FONDO CON DEGRADADO DE LA PALETA
+   ========================================================================== */
+body {
+    background: linear-gradient(135deg, #081C15 0%, #1B4332 50%, #2D6A4F 100%);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   2. ESTRUCTURA DE LA TARJETA (LOGIN-CARD)
+   ========================================================================== */
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 32px;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    background: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.login-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(34, 82, 61, 0.09);
+    color: #22523D;
+    font-size: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    margin: 0 auto 20px;
+}
+
+.login-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #081C15;
+    margin: 0 0 4px;
+    letter-spacing: -0.5px;
+}
+
+.login-subtitle {
+    font-size: 13px;
+    font-weight: 500;
+    color: #2D6A4F;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* ==========================================================================
+   3. CAMPOS DE ENTRADA (INPUTS)
+   ========================================================================== */
+.login-card .form-label {
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    font-size: 14px;
+    color: #143629;
+    margin-bottom: 8px;
+}
+
+.login-card .form-control {
+    border: 1px solid rgba(34, 82, 61, 0.25);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    background-color: #fbfdfb;
+    color: #081C15;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.login-card .form-control:focus {
+    border-color: #2D6A4F;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(45, 106, 79, 0.15);
+}
+
+.login-card .form-control::placeholder {
+    color: #a0b0a8;
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   4. BOTÓN DE ACCESO PRINCIPAL
+   ========================================================================== */
+.btn-login-submit {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    background-color: #1B4332;
+    color: #ffffff;
+    display: block;
+    width: 100%;
+    padding: 13px 0;
+    border-radius: 12px;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-top: 12px;
+}
+
+.btn-login-submit:hover {
+    background-color: #081C15;
+    box-shadow: 0 6px 16px rgba(8, 28, 21, 0.18);
+    transform: translateY(-1px);
+}
+
+.btn-login-submit:active {
+    transform: translateY(1px);
+}
+
+/* ==========================================================================
+   5. DECORACIONES INFERIORES
+   ========================================================================== */
+.login-divider {
+    height: 1px;
+    background: rgba(27, 67, 50, 0.08);
+    margin: 24px 0;
+}
+
+.login-footer {
+    font-size: 13px;
+    font-weight: 500;
+    color: #2D6A4F;
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* ==========================================================================
+   6. SWEETALERT2 — ESTILOS PERSONALIZADOS
+   ========================================================================== */
+
+/* Popup base (modal pequeño) */
+.swal-mini-popup {
+    border-radius: 14px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+/* Toast (notificación esquina) */
+.swal-toast-mini {
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10) !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+.swal-toast-mini .swal2-icon {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+}
+
+.swal-toast-mini .swal2-title {
+    margin: 0 !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+.swal-toast-mini .swal2-timer-progress-bar {
+    height: 2px !important;
+    background: #1D9E75 !important;
+}
+
+/* Botón pequeño del modal de error */
+.swal-btn-small {
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 7px 18px !important;
+    border-radius: 8px !important;
+}
+
+/* Ícono de error más compacto */
+.swal-mini-popup .swal2-icon {
+    width: 48px !important;
+    height: 48px !important;
+    margin: 0 auto 10px !important;
+}
+
+.swal-mini-popup .swal2-icon .swal2-icon-content {
+    font-size: 24px !important;
+}
+
+/* Spinner de loading */
+.swal-mini-popup .swal2-loader {
+    width: 32px !important;
+    height: 32px !important;
+    border-color: #1B4332 transparent #1B4332 transparent !important;
+}

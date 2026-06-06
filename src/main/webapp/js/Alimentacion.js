@@ -16,23 +16,28 @@ const size = 5;
 // CARGAR ANIMALES
 // ===============================
 function cargarAnimales() {
-    fetch('AnimalServlet') // O la URL que uses para listar tus animales
-            .then(response => response.json())
-            .then(animales => {
-                const selectAnimal = document.getElementById('idAnimal');
 
-                selectAnimal.length = 1;
+    fetch("AnimalServlet")
+        .then(response => response.json())
+        .then(data => {
 
-                animales.forEach(animal => {
-                    const option = document.createElement('option');
-                    option.value = animal.id;
+            let select = document.getElementById("idAnimal");
 
-                    option.textContent = animal.especie;
+            select.innerHTML =
+                    '<option value="">Seleccione un animal</option>';
 
-                    selectAnimal.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error al cargar animales:', error));
+            data.forEach(animal => {
+
+                select.innerHTML += `
+                    <option value="${animal.id}">
+                        ${animal.nombre}
+                    </option>
+                `;
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
 }
 
 // ===============================
@@ -43,46 +48,60 @@ function buscar(pagina = 1) {
     paginaActual = pagina;
 
     fetch("AlimentacionServlet")
-            .then(response => response.json())
-            .then(data => {
+        .then(response => response.json())
+        .then(data => {
 
-                console.log(data);
+            console.log(data);
 
-                mostrarAlimentaciones(data);
+            mostrarAlimentaciones(data);
 
-            })
-            .catch(error => {
-                console.error("Error buscando:", error);
-            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
 }
 
 // ===============================
 // MOSTRAR ALIMENTACIONES
 // ===============================
 function mostrarAlimentaciones(lista) {
-    const tbody = document.getElementById('tbodyAlimentacion');
-    tbody.innerHTML = ''; // Limpiar tabla
 
-    lista.forEach(alimentacion => {
-        const tr = document.createElement('tr');
+    let html = "";
 
-        // Validamos que el objeto animal no venga nulo por seguridad
-        const especieAnimal = alimentacion.animal ? alimentacion.animal.especie : 'Sin asignar';
+    lista.forEach(a => {
 
-        // 🛠️ CORREGIDO: Se cambió 'cargarParaEditar' por 'editar'
-        tr.innerHTML = `
-            <td>${alimentacion.id}</td>
-            <td>${alimentacion.tipoAlimento}</td>
-            <td>${alimentacion.horario}</td>
-            <td>${alimentacion.cantidad}</td>
-            <td>${especieAnimal}</td>
-            <td class="acciones">
-                <button type="button" class="btnEditar" onclick="editar(${alimentacion.id})">Editar</button>
-                <button type="button" class="btnEliminar" onclick="eliminarAlimentacion(${alimentacion.id})">Eliminar</button>
-            </td>
+        html += `
+            <tr>
+
+                <td>${a.id}</td>
+
+                <td>${a.tipoAlimento}</td>
+
+                <td>${a.horario}</td>
+
+                <td>${a.cantidad}</td>
+
+                <td>${a.animal ? a.animal.nombre : "Sin animal"}</td>
+
+                <td class="acciones">
+
+                    <button class="btnEditar"
+                            onclick="editar(${a.id})">
+                        <i class="ti ti-edit"></i>
+                    </button>
+
+                    <button class="btnEliminar"
+                            onclick="eliminarAlimentacion(${a.id})">
+                      <i class="ti ti-trash"></i>
+                    </button>
+
+                </td>
+
+            </tr>
         `;
-        tbody.appendChild(tr);
     });
+
+    document.getElementById("tbodyAlimentacion").innerHTML = html;
 }
 
 // ===============================
@@ -91,27 +110,27 @@ function mostrarAlimentaciones(lista) {
 function editar(id) {
 
     fetch(`AlimentacionServlet?id=${id}`)
-            .then(response => response.json())
-            .then(a => {
+        .then(response => response.json())
+        .then(a => {
 
-                document.getElementById("idAlimentacion").value = a.id;
+            document.getElementById("idAlimentacion").value = a.id;
 
-                document.getElementById("tipoAlimento").value =
-                        a.tipoAlimento;
+            document.getElementById("tipoAlimento").value =
+                    a.tipoAlimento;
 
-                document.getElementById("horario").value =
-                        a.horario;
+            document.getElementById("horario").value =
+                    a.horario;
 
-                document.getElementById("cantidad").value =
-                        a.cantidad;
+            document.getElementById("cantidad").value =
+                    a.cantidad;
 
-                document.getElementById("idAnimal").value =
-                        a.animal ? a.animal.id : "";
+            document.getElementById("idAnimal").value =
+                    a.animal ? a.animal.id : "";
 
-            })
-            .catch(error => {
-                console.error("Error editando:", error);
-            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
 }
 
 // ===============================
@@ -120,101 +139,90 @@ function editar(id) {
 document.getElementById("formAlimentacion")
         .addEventListener("submit", function (event) {
 
-            event.preventDefault();
+    event.preventDefault();
 
-            let id =
-                    document.getElementById("idAlimentacion").value;
+    let id =
+            document.getElementById("idAlimentacion").value;
 
-            let idAnimal =
-                    document.getElementById("idAnimal").value;
+    let alimentacion = {
 
-            let alimentacion = {
+        tipoAlimento:
+                document.getElementById("tipoAlimento").value,
 
-                tipoAlimento:
-                        document.getElementById("tipoAlimento").value,
+        horario:
+                document.getElementById("horario").value,
 
-                horario:
-                        document.getElementById("horario").value,
+        cantidad:
+                parseFloat(
+                        document.getElementById("cantidad").value
+                ),
 
-                cantidad:
-                        parseFloat(
-                                document.getElementById("cantidad").value
-                                ),
+        animal: {
+            id: parseInt(
+                    document.getElementById("idAnimal").value
+            )
+        }
+    };
 
-                animal: idAnimal ? {
-                    id: parseInt(idAnimal)
-                } : null
-            };
+    // SOLO EN EDICIÓN
+    if (id) {
+        alimentacion.id = parseInt(id);
+    }
 
-            // SOLO EN EDICIÓN
-            if (id) {
-                alimentacion.id = parseInt(id);
-            }
+    let metodo = id ? "PUT" : "POST";
 
-            console.log("ENVIANDO:", alimentacion);
+    fetch("AlimentacionServlet", {
 
-            let metodo = id ? "PUT" : "POST";
+        method: metodo,
 
-            fetch("AlimentacionServlet", {
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-                method: metodo,
+        body: JSON.stringify(alimentacion)
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+    })
+    .then(response => response.json())
+    .then(data => {
 
-                body: JSON.stringify(alimentacion)
+        console.log(data);
 
-            })
-                    .then(async response => {
+        limpiarFormulario();
 
-                        let texto = await response.text();
+        buscar();
+    })
+    .catch(error => {
 
-                        console.log("RESPUESTA SERVIDOR:", texto);
+        console.error(error);
+    });
 
-                        if (!response.ok) {
-                            throw new Error(texto);
-                        }
-
-                        return JSON.parse(texto);
-                    })
-                    .then(data => {
-
-                        console.log("GUARDADO:", data);
-
-                        alert(data.mensaje);
-
-                        limpiarFormulario();
-
-                        buscar();
-                    })
-                    .catch(error => {
-
-                        console.error("ERROR COMPLETO:", error);
-
-                        alert("Error: " + error.message);
-                    });
-
-        });
+});
 
 // ===============================
 // ELIMINAR
 // ===============================
 function eliminarAlimentacion(id) {
-    if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
-        fetch(`AlimentacionServlet?id=${id}`, {
-            method: 'DELETE'
-        })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("ELIMINADO: ", data);
-                    alert(data.mensaje);
-                    // 🛠️ CORREGIDO: Se cambió 'listarAlimentaciones()' por 'buscar()' para refrescar la tabla
-                    buscar();
-                    limpiarFormulario();
-                })
-                .catch(error => console.error('Error al eliminar:', error));
+
+    if (!confirm("¿Desea eliminar este registro?")) {
+        return;
     }
+
+    fetch(`AlimentacionServlet?id=${id}`, {
+
+        method: "DELETE"
+
+    })
+    .then(response => response.text())
+    .then(data => {
+
+        console.log(data);
+
+        buscar();
+    })
+    .catch(error => {
+
+        console.error(error);
+    });
 }
 
 // ===============================

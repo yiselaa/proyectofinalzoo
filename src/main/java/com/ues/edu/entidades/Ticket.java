@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -24,9 +25,11 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "ticket")
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "ticket", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "tipo")
+})
 public class Ticket {
 
     @Id
@@ -34,11 +37,15 @@ public class Ticket {
     private Integer id;
 
     @NotBlank
-    @Column(name = "tipo", nullable = false, length = 70)
+    @Column(name = "tipo", unique = true, nullable = false, length = 70)
     private String tipo;
 
     @NotNull
     @Column(name = "precio", nullable = false)
     private double precio;
+
+    @NotBlank
+    @Column(name = "estado", nullable = false, length = 20)
+    private String estado;
 
 }

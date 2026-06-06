@@ -26,21 +26,17 @@ public class HistorialMedicoServlet extends HttpServlet {
 
     private HistorialMedicoService historialService = new HistorialMedicoService();
 
-   private Gson gson = new GsonBuilder()
+    private Gson gson = new GsonBuilder()
         .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
-                // Bloqueamos todas las listas y relaciones profundas que el frontend no necesita
-                return f.getName().equals("historiales")
-                    || f.getName().equals("cuidadores")
-                    || f.getName().equals("animalesAsignados")
-                    || f.getName().equals("usuario")
-                    || f.getName().equals("listaAnimales"); // <--- EL NUEVO CULPABLE AQUÍ
+                // Evitar ciclos infinitos en relaciones bidireccionales
+                return f.getName().equals("listaHistoriales") 
+                    || f.getName().equals("listaAnimales");
             }
             @Override
             public boolean shouldSkipClass(Class<?> clazz) { return false; }
         })
-        .setDateFormat("yyyy-MM-dd") 
         .create();
 
     /**
@@ -79,40 +75,34 @@ public class HistorialMedicoServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+      
 
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
+     String idParam = request.getParameter("id");
 
-    String idParam = request.getParameter("id");
 
-    if (idParam != null && !idParam.isEmpty()) {
+        if (idParam != null && !idParam.isEmpty()) {
+            int id = Integer.parseInt(idParam);
+            HistorialMedico h = historialService.buscarHistorial(id);
 
-        int id = Integer.parseInt(idParam);
+            if (h == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"mensaje\":\"Historial no encontrado\"}");
+                return;
+            }
 
-        HistorialMedico h = historialService.buscarHistorial(id);
-
-        if (h == null) {
-
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-            response.getWriter().write(
-                "{\"mensaje\":\"Historial no encontrado\"}"
-            );
-
+            response.getWriter().write(gson.toJson(h));
             return;
         }
 
-        response.getWriter().write(gson.toJson(h));
-        return;
+        List<HistorialMedico> historiales = historialService.obtenerHistoriales();
+        response.getWriter().write(gson.toJson(historiales));
+        
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
     }
 
-    List<HistorialMedico> historiales =
-            historialService.obtenerHistoriales();
-
-    response.getWriter().write(gson.toJson(historiales));
-}
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -125,72 +115,48 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        
-        try {
-            // 1. Le enseñamos a Gson a leer el formato de fecha que manda el HTML
-            Gson gson = new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd") // El formato clásico de los <input type="date">
-                    .create();
-            
-            // 2. Convertimos el JSON a objeto Java
-            HistorialMedico historial = gson.fromJson(request.getReader(), HistorialMedico.class);
+ 
+        HistorialMedico historial = gson.fromJson(request.getReader(), HistorialMedico.class);
 
-            // 3. Validamos
-            String error = validarHistorial(historial);
-            if (error != null) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"error\":\"" + error + "\"}");
-                return;
-            }
+        String error = validarHistorial(historial);
 
-            // 4. Guardamos en la base de datos
-            historialService.crearHistorial(historial);
-
-            // 5. Enviamos mensaje de éxito
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"mensaje\":\"Historial guardado exitosamente\"}");
-            
-        } catch (Exception e) {
-            // ¡Si algo explota, atrapamos el error!
-            e.printStackTrace(); // Esto imprimirá el error exacto en la consola de NetBeans/Eclipse
-            
-            // Y le mandamos un mensaje limpio a tu JavaScript
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentType("application/json;charset=UTF-8");
-            
-            // Quitamos comillas dobles del mensaje de error para evitar dañar el JSON
-            String mensajeError = e.getMessage() != null ? e.getMessage().replace("\"", "'") : "Error desconocido";
-            response.getWriter().write("{\"error\":\"Error en el servidor: " + mensajeError + "\"}");
+        if (error != null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"" + error + "\"}");
+            return;
         }
+
+        historialService.crearHistorial(historial);
+
+        response.setContentType("application/json");
+        response.getWriter().write("{\"mensaje\":\"Historial guardado\"}");
     }
-    
+
     // ===============================
     // PUT → actualizar historial
     // ===============================
     @Override
-protected void doPut(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    try {
-        // Le enseñamos a Gson a leer la fecha del formulario
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-        
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
         HistorialMedico historial = gson.fromJson(request.getReader(), HistorialMedico.class);
 
-        // Llamamos al método de actualizar del servicio/DAO
-        historialService.editarHistorial(historial); 
+        String error = validarHistorial(historial);
 
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"mensaje\":\"Historial actualizado exitosamente\"}");
-        
-    } catch (Exception e) {
-        e.printStackTrace();
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.setContentType("application/json;charset=UTF-8");
-        String mensajeError = e.getMessage() != null ? e.getMessage().replace("\"", "'") : "Error al actualizar";
-        response.getWriter().write("{\"error\":\"Error en el servidor: " + mensajeError + "\"}");
+        if (error != null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"" + error + "\"}");
+            return;
+        }
+
+        historialService.editarHistorial(historial);
+
+        response.setContentType("application/json");
+        response.getWriter().write("{\"mensaje\":\"Historial actualizado\"}");
     }
-}
+
     // ===============================
     // DELETE → eliminar historial
     // ===============================

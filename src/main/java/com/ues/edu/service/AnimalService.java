@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class AnimalService {
 
+
     private AnimalDao dao = new AnimalDao();
 
     // 🔥 CREAR
@@ -46,9 +47,9 @@ public class AnimalService {
         return dao.buscarPorNombre(nombre);
     }
 
-    // 🔥 FILTRAR POR HÁBITAT
-    public List<Animal> filtrarPorHabitat(int idHabitat) {
-        return dao.filtrarPorHabitat(idHabitat);
+    // 🔥 FILTRAR POR CATEGORÍA
+    public List<Animal> filtrarPorCategoria(int idCategoria) {
+        return dao.filtrarPorCategoria(idCategoria);
     }
 
     // 🔥 PAGINACIÓN
@@ -56,3 +57,6 @@ public class AnimalService {
         return dao.listarPaginado(pagina, size);
     }
 }
+
+    
+

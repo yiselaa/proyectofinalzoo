@@ -23,25 +23,25 @@ import java.util.List;
  */
 @WebServlet(name = "AnimalServlet", urlPatterns = {"/AnimalServlet"})
 public class AnimalServlet extends HttpServlet {
+    
+     private AnimalService animalService = new AnimalService();
 
-    private AnimalService animalService = new AnimalService();
+ private Gson gson = new GsonBuilder()
+    .setDateFormat("yyyy-MM-dd")
+    .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
+    .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
+        @Override
+        public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
+            return f.getName().equals("cuidadores")
+                || f.getName().equals("listaAnimales");
+        }
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return false;
+        }
+    })
+    .create();
 
-    private Gson gson = new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd")
-            .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
-            .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
-                @Override
-                public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
-                    return f.getName().equals("cuidadores")
-                            || f.getName().equals("listaAnimales");
-                }
-
-                @Override
-                public boolean shouldSkipClass(Class<?> clazz) {
-                    return false;
-                }
-            })
-            .create();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -81,38 +81,30 @@ public class AnimalServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+       
+        
+        String idParam = request.getParameter("id");
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        // 🔥 BUSCAR POR ID
+        if (idParam != null && !idParam.isEmpty()) {
+            int id = Integer.parseInt(idParam);
+            Animal animal = animalService.buscarAnimal(id);
 
-        try {
-            String idParam = request.getParameter("id");
-
-            if (idParam != null && !idParam.isEmpty()) {
-                int id = Integer.parseInt(idParam);
-                Animal animal = animalService.buscarAnimal(id);
-
-                if (animal == null) {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    response.getWriter().write("{\"error\":\"Animal no encontrado\"}");
-                    return;
-                }
-
-                response.getWriter().write(gson.toJson(animal));
+            if (animal == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"mensaje\":\"Animal no encontrado\"}");
                 return;
             }
 
-            List<Animal> animales = animalService.obtenerAnimales();
-            response.getWriter().write(gson.toJson(animales));
-
-        } catch (Exception e) {
-            // Imprime el error real en la consola de tu NetBeans/IDE
-            e.printStackTrace();
-
-            // Envía una respuesta JSON controlada en lugar de una página HTML rota
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"Error interno en el servidor: " + e.getMessage() + "\"}");
+            response.setContentType("application/json");
+            response.getWriter().write(gson.toJson(animal));
+            return;
         }
+
+        // 🔥 LISTAR TODOS
+        List<Animal> animales = animalService.obtenerAnimales();
+        response.setContentType("application/json");
+        response.getWriter().write(gson.toJson(animales));
     }
 
     /**
@@ -126,8 +118,8 @@ public class AnimalServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        Animal animal = gson.fromJson(request.getReader(), Animal.class);
+        
+          Animal animal = gson.fromJson(request.getReader(), Animal.class);
 
         String error = validarAnimal(animal);
 
@@ -143,7 +135,7 @@ public class AnimalServlet extends HttpServlet {
         response.setContentType("application/json");
         response.getWriter().write("{\"mensaje\":\"Animal guardado\"}");
     }
-
+    
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -178,7 +170,6 @@ public class AnimalServlet extends HttpServlet {
 
     // 🔥 VALIDACIÓN
     private String validarAnimal(Animal a) {
-
         if (a == null) {
             return "Animal inválido";
         }
@@ -187,21 +178,13 @@ public class AnimalServlet extends HttpServlet {
             return "Nombre mínimo 3 caracteres";
         }
 
-        if (a.getEspecie() == null || a.getEspecie().trim().length() < 3) {
-            return "La especie es requerida";
-        }
-
         if (a.getFechaNacimiento() == null) {
             return "Fecha de nacimiento requerida";
         }
 
-        if (a.getHabitat() == null || a.getHabitat().getId() == null) {
-            return "Debe asignar un hábitat válido";
-        }
-
         return null;
     }
-
+     
     /**
      * Returns a short description of the servlet.
      *
