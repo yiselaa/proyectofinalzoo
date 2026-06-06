@@ -3,13 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
-
-/* 
- * HistorialMedico.js
- */
-
-/* 
- * HistorialMedico.js
+/* * HistorialMedico.js
  */
 
 console.log("JS HISTORIAL MÉDICO CARGADO");
@@ -17,31 +11,51 @@ console.log("JS HISTORIAL MÉDICO CARGADO");
 let paginaActual = 1;
 const size = 5;
 
+// Diccionario global para guardar los animales y sus especies reales
+let mapaAnimalesEspecies = {}; 
+
 // ===============================
 // CARGAR ANIMALES
 // ===============================
 function cargarAnimales() {
-
     fetch("AnimalServlet")
         .then(response => response.json())
         .then(data => {
-
             let select = document.getElementById("idAnimal");
+            select.innerHTML = '<option value="">Seleccione un animal</option>';
 
-            select.innerHTML =
-                    '<option value="">Seleccione un animal</option>';
+            // Limpiamos el mapa global
+            mapaAnimalesEspecies = {};
 
             data.forEach(animal => {
+                // Extraemos el texto de la especie de forma segura
+                let nombreEspecie = (animal.especie && typeof animal.especie === 'object') ? animal.especie.nombre : animal.especie;
+
+                // Guardamos en nuestro mapa global relacionando el nombre del animal con su especie
+                if (animal.nombre) {
+                    mapaAnimalesEspecies[animal.nombre.trim().toLowerCase()] = nombreEspecie || "Sin especie";
+                }
 
                 select.innerHTML += `
-                    <option value="${animal.id}">
+                    <option value="${animal.id}" data-especie="${nombreEspecie || ''}">
                         ${animal.nombre}
                     </option>
                 `;
             });
+
+            // Mostrar especie automáticamente al cambiar en el select
+            select.addEventListener("change", function () {
+                let especieInput = document.getElementById("especieAnimal");
+                let opcionSeleccionada = this.options[this.selectedIndex];
+                especieInput.value = opcionSeleccionada.dataset.especie || "";
+            });
+
+            // Al cargar la página por primera vez, buscamos los datos de la tabla
+            buscarHistoriales();
         })
         .catch(error => {
             console.error("Error cargando animales:", error);
+            buscarHistoriales();
         });
 }
 
@@ -49,48 +63,42 @@ function cargarAnimales() {
 // CARGAR VETERINARIOS
 // ===============================
 function cargarVeterinarios() {
-
-    fetch("VeterinarioServlet")
+    fetch("EmpleadoServlet")
         .then(response => response.json())
         .then(data => {
-
             let select = document.getElementById("idVeterinario");
-
-            select.innerHTML =
-                    '<option value="">Seleccione un veterinario</option>';
-
-            data.forEach(veterinario => {
-
-                select.innerHTML += `
-                    <option value="${veterinario.id}">
-                        ${veterinario.nombre}
-                    </option>
-                `;
+            select.innerHTML = '<option value="">Seleccione un veterinario</option>';
+            
+            data.forEach(empleado => {
+                if (empleado.rol === 'Veterinario') {
+                    select.innerHTML += `
+                        <option value="${empleado.id}">
+                            ${empleado.nombre} ${empleado.apellido}
+                        </option>
+                    `;
+                }
             });
         })
         .catch(error => {
-            console.error("Error cargando veterinarios:", error);
+            console.error("Error al cargar los veterinarios:", error);
         });
 }
 
 // ===============================
-// BUSCAR HISTORIALES
+// BUSCAR HISTORIALES (REFRESCO CON ANTI-CACHÉ)
 // ===============================
 function buscarHistoriales(pagina = 1) {
-
     paginaActual = pagina;
 
-    fetch("HistorialMedicoServlet")
+    // Agregamos un parámetro de tiempo (?_=[timestamp]) para obligar al navegador a no usar datos viejos
+    fetch(`HistorialMedicoServlet?_=${new Date().getTime()}`)
         .then(response => response.json())
         .then(data => {
-
-            console.log(data);
-
+            console.log("Datos recibidos para la tabla:", data);
             mostrarHistoriales(data);
         })
         .catch(error => {
-
-            console.error("Error:", error);
+            console.error("Error al buscar historiales:", error);
         });
 }
 
@@ -98,15 +106,23 @@ function buscarHistoriales(pagina = 1) {
 // MOSTRAR HISTORIALES EN TABLA
 // ===============================
 function mostrarHistoriales(lista) {
-
     let html = "";
 
     lista.forEach(h => {
-
         let fechaFormateada = "";
-
         if (h.fecha) {
             fechaFormateada = h.fecha.split("T")[0];
+        }
+
+        // Buscamos el nombre del animal en nuestro mapa de especies reales cargado desde AnimalServlet
+        let nombreAnimal = h.animal ? h.animal.nombre : null;
+        let especieReal = "Sin especie";
+
+        if (nombreAnimal) {
+            let llave = nombreAnimal.trim().toLowerCase();
+            if (mapaAnimalesEspecies[llave]) {
+                especieReal = mapaAnimalesEspecies[llave];
+            }
         }
 
         html += `
@@ -114,21 +130,17 @@ function mostrarHistoriales(lista) {
                 <td>${h.id}</td>
                 <td>${fechaFormateada}</td>
                 <td>${h.diagnostico}</td>
-                <td>${h.tratamiento}</td>
-                <td>${h.animal ? h.animal.nombre : "Sin animal"}</td>
-                <td>${h.veterinario ? h.veterinario.nombre : "Sin veterinario"}</td>
+                <td>${h.treatment || h.tratamiento}</td>
+                <td>${nombreAnimal || "Sin animal"}</td>
+                <td>${especieReal}</td>
+                <td>${h.veterinario ? h.veterinario.nombre + ' ' + h.veterinario.apellido : "Sin veterinario"}</td>
                 <td class="acciones">
-
-                    <button class="btnEditar"
-                            onclick="editarHistorial(${h.id})">
+                    <button class="btnEditar" onclick="editarHistorial(${h.id})">
                         Editar
                     </button>
-
-                    <button class="btnEliminar"
-                            onclick="eliminarHistorial(${h.id})">
+                    <button class="btnEliminar" onclick="eliminarHistorial(${h.id})">
                         Eliminar
                     </button>
-
                 </td>
             </tr>
         `;
@@ -141,128 +153,109 @@ function mostrarHistoriales(lista) {
 // EDITAR HISTORIAL
 // ===============================
 function editarHistorial(id) {
-
-    fetch(`HistorialMedicoServlet?id=${id}`)
+    fetch(`HistorialMedicoServlet?id=${id}&_=${new Date().getTime()}`)
         .then(response => response.json())
         .then(h => {
-
             document.getElementById("idHistorial").value = h.id;
+            document.getElementById("fecha").value = h.fecha ? h.fecha.split("T")[0] : "";
+            document.getElementById("diagnostico").value = h.diagnostico;
+            document.getElementById("tratamiento").value = h.tratamiento;
+            document.getElementById("idAnimal").value = h.animal ? h.animal.id : "";
 
-            document.getElementById("fecha").value =
-                    h.fecha ? h.fecha.split("T")[0] : "";
+            // Buscamos la especie real para ponerla en el input al editar
+            let nombreAnimal = h.animal ? h.animal.nombre : null;
+            let especieReal = "";
+            if (nombreAnimal) {
+                especieReal = mapaAnimalesEspecies[nombreAnimal.trim().toLowerCase()] || "";
+            }
+            document.getElementById("especieAnimal").value = especieReal;
 
-            document.getElementById("diagnostico").value =
-                    h.diagnostico;
-
-            document.getElementById("tratamiento").value =
-                    h.tratamiento;
-
-            document.getElementById("idAnimal").value =
-                    h.animal ? h.animal.id : "";
-
-            document.getElementById("idVeterinario").value =
-                    h.veterinario ? h.veterinario.id : "";
+            document.getElementById("idVeterinario").value = h.veterinario ? h.veterinario.id : "";
         })
         .catch(error => {
-
-            console.error("Error:", error);
+            console.error("Error al editar historial:", error);
         });
 }
 
 // ===============================
-// GUARDAR O ACTUALIZAR
+// GUARDAR O ACTUALIZAR (CON RETRASO DE PERSISTENCIA)
 // ===============================
 document.getElementById("formHistorial")
-        .addEventListener("submit", function (event) {
+    .addEventListener("submit", function (event) {
+        event.preventDefault();
 
-    event.preventDefault();
+        let id = document.getElementById("idHistorial").value;
 
-    let id = document.getElementById("idHistorial").value;
+        let historial = {
+            fecha: document.getElementById("fecha").value,
+            diagnostico: document.getElementById("diagnostico").value,
+            tratamiento: document.getElementById("tratamiento").value,
+            animal: {
+                id: parseInt(document.getElementById("idAnimal").value)
+            },
+            veterinario: {
+                id: parseInt(document.getElementById("idVeterinario").value)
+            }
+        };
 
-    let historial = {
-
-        fecha: document.getElementById("fecha").value,
-
-        diagnostico:
-                document.getElementById("diagnostico").value,
-
-        tratamiento:
-                document.getElementById("tratamiento").value,
-
-        animal: {
-            id: parseInt(
-                    document.getElementById("idAnimal").value)
-        },
-
-        veterinario: {
-            id: parseInt(
-                    document.getElementById("idVeterinario").value)
-        }
-    };
-
-    if (id) {
-        historial.id = parseInt(id);
-    }
-
-    let metodo = id ? "PUT" : "POST";
-
-    fetch("HistorialMedicoServlet", {
-
-        method: metodo,
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(historial)
-
-    })
-    .then(async response => {
-
-        let data = await response.json();
-
-        if (!response.ok) {
-
-            alert(data.error || "Error al guardar");
-            return;
+        if (id) {
+            historial.id = parseInt(id);
         }
 
-        console.log(data);
+        let metodo = id ? "PUT" : "POST";
 
-        limpiarFormularioHistorial();
+        fetch("HistorialMedicoServlet", {
+            method: metodo,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(historial)
+        })
+        .then(async response => {
+            let data = await response.json();
 
-        buscarHistoriales();
-    })
-    .catch(error => {
+            if (!response.ok) {
+                alert(data.error || "Error al guardar");
+                return;
+            }
 
-        console.error("Error:", error);
+            console.log("Respuesta del servidor:", data);
+            
+            // 1. Limpiamos las cajas de texto del formulario inmediatamente
+            limpiarFormularioHistorial();
+            
+            // 2. Esperamos 250ms para asegurar que Hibernate/EclipseLink/JPA termine de procesar el commit en BD
+            setTimeout(() => {
+                buscarHistoriales();
+            }, 250);
+        })
+        .catch(error => {
+            console.error("Error en la operación guardar/actualizar:", error);
+        });
     });
-});
 
 // ===============================
 // ELIMINAR HISTORIAL
 // ===============================
 function eliminarHistorial(id) {
-
     if (!confirm("¿Desea eliminar este historial médico?")) {
         return;
     }
 
     fetch(`HistorialMedicoServlet?id=${id}`, {
-
         method: "DELETE"
-
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
-
-        console.log(data);
-
-        buscarHistoriales();
+        console.log("Eliminado exitosamente:", data);
+        
+        // Esperamos 250ms antes de refrescar la tabla para darle respiro al borrado en BD
+        setTimeout(() => {
+            buscarHistoriales();
+        }, 250);
     })
     .catch(error => {
-
-        console.error("Error:", error);
+        console.error("Error al eliminar:", error);
     });
 }
 
@@ -270,21 +263,16 @@ function eliminarHistorial(id) {
 // LIMPIAR FORMULARIO
 // ===============================
 function limpiarFormularioHistorial() {
-
     document.getElementById("formHistorial").reset();
-
     document.getElementById("idHistorial").value = "";
+    document.getElementById("especieAnimal").value = "";
 }
 
 // ===============================
-// INICIO
+// INICIO DE LA APLICACIÓN
 // ===============================
 document.addEventListener("DOMContentLoaded", function () {
-
-    cargarAnimales();
-
+    // Primero cargamos veterinarios y animales (los animales dispararán la búsqueda de la tabla)
     cargarVeterinarios();
-
-    buscarHistoriales();
-
+    cargarAnimales();
 });
