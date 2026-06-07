@@ -22,7 +22,11 @@
                 --azul:#40916c;
             }
 
-            *{ margin:0; padding:0; box-sizing:border-box; }
+            *{
+                margin:0;
+                padding:0;
+                box-sizing:border-box;
+            }
 
             body{
                 font-family: Arial, Helvetica, sans-serif;
@@ -47,10 +51,19 @@
                 text-align:center;
             }
 
-            .header h1{ font-size:40px; margin-bottom:10px; letter-spacing:2px; }
-            .header p{ font-size:18px; opacity:0.9; }
+            .header h1{
+                font-size:40px;
+                margin-bottom:10px;
+                letter-spacing:2px;
+            }
+            .header p{
+                font-size:18px;
+                opacity:0.9;
+            }
 
-            .contenido{ padding:35px; }
+            .contenido{
+                padding:35px;
+            }
 
             .formulario{
                 display:grid;
@@ -59,8 +72,15 @@
                 margin-bottom:40px;
             }
 
-            .campo{ display:flex; flex-direction:column; }
-            .campo label{ margin-bottom:8px; font-weight:bold; color:var(--verde-oscuro); }
+            .campo{
+                display:flex;
+                flex-direction:column;
+            }
+            .campo label{
+                margin-bottom:8px;
+                font-weight:bold;
+                color:var(--verde-oscuro);
+            }
 
             .campo input, .campo select{
                 padding:14px;
@@ -95,33 +115,91 @@
                 transition:0.3s;
             }
 
-            .guardar{ background:var(--verde-medio); color:white; }
-            .guardar:hover{ background:var(--verde-oscuro); transform:scale(1.05); }
-
-            .cancelar{ background:#b7e4c7; color:var(--verde-oscuro); }
-            .cancelar:hover{ background:#95d5b2; transform:scale(1.05); }
-
-            table{ width:100%; border-collapse:collapse; overflow:hidden; border-radius:15px; }
-            thead{ background:var(--verde-medio); color:white; }
-            th{ padding:18px; font-size:15px; text-transform:uppercase; letter-spacing:1px; }
-            td{ padding:16px; text-align:center; border-bottom:1px solid #ddd; }
-            tbody tr:nth-child(even){ background:var(--verde-suave); }
-            tbody tr:hover{ background:#b7e4c7; transition:0.3s; }
-
-            .acciones{ display:flex; justify-content:center; gap:10px; }
-            .btnEditar, .btnEliminar{
-                border:none; padding:10px 14px; border-radius:8px;
-                cursor:pointer; color:white; font-weight:bold; transition:0.3s;
+            .guardar{
+                background:var(--verde-medio);
+                color:white;
             }
-            .btnEditar{ background:var(--azul); }
-            .btnEliminar{ background:var(--rojo); }
-            .btnEditar:hover, .btnEliminar:hover{ transform:translateY(-2px); opacity:0.9; }
+            .guardar:hover{
+                background:var(--verde-oscuro);
+                transform:scale(1.05);
+            }
+
+            .cancelar{
+                background:#b7e4c7;
+                color:var(--verde-oscuro);
+            }
+            .cancelar:hover{
+                background:#95d5b2;
+                transform:scale(1.05);
+            }
+
+            table{
+                width:100%;
+                border-collapse:collapse;
+                overflow:hidden;
+                border-radius:15px;
+            }
+            thead{
+                background:var(--verde-medio);
+                color:white;
+            }
+            th{
+                padding:18px;
+                font-size:15px;
+                text-transform:uppercase;
+                letter-spacing:1px;
+            }
+            td{
+                padding:16px;
+                text-align:center;
+                border-bottom:1px solid #ddd;
+            }
+            tbody tr:nth-child(even){
+                background:var(--verde-suave);
+            }
+            tbody tr:hover{
+                background:#b7e4c7;
+                transition:0.3s;
+            }
+
+            .acciones{
+                display:flex;
+                justify-content:center;
+                gap:10px;
+            }
+            .btnEditar, .btnEliminar{
+                border:none;
+                padding:10px 14px;
+                border-radius:8px;
+                cursor:pointer;
+                color:white;
+                font-weight:bold;
+                transition:0.3s;
+            }
+            .btnEditar{
+                background:var(--azul);
+            }
+            .btnEliminar{
+                background:var(--rojo);
+            }
+            .btnEditar:hover, .btnEliminar:hover{
+                transform:translateY(-2px);
+                opacity:0.9;
+            }
 
             @media(max-width:768px){
-                body{ padding:15px; }
-                .header h1{ font-size:28px; }
-                .botones{ flex-direction:column; }
-                .acciones{ flex-direction:column; }
+                body{
+                    padding:15px;
+                }
+                .header h1{
+                    font-size:28px;
+                }
+                .botones{
+                    flex-direction:column;
+                }
+                .acciones{
+                    flex-direction:column;
+                }
             }
         </style>
     </head>
@@ -144,6 +222,11 @@
                         </div>
 
                         <div class="campo">
+                            <label >Especie</label>
+                            <input type="text" id="especie" class="form-control" required>
+                        </div>
+
+                        <div class="campo">
                             <label>Fecha Nacimiento</label>
                             <input type="date" id="fechaNacimiento" required>
                         </div>
@@ -154,11 +237,10 @@
                         </div>
 
                         <div class="campo">
-                            <label>Categoría</label>
-                            
-                            <select id="categoria" required>
-                                <option value="">Seleccione categoría</option>
-                                <!-- Aquí puedes cargar dinámicamente las categorías -->
+                            <label>Habitat</label>
+
+                            <select id="habitat" required>
+                                <option value="">Seleccione habitat...</option>
                             </select>
                         </div>
 
@@ -174,10 +256,11 @@
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
+                             <th>Especie</th>
                             <th>Fecha Nacimiento</th>  
                             <th>Edad</th>
                             <th>Fecha Ingreso</th>
-                            <th>Categoría</th>
+                            <th>Habitat</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>

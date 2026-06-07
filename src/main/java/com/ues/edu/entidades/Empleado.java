@@ -49,7 +49,7 @@ public class Empleado {
     private Usuario usuario;
 
     @ManyToMany(mappedBy = "cuidadores")
-    private List<Animal> animalesAsignados;
+    private List<Habitat> habitatAsignadas;
 
     @OneToMany(mappedBy = "veterinario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HistorialMedico> historiales;

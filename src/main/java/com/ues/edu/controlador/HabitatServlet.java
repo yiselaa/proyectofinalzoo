@@ -6,8 +6,8 @@ package com.ues.edu.controlador;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.ues.edu.entidades.Categoria;
-import com.ues.edu.service.CategoriaService;
+import com.ues.edu.entidades.Habitat;
+import com.ues.edu.service.HabitatService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -21,25 +21,23 @@ import java.util.List;
  *
  * @author coc44
  */
-@WebServlet(name = "CategoriaServlet", urlPatterns = {"/CategoriaServlet"})
-public class CategoriaServlet extends HttpServlet {
+@WebServlet(name = "HabitatServlet", urlPatterns = {"/HabitatServlet"})
+public class HabitatServlet extends HttpServlet {
     
-     private CategoriaService categoriaService = new CategoriaService();
+     private HabitatService habitatService = new HabitatService();
 
     private Gson gson = new GsonBuilder()
-    .excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT)
     .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
 
         @Override
-        public boolean shouldSkipField(
-                com.google.gson.FieldAttributes f) {
+        public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
 
-            return f.getName().equals("listaAnimales");
+           return f.getName().equals("listaAnimales")
+                    || f.getName().equals("cuidadores");
         }
 
         @Override
         public boolean shouldSkipClass(Class<?> clazz) {
-
             return false;
         }
     })
@@ -84,41 +82,29 @@ public class CategoriaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-    String idParam = request.getParameter("id");
+   String idParam = request.getParameter("id");
 
-        // BUSCAR POR ID
+        // 🔥 BUSCAR POR ID
         if (idParam != null && !idParam.isEmpty()) {
-
             long id = Long.parseLong(idParam);
+            Habitat habitat = habitatService.buscarHabitat(id);
 
-            Categoria categoria = categoriaService.buscarCategoria(id);
-
-            if (categoria == null) {
-
+            if (habitat == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-                response.getWriter()
-                        .write("{\"mensaje\":\"Categoría no encontrada\"}");
-
+                response.getWriter().write("{\"mensaje\":\"Habitat no encontrado\"}");
                 return;
             }
 
             response.setContentType("application/json");
-
-            response.getWriter().write(gson.toJson(categoria));
-
+            response.getWriter().write(gson.toJson(habitat));
             return;
         }
 
-        // LISTAR TODOS
-        List<Categoria> categorias =
-                categoriaService.obtenerCategorias();
-
+        // 🔥 LISTAR TODOS
+        List<Habitat> habitats = habitatService.obtenerHabitats();
         response.setContentType("application/json");
-
-        response.getWriter().write(gson.toJson(categorias));
+        response.getWriter().write(gson.toJson(habitats));
     }
-
    
 
     /**
@@ -134,97 +120,63 @@ public class CategoriaServlet extends HttpServlet {
             HttpServletResponse response)
             throws IOException {
 
-        Categoria categoria =
-                gson.fromJson(request.getReader(), Categoria.class);
-
-        String error = validarCategoria(categoria);
-
-        if (error != null) {
-
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
-            response.setContentType("application/json");
-
-            response.getWriter()
-                    .write("{\"error\":\"" + error + "\"}");
-
-            return;
-        }
-
-        categoriaService.crearCategoria(categoria);
-
-        response.setContentType("application/json");
-
-        response.getWriter()
-                .write("{\"mensaje\":\"Categoría guardada\"}");
+    response.setContentType("application/json");
+    try {
+        Habitat habitat = gson.fromJson(request.getReader(), Habitat.class);
+        habitatService.crearHabitat(habitat);
+        response.getWriter().write("{\"mensaje\":\"Hábitat guardado correctamente\"}");
+    } catch (Exception e) {
+        e.printStackTrace(); // ver en consola
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.getWriter().write("{\"error\":\"Error al guardar hábitat: " + e.getMessage() + "\"}");
     }
+}
 
-    
-     @Override
-    protected void doPut(HttpServletRequest request,
-            HttpServletResponse response)
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        Categoria categoria =
-                gson.fromJson(request.getReader(), Categoria.class);
+        Habitat habitat = gson.fromJson(request.getReader(), Habitat.class);
 
-        String error = validarCategoria(categoria);
+        String error = validarHabitat(habitat);
 
         if (error != null) {
-
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
             response.setContentType("application/json");
-
-            response.getWriter()
-                    .write("{\"error\":\"" + error + "\"}");
-
+            response.getWriter().write("{\"error\":\"" + error + "\"}");
             return;
         }
 
-        categoriaService.editarCategoria(categoria);
+        habitatService.editarHabitat(habitat);
 
         response.setContentType("application/json");
-
-        response.getWriter()
-                .write("{\"mensaje\":\"Categoría actualizada\"}");
+        response.getWriter().write("{\"mensaje\":\"Habitat actualizado\"}");
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
         long id = Long.parseLong(request.getParameter("id"));
-
-        categoriaService.eliminarCategoria(id);
+        habitatService.eliminarHabitat(id);
 
         response.setContentType("application/json");
-
-        response.getWriter()
-                .write("{\"mensaje\":\"Categoría eliminada\"}");
+        response.getWriter().write("{\"mensaje\":\"Habitat eliminado\"}");
     }
 
-    // ==========================
-    // VALIDAR
-    // ==========================
-    private String validarCategoria(Categoria c) {
-
-        if (c == null) {
-
-            return "Categoría inválida";
+    // VALIDACIÓN
+    private String validarHabitat(Habitat h) {
+        if (h == null) {
+            return "Habitat inválido";
         }
 
-        if (c.getNombre() == null
-                || c.getNombre().trim().length() < 3) {
-
-            return "Nombre mínimo 3 caracteres";
+        if (h.getTipoTerreno() == null || h.getTipoTerreno().trim().length() < 3) {
+            return "Tipo de terreno mínimo 3 caracteres";
         }
 
-        if (c.getDescripcion() == null
-                || c.getDescripcion().trim().length() < 3) {
-
-            return "Descripción mínima 3 caracteres";
+        if (h.getCapacidad() == null || h.getCapacidad() <= 0) {
+            return "Capacidad debe ser mayor a 0";
         }
 
         return null;

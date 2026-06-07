@@ -1,20 +1,16 @@
 <%-- 
-    Document   : Alimentacion
-    Created on : 18 may. 2026, 22:02:32
+    Document   : Cuidador
+    Created on : 31 may. 2026, 16:18:47
     Author     : coc44
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
 <html>
-
     <head>
-
-        <title>Gestión de Alimentación</title>
+        <title>Gestión de Categorías y sus Cuidadores</title>
 
         <style>
-
             :root{
                 --verde-oscuro:#1b4332;
                 --verde-medio:#2d6a4f;
@@ -49,11 +45,7 @@
             }
 
             .header{
-                background:linear-gradient(
-                    90deg,
-                    var(--verde-oscuro),
-                    var(--verde-medio)
-                    );
+                background:linear-gradient(90deg, var(--verde-oscuro), var(--verde-medio));
                 color:white;
                 padding:35px;
                 text-align:center;
@@ -62,6 +54,12 @@
             .header h1{
                 font-size:40px;
                 margin-bottom:10px;
+                letter-spacing:2px;
+            }
+
+            .header p{
+                font-size:18px;
+                opacity:0.9;
             }
 
             .contenido{
@@ -70,11 +68,8 @@
 
             .formulario{
                 display:grid;
-                grid-template-columns:
-                    repeat(auto-fit, minmax(250px,1fr));
-
+                grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
                 gap:20px;
-
                 margin-bottom:40px;
             }
 
@@ -91,43 +86,43 @@
 
             .campo input,
             .campo select{
-
                 padding:14px;
-
                 border:2px solid #cce3de;
-
                 border-radius:12px;
-
                 font-size:15px;
-
+                transition:0.3s;
                 background:#f8fff9;
-
                 width:100%;
+            }
+
+            /* Estilo personalizado para el selector múltiple */
+            .campo select[multiple] {
+                height: 140px;
+                padding: 10px;
+            }
+
+            .campo input:focus,
+            .campo select:focus{
+                outline:none;
+                border-color:var(--verde-claro);
+                box-shadow:0 0 10px rgba(82,183,136,0.4);
             }
 
             .botones{
                 grid-column:1/-1;
-
                 display:flex;
-
                 gap:15px;
-
                 margin-top:10px;
             }
 
             .botones button{
-
                 padding:14px 25px;
-
                 border:none;
-
                 border-radius:12px;
-
                 cursor:pointer;
-
                 font-size:15px;
-
                 font-weight:bold;
+                transition:0.3s;
             }
 
             .guardar{
@@ -135,9 +130,19 @@
                 color:white;
             }
 
+            .guardar:hover{
+                background:var(--verde-oscuro);
+                transform:scale(1.05);
+            }
+
             .cancelar{
                 background:#b7e4c7;
                 color:var(--verde-oscuro);
+            }
+
+            .cancelar:hover{
+                background:#95d5b2;
+                transform:scale(1.05);
             }
 
             table{
@@ -154,6 +159,9 @@
 
             th{
                 padding:18px;
+                font-size:15px;
+                text-transform:uppercase;
+                letter-spacing:1px;
             }
 
             td{
@@ -166,6 +174,11 @@
                 background:var(--verde-suave);
             }
 
+            tbody tr:hover{
+                background:#b7e4c7;
+                transition:0.3s;
+            }
+
             .acciones{
                 display:flex;
                 justify-content:center;
@@ -174,18 +187,13 @@
 
             .btnEditar,
             .btnEliminar{
-
                 border:none;
-
                 padding:10px 14px;
-
                 border-radius:8px;
-
                 cursor:pointer;
-
                 color:white;
-
                 font-weight:bold;
+                transition:0.3s;
             }
 
             .btnEditar{
@@ -196,8 +204,30 @@
                 background:var(--rojo);
             }
 
-        </style>
+            .btnEditar:hover,
+            .btnEliminar:hover{
+                transform:translateY(-2px);
+                opacity:0.9;
+            }
 
+            @media(max-width:768px){
+                body{
+                    padding:15px;
+                }
+
+                .header h1{
+                    font-size:28px;
+                }
+
+                .botones{
+                    flex-direction:column;
+                }
+
+                .acciones{
+                    flex-direction:column;
+                }
+            }
+        </style>
     </head>
 
     <body>
@@ -205,130 +235,68 @@
         <div class="contenedor">
 
             <div class="header">
-
                 <h1>WILD ZOO MK</h1>
-
-                <p>Sistema de Gestión de Alimentación</p>
-
+                <p>Sistema de Gestión de Categorías y Cuidadores</p>
             </div>
 
             <div class="contenido">
 
-                <form id="formAlimentacion">
+                <form id="formCategoriaCuidador">
 
-                    <input type="hidden"
-                           id="idAlimentacion">
+                    <input type="hidden" id="idAsignacionOculta">
 
                     <div class="formulario">
 
                         <div class="campo">
-
-                            <label>Tipo Alimento</label>
-
-                            <input type="text"
-                                   id="tipoAlimento"
-                                   placeholder="Ingrese alimento"
-                                   required>
-
-                        </div>
-
-                        <div class="campo">
-
-                            <label>Horario</label>
-
-                            <input type="text"
-                                   id="horario"
-                                   placeholder="Ej: 08:00 AM"
-                                   required>
-
-                        </div>
-
-                        <div class="campo">
-                            <label>Cantidad</label>
-                            <div style="display: flex; width: 100%;">
-                                <input type="number"
-                                       step="0.01"
-                                       id="cantidad"
-                                       placeholder="Ingrese cantidad"
-                                       required
-                                       style="border-radius: 12px 0 0 12px; border-right: none; flex: 1;">
-                                <span style="display: flex; align-items: center; padding: 0 15px; background: var(--verde-suave); border: 2px solid #cce3de; border-left: none; border-radius: 0 12px 12px 0; color: var(--verde-oscuro); font-weight: bold; font-size: 15px;">
-                                    kg
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="campo">
-
-                            <label>Animal</label>
-
-                            <select id="idAnimal" required>
-
-                                <option value="">
-                                    Seleccione un animal
-                                </option>
-
+                            <label>Categoria</label>
+                            <select id="idHabitatSelect" required>
+                                <option value="">Cargando habitar...</option>
                             </select>
+                        </div>
 
+                        <div class="campo">
+                            <label>Cuidador</label>
+                            
+                            <select id="idEmpleadoSelect" required>
+                                <option value="">Seleccione cuidador...</option>
+                                
+                            </select>
                         </div>
 
                         <div class="botones">
-
-                            <button type="submit"
-                                    class="guardar">
-
-                                Guardar Alimentación
-
+                            <button type="submit" class="guardar">
+                                Guardar Asignación
                             </button>
 
                             <button type="button"
                                     class="cancelar"
                                     onclick="limpiarFormulario()">
-
                                 Cancelar
-
                             </button>
-
                         </div>
 
                     </div>
 
                 </form>
 
-                <table id="tablaAlimentacion">
-
+                <table id="tablaCategoriaCuidador">
                     <thead>
-
                         <tr>
-
-                            <th>ID</th>
-
-                            <th>Tipo Alimento</th>
-
-                            <th>Horario</th>
-
-                            <th>Cantidad (kg)</th>
-
-                            <th>Animal</th>
-
-                            <th>Acciones</th>
-
+                            <th style="">ID</th>
+                            <th style="">Habitat </th>
+                            <th style=";">Cuidadores Responsables</th>
+                            <th style="">Acciones</th>
                         </tr>
-
                     </thead>
 
-                    <tbody id="tbodyAlimentacion">
-
-                    </tbody>
-
+                    <tbody id="tbodyCategoriaCuidador">
+                        </tbody>
                 </table>
 
             </div>
 
         </div>
 
-        <script src="${pageContext.request.contextPath}/js/Alimentacion.js?v=1.1"></script>
-
+        <script src="${pageContext.request.contextPath}/js/HabitatCuidador.js"></script>
     </body>
-
 </html>

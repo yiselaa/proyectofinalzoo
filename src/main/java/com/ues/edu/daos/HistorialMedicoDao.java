@@ -4,9 +4,12 @@
  */
 package com.ues.edu.daos;
 
+import com.ues.edu.entidades.Animal;
+import com.ues.edu.entidades.Empleado;
 import com.ues.edu.entidades.HistorialMedico;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
 import java.util.Date;
@@ -19,40 +22,64 @@ import java.util.List;
 
 public class HistorialMedicoDao {
 
-  private EntityManagerFactory emf = JPAUtil.getEMF();
-
+    private EntityManagerFactory emf =
+            Persistence.createEntityManagerFactory("profinalPU");
 
     // ==========================
     // GUARDAR
     // ==========================
     public void guardar(HistorialMedico historial) {
         EntityManager em = emf.createEntityManager();
+      try {
         em.getTransaction().begin();
-        em.persist(historial);
-        em.getTransaction().commit();
-        em.close();
+        Animal animalReal = em.find(Animal.class, historial.getAnimal().getId());
+        Empleado veterinarioReal = em.find(Empleado.class, historial.getVeterinario().getId());
+        
+        // 2. Se los inyectamos al historial (reemplazando los "esqueletos" que venían de JS)
+        historial.setAnimal(animalReal);
+        historial.setVeterinario(veterinarioReal);
+       em.merge(historial);
+            
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e; // Lanzamos el error para que el Servlet lo atrape
+        } finally {
+            em.close();
+        }
     }
 
     // ==========================
     // ACTUALIZAR
     // ==========================
     public void actualizar(HistorialMedico historial) {
-        EntityManager em = emf.createEntityManager();
+    EntityManager em = emf.createEntityManager();
+    try {
         em.getTransaction().begin();
-
-        HistorialMedico existente = em.find(HistorialMedico.class, historial.getId());
-
-        if (existente != null) {
-            existente.setFecha(historial.getFecha());
-            existente.setDiagnostico(historial.getDiagnostico());
-            existente.setTratamiento(historial.getTratamiento());
-            existente.setAnimal(historial.getAnimal());
-            existente.setVeterinario(historial.getVeterinario());
-        }
-
+        
+        // 1. Igual que en el guardar, rescatamos los objetos reales de la DB
+        Animal animalReal = em.find(Animal.class, historial.getAnimal().getId());
+        Empleado veterinarioReal = em.find(Empleado.class, historial.getVeterinario().getId());
+        
+        // 2. Se los inyectamos al historial para que no se pierdan sus datos
+        historial.setAnimal(animalReal);
+        historial.setVeterinario(veterinarioReal);
+        
+        // 3. ¡AQUÍ ESTÁ EL CAMBIO! Para editar se usa MERGE, no persist
+        em.merge(historial);
+        
         em.getTransaction().commit();
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+        throw e;
+    } finally {
         em.close();
     }
+}
 
     // ==========================
     // ELIMINAR

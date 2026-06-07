@@ -2,6 +2,7 @@ package com.ues.edu.daos;
 
 import com.ues.edu.entidades.Animal;
 import com.ues.edu.entidades.Empleado;
+import com.ues.edu.entidades.Habitat;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
@@ -60,13 +61,13 @@ public class EmpleadoDao {
             }
 
             // Si es cuidador, quitarlo de todos los animales asignados
-            if (e.getAnimalesAsignados() != null) {
+            if (e.getHabitatAsignadas()!= null) {
 
-                for (Animal animal : e.getAnimalesAsignados()) {
-                    animal.getCuidadores().remove(e);
+                for (Habitat habitat : e.getHabitatAsignadas()) {
+                    habitat.getCuidadores().remove(e);
                 }
 
-                e.getAnimalesAsignados().clear();
+                e.getHabitatAsignadas().clear();
 
                 em.flush();
             }

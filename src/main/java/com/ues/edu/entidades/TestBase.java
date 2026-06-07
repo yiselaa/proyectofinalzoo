@@ -23,13 +23,13 @@ public class TestBase {
     EntityManager em = emf.createEntityManager();
     
     // 2. Prueba rápida: Crear una categoría
-    Categoria cat = new Categoria();
-    cat.setNombre("Felinos");
-    cat.setDescripcion("Animales con garras");
-    
+    Habitat h = new Habitat();
+    h.setTipoTerreno("Selva");
+    h.setCapacidad(20);
+     
     try {
         em.getTransaction().begin();
-        em.persist(cat);
+        em.persist(h);
         em.getTransaction().commit();
         System.out.println("¡Base de datos y tablas creadas exitosamente!");
     } catch (Exception e) {

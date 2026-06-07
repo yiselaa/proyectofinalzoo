@@ -41,6 +41,10 @@ public class Animal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+     @NotBlank
+    @Column(name = "especie", nullable = false, length = 70)
+    private String especie;
+     
     @NotBlank
     @Column(name = "nombre_animal", nullable = false, length = 70)
     private String nombre;
@@ -54,13 +58,13 @@ public class Animal {
     private Date fechaIngreso;
 
     @ManyToOne
-    @JoinColumn(name = "idcategoria")
-    private Categoria categoria;
+    @JoinColumn(name = "idhabitat")
+    private Habitat habitat;
 
     @ManyToMany
     @JoinTable(
-            name = "animal_cuidador",
-            joinColumns = @JoinColumn(name = "idAnimal"),
+            name = "habitat_cuidador",
+            joinColumns = @JoinColumn(name = "idHabitat"),
             inverseJoinColumns = @JoinColumn(name = "idEmpleado")
     )
     private List<Empleado> cuidadores;

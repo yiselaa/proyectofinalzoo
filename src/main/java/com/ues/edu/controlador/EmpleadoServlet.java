@@ -33,7 +33,7 @@ public class EmpleadoServlet extends HttpServlet {
             .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
                 @Override
                 public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
-                    return f.getName().equals("animalesAsignados")
+                    return f.getName().equals("habitatAsignadas")
                             || f.getName().equals("cuidadores")
                             || f.getName().equals("historiales")
                             || f.getName().equals("usuario")
