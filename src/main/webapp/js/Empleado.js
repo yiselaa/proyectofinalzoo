@@ -242,7 +242,6 @@ function limpiarFormulario() {
 
     document.getElementById("formEmpleado").reset();
     document.getElementById("idEmpleado").value = "";
-
     document.querySelector(".guardar").textContent =
             "Guardar Empleado";
 }
@@ -292,7 +291,7 @@ function irPagina(numero) {
     renderPaginacion();
 }
 // ===============================
-// ASIGNACIÓN DE EVENTOS E INICIO
+// inicio
 // ===============================
 document.addEventListener("DOMContentLoaded", function () {
 

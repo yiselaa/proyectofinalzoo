@@ -31,7 +31,7 @@ public class EmpleadosService {
         dao.actualizar(e);
     }
 
-    // ELIMINAR
+     
     public void eliminarEmpleado(int id) {
         dao.eliminar(id);
     }

@@ -152,10 +152,9 @@ function deshabilitarTicket(id) {
 
 
 function limpiarFormulario() {
-
+    document.getElementById("formTicket").reset();
     document.getElementById("idTicket").value = "";
-    document.getElementById("tipoTicket").value = "";
-    document.getElementById("precio").value = "";
+
 }
 
 function habilitarTicket(id) {
@@ -169,33 +168,35 @@ function habilitarTicket(id) {
         confirmButtonText: "Sí, habilitar",
         cancelButtonText: "Cancelar"
     }).then((result) => {
-        if (!result.isConfirmed) return;
+        if (!result.isConfirmed)
+            return;
 
         fetch(`/ProyectoFinalZoo/TicketServlet?id=${id}`, {
-    method: "PUT",
-    headers: { "X-Accion": "habilitar" }
-})
-        .then(async response => {
-            const texto = await response.text();
-            if (!response.ok) throw new Error(texto);
-            return JSON.parse(texto);
+            method: "PUT",
+            headers: {"X-Accion": "habilitar"}
         })
-        .then(data => {
-            Swal.fire({
-                icon: "success",
-                title: "Habilitado",
-                text: data.mensaje,
-                confirmButtonColor: "#3f5b4b"
-            });
-            cargarTickets();
-        })
-        .catch(error => {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message,
-                confirmButtonColor: "#b05d4d"
-            });
-        });
+                .then(async response => {
+                    const texto = await response.text();
+                    if (!response.ok)
+                        throw new Error(texto);
+                    return JSON.parse(texto);
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Habilitado",
+                        text: data.mensaje,
+                        confirmButtonColor: "#3f5b4b"
+                    });
+                    cargarTickets();
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: error.message,
+                        confirmButtonColor: "#b05d4d"
+                    });
+                });
     });
 }

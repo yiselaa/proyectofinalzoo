@@ -1,7 +1,10 @@
 package com.ues.edu.controlador;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSerializer;
 import com.ues.edu.entidades.DetalleVisita;
 import com.ues.edu.entidades.Ticket;
 import com.ues.edu.entidades.Usuario;
@@ -24,7 +27,27 @@ public class DetalleVisitaServlet extends HttpServlet {
     TicketService ticketService = new TicketService();
 
     private Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+            .registerTypeAdapter(LocalDate.class,
+                    (JsonSerializer<LocalDate>) (src, typeOfSrc, context)
+                    -> new com.google.gson.JsonPrimitive(src.toString()))
+            .addSerializationExclusionStrategy(
+                    new ExclusionStrategy() {
+
+                @Override
+                public boolean shouldSkipField(FieldAttributes f) {
+
+                    return f.getName().equals("habitatsAsignados")
+                            || f.getName().equals("cuidadores")
+                            || f.getName().equals("historiales")
+                            || f.getName().equals("usuario")
+                            || f.getName().equals("listaAnimales");
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> clazz) {
+                    return false;
+                }
+            })
             .create();
 
     // =========================
@@ -53,7 +76,14 @@ public class DetalleVisitaServlet extends HttpServlet {
         }
 
         List<DetalleVisita> lista = service.listarDetalleVisita();
-        response.getWriter().write(gson.toJson(lista));
+
+        System.out.println("ANTES DE JSON");
+
+        String json = gson.toJson(lista);
+
+        System.out.println("DESPUES DE JSON");
+
+        response.getWriter().write(json);
     }
 
     // =========================
@@ -100,8 +130,8 @@ public class DetalleVisitaServlet extends HttpServlet {
         Usuario usuarioLogueado
                 = (Usuario) request.getSession().getAttribute("usuario");
 
-detalleVisita.setEmpleado(usuarioLogueado.getEmpleado());
-service.guardarDetalleVisita(detalleVisita);
+        detalleVisita.setEmpleado(usuarioLogueado.getEmpleado());
+        service.guardarDetalleVisita(detalleVisita);
         response.getWriter().write("{\"mensaje\":\"Visita guardada\"}");
     }
 
