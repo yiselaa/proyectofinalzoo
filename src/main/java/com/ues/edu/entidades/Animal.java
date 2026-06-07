@@ -40,11 +40,11 @@ public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-     @NotBlank
-    @Column(name = "especie", nullable = false, length = 70)
+    
+    @NotBlank
+    @Column(name = "especie", nullable = false, length = 50)
     private String especie;
-     
+
     @NotBlank
     @Column(name = "nombre_animal", nullable = false, length = 70)
     private String nombre;
@@ -61,11 +61,4 @@ public class Animal {
     @JoinColumn(name = "idhabitat")
     private Habitat habitat;
 
-    @ManyToMany
-    @JoinTable(
-            name = "habitat_cuidador",
-            joinColumns = @JoinColumn(name = "idHabitat"),
-            inverseJoinColumns = @JoinColumn(name = "idEmpleado")
-    )
-    private List<Empleado> cuidadores;
 }

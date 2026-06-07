@@ -71,7 +71,11 @@ function listarAsignaciones() {
                         <tr>
                             <td>${h.id}</td>
                             <td>${h.tipo_terreno} (Capacidad: ${h.capacidad})</td>
+<<<<<<< HEAD
                             <td>${nombresCuidadores}</td>
+=======
+                            <td><strong>${nombresCuidadores}</strong></td>
+>>>>>>> ff5c8151c62a41751d6d12c19ed355456fc336d7
                             <td class="acciones">
                                 <button type="button" class="btnEditar" onclick="cargarParaEditar(${h.id})">Editar</button>
                                 <button type="button" class="btnEliminar" onclick="eliminarAsignacion(${h.id})">Eliminar</button>

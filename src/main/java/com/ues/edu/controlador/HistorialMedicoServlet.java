@@ -33,7 +33,7 @@ public class HistorialMedicoServlet extends HttpServlet {
                 // Bloqueamos todas las listas y relaciones profundas que el frontend no necesita
                 return f.getName().equals("historiales")
                     || f.getName().equals("cuidadores")
-                    || f.getName().equals("habitatAsignadas")
+                    || f.getName().equals("animalesAsignados")
                     || f.getName().equals("usuario")
                     || f.getName().equals("listaAnimales"); // <--- EL NUEVO CULPABLE AQUÍ
             }

@@ -1,3 +1,10 @@
+/* =============================================================
+ * detalleVisita.js
+ * ============================================================= */
+
+// =========================
+// ESTADO GLOBAL
+// =========================
 let tickets = [];
 let idsOriginales = [];
 const precios = {};
@@ -10,6 +17,9 @@ const colores = [
     "badge-rosa"
 ];
 
+// =========================
+// INICIALIZACIÓN
+// =========================
 document.addEventListener("DOMContentLoaded", function () {
 
     cargarTabla();
@@ -25,9 +35,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    document.getElementById("btnAgregar").addEventListener("click", agregarTicket);
-    document.getElementById("formDetalleVisita").addEventListener("submit", guardarRegistro);
-    document.getElementById("btnCancelar").addEventListener("click", limpiarFormulario);
+    document.getElementById("btnAgregar")
+            .addEventListener("click", agregarTicket);
+
+    document.getElementById("formDetalleVisita")
+            .addEventListener("submit", guardarRegistro);
+
+    document.getElementById("btnCancelar")
+            .addEventListener("click", limpiarFormulario);
 
     renderTickets();
 });
@@ -87,7 +102,7 @@ function agregarTicket() {
         tickets[index].cantidad += cantidad;
         tickets[index].subtotal += subtotal;
     } else {
-        tickets.push({ tipo, cantidad, precio, subtotal });
+        tickets.push({tipo, cantidad, precio, subtotal});
     }
 
     select.value = "";
@@ -120,8 +135,8 @@ function guardarRegistro(e) {
         return;
     }
 
-    let nombre      = document.getElementById("nombreVisitante").value;
-    let telefono    = document.getElementById("telefono").value;
+    let nombre = document.getElementById("nombreVisitante").value;
+    let telefono = document.getElementById("telefono").value;
     let idExistente = document.getElementById("idDetalleVisita").value;
 
     let promesas = tickets.map(t => {
@@ -131,7 +146,7 @@ function guardarRegistro(e) {
             telefono: telefono,
             cantidad: t.cantidad,
             subtotal: t.subtotal,
-            ticket: { tipo: t.tipo }
+            ticket: {tipo: t.tipo}
         };
 
         let metodoTicket = t.idDetalle ? "PUT" : "POST";
@@ -142,57 +157,62 @@ function guardarRegistro(e) {
 
         return fetch("DetalleVisitaServlet", {
             method: metodoTicket,
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify(detalle)
         })
-        .then(async response => {
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || "Error al guardar");
-            return data;
-        });
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok)
+                        throw new Error(data.error || "Error al guardar");
+                    return data;
+                });
     });
 
     Promise.all(promesas)
-        .then(() => {
+            .then(() => {
 
-            let idsActuales = tickets
-                .filter(t => t.idDetalle)
-                .map(t => t.idDetalle);
+                let idsActuales = tickets
+                        .filter(t => t.idDetalle)
+                        .map(t => t.idDetalle);
 
-            let idsEliminar = idsOriginales.filter(id => !idsActuales.includes(id));
+                let idsEliminar = idsOriginales.filter(id => !idsActuales.includes(id));
 
-            let eliminaciones = idsEliminar.map(id =>
-                fetch("DetalleVisitaServlet?id=" + id, { method: "DELETE" })
-                    .then(r => r.json())
-            );
+                let eliminaciones = idsEliminar.map(id =>
+                    fetch("DetalleVisitaServlet?id=" + id, {method: "DELETE"})
+                            .then(r => r.json())
+                );
 
-            return Promise.all(eliminaciones);
-        })
-        .then(() => {
-            document.getElementById("mensajeError").innerHTML = "";
-            idsOriginales = [];
-            cargarTabla();
-            limpiarFormulario();
+                return Promise.all(eliminaciones);
+            })
+            .then(() => {
 
-            Swal.fire({
-                icon: "success",
-                title: idExistente ? "Actualizado" : "Guardado",
-                text: idExistente ? "Visita actualizada correctamente" : "Visita guardada correctamente",
-                confirmButtonColor: "#3f5b4b",
-                timer: 2000,
-                timerProgressBar: true
+                document.getElementById("mensajeError").innerHTML = "";
+                idsOriginales = [];
+                cargarTabla();
+                limpiarFormulario();
+
+                Swal.fire({
+                    icon: "success",
+                    title: idExistente ? "Actualizado" : "Guardado",
+                    text: idExistente ? "Visita actualizada correctamente" : "Visita guardada correctamente",
+                    confirmButtonColor: "#3f5b4b",
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+            })
+            .catch(error => {
+
+                document.getElementById("mensajeError").innerHTML = "";
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: error.message,
+                    confirmButtonColor: "#3f5b4b"
+                });
+
+                console.error(error);
             });
-        })
-        .catch(error => {
-            document.getElementById("mensajeError").innerHTML = "";
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message,
-                confirmButtonColor: "#3f5b4b"
-            });
-            console.error(error);
-        });
 }
 
 // =========================
@@ -200,9 +220,9 @@ function guardarRegistro(e) {
 // =========================
 function cargarTabla() {
     fetch("DetalleVisitaServlet")
-        .then(res => res.json())
-        .then(data => mostrarTabla(data))
-        .catch(error => console.error(error));
+            .then(res => res.json())
+            .then(data => mostrarTabla(data))
+            .catch(error => console.error(error));
 }
 
 // =========================
@@ -220,8 +240,8 @@ function mostrarTabla(lista) {
     lista.forEach(d => {
 
         let fecha = Array.isArray(d.fechaVisita)
-            ? `${d.fechaVisita[0]}-${String(d.fechaVisita[1]).padStart(2,"0")}-${String(d.fechaVisita[2]).padStart(2,"0")}`
-            : d.fechaVisita;
+                ? `${d.fechaVisita[0]}-${String(d.fechaVisita[1]).padStart(2, "0")}-${String(d.fechaVisita[2]).padStart(2, "0")}`
+                : d.fechaVisita;
 
         let clave = d.nombreVisitante + "_" + d.telefono + "_" + fecha;
 
@@ -253,10 +273,12 @@ function mostrarTabla(lista) {
                 <td>$${g.total.toFixed(2)}</td>
                 <td>
                     <div class="acciones">
-                        <button class="btnEditar" onclick="editarVisita('${g.nombre}', '${g.telefono}', '${g.fecha}')">
+                        <button class="btnEditar"
+                                onclick="editarVisita('${g.nombre}', '${g.telefono}', '${g.fecha}')">
                             <i class="ti ti-edit"></i>
                         </button>
-                        <button class="btnEliminar" onclick="eliminar('${g.nombre}', '${g.telefono}', '${g.fecha}')">
+                        <button class="btnEliminar"
+                                onclick="eliminar('${g.nombre}', '${g.telefono}', '${g.fecha}')">
                             <i class="ti ti-trash"></i>
                         </button>
                     </div>
@@ -284,41 +306,42 @@ function eliminar(nombre, telefono, fecha) {
         cancelButtonText: "Cancelar"
     }).then(result => {
 
-        if (!result.isConfirmed) return;
+        if (!result.isConfirmed)
+            return;
 
         fetch("DetalleVisitaServlet")
-            .then(r => r.json())
-            .then(lista => {
+                .then(r => r.json())
+                .then(lista => {
 
-                let registros = lista.filter(d => {
-                    let fechaD = Array.isArray(d.fechaVisita)
-                        ? `${d.fechaVisita[0]}-${String(d.fechaVisita[1]).padStart(2,"0")}-${String(d.fechaVisita[2]).padStart(2,"0")}`
-                        : d.fechaVisita;
+                    let registros = lista.filter(d => {
+                        let fechaD = Array.isArray(d.fechaVisita)
+                                ? `${d.fechaVisita[0]}-${String(d.fechaVisita[1]).padStart(2, "0")}-${String(d.fechaVisita[2]).padStart(2, "0")}`
+                                : d.fechaVisita;
 
-                    return d.nombreVisitante === nombre &&
-                           d.telefono === telefono &&
-                           fechaD === fecha;
-                });
+                        return d.nombreVisitante === nombre &&
+                                d.telefono === telefono &&
+                                fechaD === fecha;
+                    });
 
-                let promesas = registros.map(d =>
-                    fetch("DetalleVisitaServlet?id=" + d.id, { method: "DELETE" })
-                        .then(r => r.json())
-                );
+                    let promesas = registros.map(d =>
+                        fetch("DetalleVisitaServlet?id=" + d.id, {method: "DELETE"})
+                                .then(r => r.json())
+                    );
 
-                return Promise.all(promesas);
-            })
-            .then(() => {
-                cargarTabla();
-                Swal.fire({
-                    icon: "success",
-                    title: "Eliminado",
-                    text: "Registro eliminado correctamente",
-                    confirmButtonColor: "#3f5b4b",
-                    timer: 2000,
-                    timerProgressBar: true
-                });
-            })
-            .catch(error => console.error(error));
+                    return Promise.all(promesas);
+                })
+                .then(() => {
+                    cargarTabla();
+                    Swal.fire({
+                        icon: "success",
+                        title: "Eliminado",
+                        text: "Registro eliminado correctamente",
+                        confirmButtonColor: "#3f5b4b",
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                })
+                .catch(error => console.error(error));
     });
 }
 
@@ -326,55 +349,53 @@ function eliminar(nombre, telefono, fecha) {
 // EDITAR
 // =========================
 function editarVisita(nombre, telefono, fecha) {
+
     fetch("DetalleVisitaServlet")
-        .then(r => r.json())
-        .then(lista => {
+            .then(r => r.json())
+            .then(lista => {
 
-            tickets = [];
-            idsOriginales = [];
+                tickets = [];
+                idsOriginales = [];
 
-            let registros = lista.filter(d => {
-                let fechaD = Array.isArray(d.fechaVisita)
-                    ? `${d.fechaVisita[0]}-${String(d.fechaVisita[1]).padStart(2,"0")}-${String(d.fechaVisita[2]).padStart(2,"0")}`
-                    : d.fechaVisita;
+                let registros = lista.filter(d => {
+                    let fechaD = Array.isArray(d.fechaVisita)
+                            ? `${d.fechaVisita[0]}-${String(d.fechaVisita[1]).padStart(2, "0")}-${String(d.fechaVisita[2]).padStart(2, "0")}`
+                            : d.fechaVisita;
 
-                return d.nombreVisitante === nombre &&
-                       d.telefono === telefono &&
-                       fechaD === fecha;
-            });
-
-            if (registros.length === 0) return;
-
-            document.getElementById("nombreVisitante").value = nombre;
-            document.getElementById("telefono").value = telefono;
-            document.getElementById("idDetalleVisita").value = registros[0].id;
-
-            registros.forEach(d => {
-                idsOriginales.push(d.id);
-                tickets.push({
-                    idDetalle: d.id,
-                    tipo: d.ticket.tipo,
-                    cantidad: d.cantidad,
-                    precio: d.ticket.precio,
-                    subtotal: d.subtotal
+                    return d.nombreVisitante === nombre &&
+                            d.telefono === telefono &&
+                            fechaD === fecha;
                 });
-            });
 
-            renderTickets();
-            document.querySelector(".guardar").textContent = "Actualizar";
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        });
+                if (registros.length === 0)
+                    return;
+
+                document.getElementById("nombreVisitante").value = nombre;
+                document.getElementById("telefono").value = telefono;
+                document.getElementById("idDetalleVisita").value = registros[0].id;
+
+                registros.forEach(d => {
+                    idsOriginales.push(d.id);
+                    tickets.push({
+                        idDetalle: d.id,
+                        tipo: d.ticket.tipo,
+                        cantidad: d.cantidad,
+                        precio: d.ticket.precio,
+                        subtotal: d.subtotal
+                    });
+                });
+
+                renderTickets();
+                document.querySelector(".guardar").textContent = "Actualizar";
+                window.scrollTo({top: 0, behavior: "smooth"});
+            });
 }
 
 // =========================
-// LIMPIAR
+// LIMPIAR FORMULARIO
 // =========================
 function limpiarFormulario() {
-    document.getElementById("nombreVisitante").value = "";
-    document.getElementById("telefono").value = "";
-    document.getElementById("totalDisplay").value = "";
-    document.getElementById("idTicket").value = "";
-    document.getElementById("cantidad").value = "";
+    document.getElementById("formDetalleVisita").reset();
     document.getElementById("idDetalleVisita").value = "";
     document.getElementById("errorTicket").style.display = "none";
     document.getElementById("mensajeError").innerHTML = "";

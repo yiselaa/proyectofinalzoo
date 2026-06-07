@@ -26,7 +26,8 @@ public class TestBase {
     Habitat h = new Habitat();
     h.setTipoTerreno("Selva");
     h.setCapacidad(20);
-     
+   
+    
     try {
         em.getTransaction().begin();
         em.persist(h);

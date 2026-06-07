@@ -222,7 +222,7 @@
                         </div>
 
                         <div class="campo">
-                            <label >Especie</label>
+                            <label class="form-label">Especie</label>
                             <input type="text" id="especie" class="form-control" required>
                         </div>
 
@@ -240,7 +240,7 @@
                             <label>Habitat</label>
 
                             <select id="habitat" required>
-                                <option value="">Seleccione habitat...</option>
+                                <option value="">Seleccione categoría...</option>
                             </select>
                         </div>
 
@@ -255,8 +255,8 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Especie</th>
                             <th>Nombre</th>
-                             <th>Especie</th>
                             <th>Fecha Nacimiento</th>  
                             <th>Edad</th>
                             <th>Fecha Ingreso</th>

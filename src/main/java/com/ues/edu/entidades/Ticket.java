@@ -4,6 +4,7 @@
  */
 package com.ues.edu.entidades;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,10 +38,12 @@ public class Ticket {
     private Integer id;
 
     @NotBlank
+    @Expose
     @Column(name = "tipo", unique = true, nullable = false, length = 70)
     private String tipo;
 
     @NotNull
+    @Expose
     @Column(name = "precio", nullable = false)
     private double precio;
 
