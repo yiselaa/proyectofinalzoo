@@ -17,36 +17,36 @@ document.addEventListener("DOMContentLoaded", function () {
 // ==========================================
 function cargarComponentes() {
     fetch("EmpleadoServlet")
-        .then(res => res.json())
-        .then(empleados => {
-            let html = `<option value="">Seleccione cuidador...</option>`;
-            if (Array.isArray(empleados)) {
-                empleados.forEach(emp => {
-                    if (emp.rol && emp.rol.toUpperCase() === "CUIDADOR") {
-                        let nombre = emp.nombre_empleado || emp.nombre || "Sin nombre";
-                        let apellido = emp.apellido || "";
-                        html += `<option value="${emp.id}">${nombre} ${apellido}</option>`;
-                    }
-                });
-            }
-            document.getElementById("idEmpleadoSelect").innerHTML = html;
-        })
-        .catch(err => console.error("Error cargando empleados:", err));
+            .then(res => res.json())
+            .then(empleados => {
+                let html = `<option value="">Seleccione cuidador...</option>`;
+                if (Array.isArray(empleados)) {
+                    empleados.forEach(emp => {
+                        if (emp.rol && emp.rol.toUpperCase() === "CUIDADOR") {
+                            let nombre = emp.nombre_empleado || emp.nombre || "Sin nombre";
+                            let apellido = emp.apellido || "";
+                            html += `<option value="${emp.id}">${nombre} ${apellido}</option>`;
+                        }
+                    });
+                }
+                document.getElementById("idEmpleadoSelect").innerHTML = html;
+            })
+            .catch(err => console.error("Error cargando empleados:", err));
 
     fetch("HabitatServlet")
-        .then(res => res.json())
-        .then(habitats => {
-            let html = `<option value="">Seleccione hábitat...</option>`;
-            if (Array.isArray(habitats)) {
-                habitats.forEach(h => {
-                    let terreno = h.tipo_terreno || h.tipoTerreno || "Hábitat";
-                    let cap = h.capacidad !== undefined ? h.capacidad : 0;
-                    html += `<option value="${h.id}">${terreno} (Capacidad: ${cap})</option>`;
-                });
-            }
-            document.getElementById("idHabitatSelect").innerHTML = html;
-        })
-        .catch(err => console.error("Error cargando hábitats:", err));
+            .then(res => res.json())
+            .then(habitats => {
+                let html = `<option value="">Seleccione hábitat...</option>`;
+                if (Array.isArray(habitats)) {
+                    habitats.forEach(h => {
+                        let terreno = h.tipo_terreno || h.tipoTerreno || "Hábitat";
+                        let cap = h.capacidad !== undefined ? h.capacidad : 0;
+                        html += `<option value="${h.id}">${terreno} (Capacidad: ${cap})</option>`;
+                    });
+                }
+                document.getElementById("idHabitatSelect").innerHTML = html;
+            })
+            .catch(err => console.error("Error cargando hábitats:", err));
 }
 
 // ==========================================
@@ -54,39 +54,42 @@ function cargarComponentes() {
 // ==========================================
 function listarAsignaciones() {
     fetch("HabitatCuidadorServlet")
-        .then(res => res.json())
-        .then(data => {
-            let html = "";
-            if (Array.isArray(data)) {
-                data.forEach(h => {
-                    // Extraer los nombres de los cuidadores mapeados en tu Servlet
-                    let nombresCuidadores = "Sin cuidadores asignados";
-                    if (h.cuidadores && h.cuidadores.length > 0) {
-                        nombresCuidadores = h.cuidadores
-                            .map(c => `${c.nombre} ${c.apellido}`)
-                            .join(", ");
-                    }
+            .then(res => res.json())
+            .then(data => {
+                let html = "";
+                if (Array.isArray(data)) {
+                    data.forEach(h => {
+                        // Extraer los nombres de los cuidadores mapeados en tu Servlet
+                        let nombresCuidadores = "Sin cuidadores asignados";
+                        if (h.cuidadores && h.cuidadores.length > 0) {
+                            nombresCuidadores = h.cuidadores
+                                    .map(c => `${c.nombre} ${c.apellido}`)
+                                    .join(", ");
+                        }
 
-                    html += `
+                        html += `
                         <tr>
                             <td>${h.id}</td>
                             <td>${h.tipo_terreno} (Capacidad: ${h.capacidad})</td>
-<<<<<<< HEAD
                             <td>${nombresCuidadores}</td>
-=======
-                            <td><strong>${nombresCuidadores}</strong></td>
->>>>>>> ff5c8151c62a41751d6d12c19ed355456fc336d7
                             <td class="acciones">
-                                <button type="button" class="btnEditar" onclick="cargarParaEditar(${h.id})">Editar</button>
-                                <button type="button" class="btnEliminar" onclick="eliminarAsignacion(${h.id})">Eliminar</button>
-                            </td>
+    <button class="btnEditar"
+            onclick="cargarParaEditar(${h.id})">
+        <i class="ti ti-edit"></i>
+    </button>
+
+    <button class="btnEliminar"
+            onclick="eliminarAsignacion(${h.id})">
+        <i class="ti ti-trash"></i>
+    </button>
+</td>
                         </tr>
                     `;
-                });
-            }
-            document.getElementById("tbodyCategoriaCuidador").innerHTML = html;
-        })
-        .catch(err => console.error("Error al listar la tabla:", err));
+                    });
+                }
+                document.getElementById("tbodyCategoriaCuidador").innerHTML = html;
+            })
+            .catch(err => console.error("Error al listar la tabla:", err));
 }
 
 // ==========================================
@@ -97,11 +100,11 @@ function guardarOEditar(e) {
 
     const idHabitat = document.getElementById("idHabitatSelect").value;
     const selectEmpleado = document.getElementById("idEmpleadoSelect");
-    
+
     // Obtener todos los IDs seleccionados (por si usas selección múltiple)
     const idsEmpleados = Array.from(selectEmpleado.selectedOptions)
-                              .map(option => parseInt(option.value))
-                              .filter(val => !isNaN(val));
+            .map(option => parseInt(option.value))
+            .filter(val => !isNaN(val));
 
     if (idsEmpleados.length === 0) {
         alert("Por favor, seleccione al menos un cuidador.");
@@ -119,16 +122,16 @@ function guardarOEditar(e) {
 
     fetch(url, {
         method: metodo,
-        headers: { "Content-Type": "application/json;charset=UTF-8" },
+        headers: {"Content-Type": "application/json;charset=UTF-8"},
         body: JSON.stringify(payload)
     })
-    .then(res => res.json())
-    .then(res => {
-        alert(res.mensaje || "Operación realizada con éxito");
-        limpiarFormulario();
-        listarAsignaciones();
-    })
-    .catch(err => console.error("Error al procesar asignación:", err));
+            .then(res => res.json())
+            .then(res => {
+                alert(res.mensaje || "Operación realizada con éxito");
+                limpiarFormulario();
+                listarAsignaciones();
+            })
+            .catch(err => console.error("Error al procesar asignación:", err));
 }
 
 // ==========================================
@@ -136,22 +139,22 @@ function guardarOEditar(e) {
 // ==========================================
 function cargarParaEditar(idHabitat) {
     fetch(`HabitatCuidadorServlet?id=${idHabitat}`)
-        .then(res => res.json())
-        .then(habitat => {
-            // Bloqueamos o asignamos el ID del hábitat
-            document.getElementById("idHabitatSelect").value = habitat.id;
-            document.getElementById("idAsignacionOculta").value = habitat.id;
+            .then(res => res.json())
+            .then(habitat => {
+                // Bloqueamos o asignamos el ID del hábitat
+                document.getElementById("idHabitatSelect").value = habitat.id;
+                document.getElementById("idAsignacionOculta").value = habitat.id;
 
-            // Seleccionar los cuidadores actuales en el select
-            const selectEmpleado = document.getElementById("idEmpleadoSelect");
-            const idsAsignados = habitat.cuidadores.map(c => c.id.toString());
+                // Seleccionar los cuidadores actuales en el select
+                const selectEmpleado = document.getElementById("idEmpleadoSelect");
+                const idsAsignados = habitat.cuidadores.map(c => c.id.toString());
 
-            for (let i = 0; i < selectEmpleado.options.length; i++) {
-                let option = selectEmpleado.options[i];
-                option.selected = idsAsignados.includes(option.value);
-            }
-        })
-        .catch(err => console.error("Error al buscar asignación:", err));
+                for (let i = 0; i < selectEmpleado.options.length; i++) {
+                    let option = selectEmpleado.options[i];
+                    option.selected = idsAsignados.includes(option.value);
+                }
+            })
+            .catch(err => console.error("Error al buscar asignación:", err));
 }
 
 // ==========================================
@@ -162,12 +165,12 @@ function eliminarAsignacion(idHabitat) {
         fetch(`HabitatCuidadorServlet?id=${idHabitat}`, {
             method: "DELETE"
         })
-        .then(res => res.json())
-        .then(res => {
-            alert(res.mensaje);
-            listarAsignaciones();
-        })
-        .catch(err => console.error("Error al eliminar:", err));
+                .then(res => res.json())
+                .then(res => {
+                    alert(res.mensaje);
+                    listarAsignaciones();
+                })
+                .catch(err => console.error("Error al eliminar:", err));
     }
 }
 

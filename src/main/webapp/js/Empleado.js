@@ -1,239 +1,181 @@
-/* * Empleados.js
+/* 
+ * Empleados.js
  */
 
 console.log("JS EMPLEADOS CARGADO");
 
-let empleados = [];
 let paginaActual = 1;
 const size = 5;
 
 // ===============================
 // BUSCAR EMPLEADOS
 // ===============================
-function cargarEmpleados() {
+function buscar(pagina = 1) {
+
+    paginaActual = pagina;
 
     fetch("EmpleadoServlet")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Error en la respuesta del servidor");
-                }
-                return response.json();
-            })
-            .then(data => {
+        .then(response => response.json())
+        .then(data => {
 
-                empleados = data;
+            console.log(data);
 
-                mostrarEmpleados();
-                renderPaginacion();
+            mostrarEmpleados(data);
 
-            })
-            .catch(error => {
-                console.error("Error al buscar empleados:", error);
-            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
 }
+
 // ===============================
 // MOSTRAR EMPLEADOS EN TABLA
 // ===============================
-function mostrarEmpleados() {
+function mostrarEmpleados(lista) {
 
     let html = "";
 
-    let inicio = (paginaActual - 1) * size;
-    let fin = inicio + size;
-
-    let empleadosPagina = empleados.slice(inicio, fin);
-
-    if (empleadosPagina.length === 0) {
-
-        html = `
-            <tr>
-                <td colspan="6" style="text-align:center;">
-                    No se encontraron empleados registrados
-                </td>
-            </tr>
-        `;
-
-        document.getElementById("tbodyEmpleados").innerHTML = html;
-        return;
-    }
-
-    empleadosPagina.forEach(e => {
+    lista.forEach(e => {
 
         html += `
             <tr>
+
                 <td>${e.id}</td>
+
                 <td>${e.nombre}</td>
+
                 <td>${e.apellido}</td>
+
                 <td>${e.dui}</td>
+
                 <td>${e.rol}</td>
+
                 <td class="acciones">
 
-                    <button class="btnEditar" onclick="editar(${e.id})">
-                        <i class="ti ti-edit"></i>
+                    <button class="btnEditar"
+                            onclick="editar(${e.id})">
+                        Editar
                     </button>
 
                     <button class="btnEliminar"
                             onclick="eliminarEmpleado(${e.id})">
-                        <i class="ti ti-trash"></i>
+                        Eliminar
                     </button>
 
                 </td>
+
             </tr>
         `;
     });
 
     document.getElementById("tbodyEmpleados").innerHTML = html;
 }
+
 // ===============================
-// EDITAR EMPLEADO (Cargar datos en el formulario)
+// EDITAR EMPLEADO
 // ===============================
 function editar(id) {
+
     fetch(`EmpleadoServlet?id=${id}`)
-            .then(response => {
-                if (!response.ok)
-                    throw new Error("No se pudo obtener el registro");
-                return response.json();
-            })
-            .then(e => {
-                document.getElementById("idEmpleado").value = e.id;
-                document.getElementById("nombreEmpleado").value = e.nombre;
-                document.getElementById("apellido").value = e.apellido;
-                document.getElementById("numeroDui").value = e.dui;
-                document.getElementById("rol").value = e.rol;
+        .then(response => response.json())
+        .then(e => {
 
-                document.querySelector(".guardar").textContent = "Actualizar Empleado";
+            document.getElementById("idEmpleado").value = e.id;
 
-                // Opcional: Desplazar la pantalla suavemente hacia el formulario al editar
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            })
-            .catch(error => {
-                console.error("Error al cargar datos de edición:", error);
-            });
+            document.getElementById("nombreEmpleado").value = e.nombre;
+
+            document.getElementById("apellido").value = e.apellido;
+
+            document.getElementById("numeroDui").value = e.dui;
+
+            document.getElementById("rol").value = e.rol;
+        })
+        .catch(error => {
+            console.error(error);
+        });
 }
 
 // ===============================
-// GUARDAR O ACTUALIZAR (Submit del Formulario)
+// GUARDAR O ACTUALIZAR
 // ===============================
-document.getElementById("formEmpleado").addEventListener("submit", function (event) {
+document.getElementById("formEmpleado")
+        .addEventListener("submit", function (event) {
+
     event.preventDefault();
+
     let id = document.getElementById("idEmpleado").value;
+
     let empleado = {
+
         nombre: document.getElementById("nombreEmpleado").value,
+
         apellido: document.getElementById("apellido").value,
+
         dui: document.getElementById("numeroDui").value,
+
         rol: document.getElementById("rol").value
     };
 
-
-    // Solo se adjunta el ID si estamos editando
+    // SOLO EN EDICIÓN
     if (id) {
         empleado.id = parseInt(id);
     }
 
     let metodo = id ? "PUT" : "POST";
+
     fetch("EmpleadoServlet", {
+
         method: metodo,
+
         headers: {
             "Content-Type": "application/json"
         },
+
         body: JSON.stringify(empleado)
+
     })
-            .then(async response => {
+    .then(response => response.json())
+    .then(data => {
 
-                const data = await response.json();
+        console.log(data);
 
-                if (!response.ok) {
-                    throw new Error(data.error);
-                }
+        limpiarFormulario();
 
-                return data;
-            })
-            .then(data => {
+        buscar();
+    })
+    .catch(error => {
 
-                Swal.fire({
-                    icon: "success",
-                    title: id ? "Actualizado" : "Agregado",
-                    text: data.mensaje,
-                    confirmButtonColor: "#3f5b4b"
-                });
+        console.error(error);
+    });
 
-                limpiarFormulario();
-                paginaActual = 1; // agregar esto
-
-                cargarEmpleados();
-
-            })
-            .catch(error => {
-
-                Swal.fire({
-                    icon: "warning",
-                    title: "No se puede guardar",
-                    text: error.message,
-                    confirmButtonColor: "#b05d4d"
-                });
-                
-
-            });
 });
+
 // ===============================
 // ELIMINAR EMPLEADO
 // ===============================
 function eliminarEmpleado(id) {
 
-    Swal.fire({
-        title: "¿Eliminar empleado?",
-        text: "Esta acción no se puede deshacer",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#b05d4d",
-        cancelButtonColor: "#3f5b4b",
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar"
-    }).then((result) => {
+    if (!confirm("¿Desea eliminar este empleado?")) {
+        return;
+    }
 
-        if (!result.isConfirmed) {
-            return;
-        }
+    fetch(`EmpleadoServlet?id=${id}`, {
 
-        fetch(`EmpleadoServlet?id=${id}`, {
-            method: "DELETE"
-        })
-                .then(async response => {
+        method: "DELETE"
 
-                    const texto = await response.text();
+    })
+    .then(response => response.text())
+    .then(data => {
 
-                    console.log("STATUS:", response.status);
-                    console.log("RESPUESTA:", texto);
+        console.log(data);
 
-                    if (!response.ok) {
-                        throw new Error(texto);
-                    }
+        buscar();
+    })
+    .catch(error => {
 
-                    return JSON.parse(texto);
-                })
-                .then(data => {
-
-                    Swal.fire({
-                        icon: "success",
-                        title: "Eliminado",
-                        text: data.mensaje,
-                        confirmButtonColor: "#3f5b4b"
-                    });
-                    paginaActual = 1; // agregar esto
-                    cargarEmpleados();
-                })
-                .catch(error => {
-
-                    Swal.fire({
-                        icon: "warning",
-                        title: "No se puede eliminar",
-                        text: error.message,
-                        confirmButtonColor: "#b05d4d"
-                    });
-                });
+        console.error(error);
     });
 }
-
 
 // ===============================
 // LIMPIAR FORMULARIO
@@ -241,69 +183,15 @@ function eliminarEmpleado(id) {
 function limpiarFormulario() {
 
     document.getElementById("formEmpleado").reset();
+
     document.getElementById("idEmpleado").value = "";
-    document.querySelector(".guardar").textContent =
-            "Guardar Empleado";
 }
 
-function renderPaginacion() {
-    document.getElementById("paginacion").innerHTML = `
-        <button onclick="anterior()">
-            <i class="ti ti-chevron-left"></i>
-        </button>
-
-        Página ${paginaActual}
-
-        <button onclick="siguiente()">
-            <i class="ti ti-chevron-right"></i>
-        </button>
-    `;
-}
-function siguiente() {
-
-    let totalPaginas = Math.ceil(empleados.length / size);
-
-    if (paginaActual < totalPaginas) {
-
-        paginaActual++;
-
-        mostrarEmpleados();
-        renderPaginacion();
-    }
-}
-
-function anterior() {
-
-    if (paginaActual > 1) {
-
-        paginaActual--;
-
-        mostrarEmpleados();
-        renderPaginacion();
-    }
-}
-
-function irPagina(numero) {
-
-    paginaActual = numero;
-
-    mostrarEmpleados();
-    renderPaginacion();
-}
 // ===============================
-// inicio
+// INICIO
 // ===============================
 document.addEventListener("DOMContentLoaded", function () {
 
-    cargarEmpleados();
-
-    const btnCancelar = document.querySelector(".cancelar");
-
-    if (btnCancelar) {
-        btnCancelar.addEventListener("click", function (e) {
-            e.preventDefault();
-            limpiarFormulario();
-        });
-    }
+    buscar();
 
 });

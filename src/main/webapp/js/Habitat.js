@@ -45,12 +45,14 @@ function mostrarHabitats(lista) {
                 <td>${h.capacidad}</td>
                 <td class="acciones">
                     <button class="btnEditar"
-                            onclick="editarHabitat(${h.id})">
-                        Editar
+                        onclick="editarHabitat(${h.id})">
+                        <i class="ti ti-edit"></i>
                     </button>
+
                     <button class="btnEliminar"
-                            onclick="eliminarHabitat(${h.id})">
-                        Eliminar
+                        onclick="eliminarHabitat(${h.id})">
+                          <i class="ti ti-trash"></i>
+
                     </button>
                 </td>
             </tr>
@@ -92,7 +94,6 @@ document.getElementById("formHabitat")
         capacidad: parseInt(document.getElementById("capacidad").value)
     };
 
-    // SOLO EN EDICIÓN
     if (id) {
         habitat.id = parseInt(id);
     }

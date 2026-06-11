@@ -77,8 +77,16 @@ function mostrarAlimentaciones(lista) {
             <td>${alimentacion.cantidad}</td>
             <td>${especieAnimal}</td>
             <td class="acciones">
-                <button type="button" class="btnEditar" onclick="editar(${alimentacion.id})">Editar</button>
-                <button type="button" class="btnEliminar" onclick="eliminarAlimentacion(${alimentacion.id})">Eliminar</button>
+    <button class="btnEditar"
+        onclick="editar(${alimentacion.id})">
+        <i class="ti ti-edit"></i>
+    </button>
+
+    <button class="btnEliminar"
+        onclick="eliminarAlimentacion(${alimentacion.id})">
+        <i class="ti ti-trash"></i>
+    </button>
+</td>
             </td>
         `;
         tbody.appendChild(tr);

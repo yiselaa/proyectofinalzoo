@@ -58,8 +58,16 @@ function mostrarAnimales(lista) {
                 <td>${formatearFecha(a.fechaIngreso)}</td>
                 <td>${a.habitat ? a.habitat.tipoTerreno : ""}</td>
                 <td class="acciones">
-                    <button class="btnEditar" onclick="editarAnimal(${a.id})">Editar</button>
-                    <button class="btnEliminar" onclick="eliminarAnimal(${a.id})">Eliminar</button>
+                    <button class="btnEditar"
+                        onclick="editarAnimal(${a.id})">
+                        <i class="ti ti-edit"></i>
+                    </button>
+
+                    <button class="btnEliminar"
+                        onclick="eliminarAnimal(${a.id})">
+                          <i class="ti ti-trash"></i>
+
+                    </button>
                 </td>
             </tr>
         `;
@@ -104,6 +112,8 @@ function editarAnimal(id) {
             document.getElementById("habitat").value =
                 a.habitat ? a.habitat.id : "";
         })
+        
+        
         .catch(error => {
             console.error(error);
         });

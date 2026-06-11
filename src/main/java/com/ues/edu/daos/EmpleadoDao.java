@@ -1,17 +1,18 @@
 package com.ues.edu.daos;
 
-import com.ues.edu.entidades.Animal;
 import com.ues.edu.entidades.Empleado;
-import com.ues.edu.entidades.Habitat;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class EmpleadoDao {
 
-    private EntityManagerFactory emf = JPAUtil.getEMF();
+    private EntityManagerFactory emf =
+            Persistence.createEntityManagerFactory("profinalPU");
 
+    
     public void guardar(Empleado empleado) {
 
         EntityManager em = emf.createEntityManager();
@@ -25,20 +26,39 @@ public class EmpleadoDao {
         em.close();
     }
 
-    public void actualizar(Empleado empleado) {
+  
+public void actualizar(Empleado empleado) {
+
+    EntityManager em = emf.createEntityManager();
+
+    em.getTransaction().begin();
+
+    Empleado existente = em.find(Empleado.class, empleado.getId());
+
+    if (existente != null) {
+        existente.setNombre(empleado.getNombre());
+        existente.setApellido(empleado.getApellido());
+        existente.setDui(empleado.getDui());
+        existente.setRol(empleado.getRol());
+        // ✅ NO tocamos historiales, usuario ni animalesAsignados
+    }
+
+    em.getTransaction().commit();
+
+    em.close();
+}
+
+  
+    public void eliminar(long id) {
 
         EntityManager em = emf.createEntityManager();
 
         em.getTransaction().begin();
 
-        Empleado existente = em.find(Empleado.class, empleado.getId());
+        Empleado e = em.find(Empleado.class, id);
 
-        if (existente != null) {
-            existente.setNombre(empleado.getNombre());
-            existente.setApellido(empleado.getApellido());
-            existente.setDui(empleado.getDui());
-            existente.setRol(empleado.getRol());
-            // ✅ NO tocamos historiales, usuario ni animalesAsignados
+        if (e != null) {
+            em.remove(e);
         }
 
         em.getTransaction().commit();
@@ -46,55 +66,12 @@ public class EmpleadoDao {
         em.close();
     }
 
-    public void eliminar(int id) {
-
-        EntityManager em = emf.createEntityManager();
-
-        try {
-
-            em.getTransaction().begin();
-
-            Empleado e = em.find(Empleado.class, id);
-
-            if (e == null) {
-                throw new RuntimeException("Empleado no encontrado");
-            }
-
-            // Si es cuidador, quitarlo de todos los animales asignados
-            if (e.getHabitatAsignadas()!= null) {
-
-                for (Habitat habitat : e.getHabitatAsignadas()) {
-                    habitat.getCuidadores().remove(e);
-                }
-
-                e.getHabitatAsignadas().clear();
-
-                em.flush();
-            }
-
-            em.remove(e);
-
-            em.getTransaction().commit();
-
-        } catch (Exception ex) {
-
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-
-            throw ex;
-
-        } finally {
-            em.close();
-        }
-    }
-
     public List<Empleado> listar() {
 
         EntityManager em = emf.createEntityManager();
 
-        TypedQuery<Empleado> query
-                = em.createQuery(
+        TypedQuery<Empleado> query =
+                em.createQuery(
                         "SELECT e FROM Empleado e",
                         Empleado.class
                 );
@@ -105,8 +82,23 @@ public class EmpleadoDao {
 
         return lista;
     }
+    
+    public List<Empleado> obtenerSoloVeterinarios() {
+        EntityManager em = emf.createEntityManager(); 
+        try {
+            return em.createQuery("SELECT e FROM Empleado e WHERE e.rol = 'Veterinario'", Empleado.class)
+                     .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
+    }
 
-    public Empleado buscarPorId(int id) {
+    public Empleado buscarPorId(long id) {
 
         EntityManager em = emf.createEntityManager();
 
@@ -117,31 +109,34 @@ public class EmpleadoDao {
         return e;
     }
 
-//    public List<Empleado> buscarPorNombre(String nombre) {
-//
-//        EntityManager em = emf.createEntityManager();
-//
-//        TypedQuery<Empleado> query =
-//                em.createQuery(
-//                        "SELECT e FROM Empleado e "
-//                        + "WHERE LOWER(e.nombre) LIKE LOWER(:nombre)",
-//                        Empleado.class
-//                );
-//
-//        query.setParameter("nombre", "%" + nombre + "%");
-//
-//        List<Empleado> lista = query.getResultList();
-//
-//        em.close();
-//
-//        return lista;
-//    }
+  
+    public List<Empleado> buscarPorNombre(String nombre) {
+
+        EntityManager em = emf.createEntityManager();
+
+        TypedQuery<Empleado> query =
+                em.createQuery(
+                        "SELECT e FROM Empleado e "
+                        + "WHERE LOWER(e.nombre) LIKE LOWER(:nombre)",
+                        Empleado.class
+                );
+
+        query.setParameter("nombre", "%" + nombre + "%");
+
+        List<Empleado> lista = query.getResultList();
+
+        em.close();
+
+        return lista;
+    }
+
+  
     public List<Empleado> filtrarPorRol(String rol) {
 
         EntityManager em = emf.createEntityManager();
 
-        TypedQuery<Empleado> query
-                = em.createQuery(
+        TypedQuery<Empleado> query =
+                em.createQuery(
                         "SELECT e FROM Empleado e "
                         + "WHERE e.rol = :rol",
                         Empleado.class
@@ -156,12 +151,13 @@ public class EmpleadoDao {
         return lista;
     }
 
+   
     public List<Empleado> listarPaginado(int pagina, int size) {
 
         EntityManager em = emf.createEntityManager();
 
-        TypedQuery<Empleado> query
-                = em.createQuery(
+        TypedQuery<Empleado> query =
+                em.createQuery(
                         "SELECT e FROM Empleado e",
                         Empleado.class
                 );
@@ -176,20 +172,5 @@ public class EmpleadoDao {
 
         return lista;
     }
-    
-    public boolean existeDui(String dui) {
-
-    EntityManager em = emf.createEntityManager();
-
-    Long cantidad = em.createQuery(
-            "SELECT COUNT(e) FROM Empleado e WHERE e.dui = :dui",
-            Long.class)
-            .setParameter("dui", dui)
-            .getSingleResult();
-
-    em.close();
-
-    return cantidad > 0;
-}
 
 }
