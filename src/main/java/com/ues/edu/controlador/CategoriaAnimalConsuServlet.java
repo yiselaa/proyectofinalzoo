@@ -1,6 +1,7 @@
 package com.ues.edu.controlador;
 
 import com.ues.edu.daos.ConsultaAnimalCategoriaDao;
+import com.ues.edu.entidades.Animal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,7 +19,7 @@ public class CategoriaAnimalConsuServlet extends HttpServlet {
 
     ConsultaAnimalCategoriaDao dao = new ConsultaAnimalCategoriaDao();
 
-     @Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -30,22 +32,43 @@ public class CategoriaAnimalConsuServlet extends HttpServlet {
 
             String filtro = request.getParameter("filtro");
 
-            List<Object[]> animales = dao.buscarFiltro(filtro);
+            List<Animal> animales = dao.buscarFiltro(filtro);
 
             JSONArray jsonArray = new JSONArray();
 
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            
             if (animales != null) {
-                for (Object[] a : animales) {
+
+                for (Animal a : animales) {
 
                     JSONObject obj = new JSONObject();
 
-                    obj.put("id", a[0] != null ? Long.parseLong(a[0].toString()) : 0);
-                    obj.put("nombre", a[1] != null ? a[1].toString() : "");
-                    obj.put("fecha_ingreso", a[2] != null ? a[2].toString() : "");
-                    obj.put("fecha_nacimiento", a[3] != null ? a[3].toString() : "");
-                    obj.put("edad", a[4] != null ? Long.parseLong(a[4].toString()) : 0);
-                    obj.put("categoria", a[5] != null ? a[5].toString() : "");
-                    obj.put("descripcion", a[6] != null ? a[6].toString() : "");
+                    obj.put("id", a.getId());
+                    obj.put("nombre", a.getNombre());
+                    obj.put("especie", a.getEspecie());
+
+                    obj.put("fecha_ingreso",
+                            a.getFechaIngreso() != null
+                            ? sdf.format(a.getFechaIngreso())
+                            : "");
+
+                    obj.put("fecha_nacimiento",
+                            a.getFechaNacimiento() != null
+                            ? sdf.format(a.getFechaNacimiento())
+                            : "");
+
+                    obj.put("edad", a.getEdad());
+
+                    obj.put("tipoTerreno",
+                            a.getHabitat() != null
+                            ? a.getHabitat().getTipoTerreno()
+                            : "");
+
+                    obj.put("capacidad",
+                            a.getHabitat() != null
+                            ? a.getHabitat().getCapacidad()
+                            : "");
 
                     jsonArray.put(obj);
                 }
@@ -65,7 +88,6 @@ public class CategoriaAnimalConsuServlet extends HttpServlet {
 
         out.flush();
     }
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
