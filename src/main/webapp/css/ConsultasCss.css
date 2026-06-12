@@ -2,24 +2,24 @@
    PALETA UNIFICADA (Inspirada en image_10b3d7.png)
    ========================================================================== */
 :root {
-    --fondo-general: #F1FAEE;   /* Blanco Menta Base */
-    --texto-oscuro: #081C15;    /* Verde Profundo Absoluto */
-    --color-consultas: #143629; /* Verde Bosque Alto */
-    --color-crud: #22523D;      /* Verde Medio */
-    --color-reportes: #2D6A4F;  /* Verde Esmeralda Bajito */
+    --fondo-general: #F1FAEE;
+    --texto-oscuro: #081C15;
+    --color-consultas: #143629;
+    --color-crud: #22523D;
+    --color-reportes: #2D6A4F;
     --blanco-puro: #ffffff;
 }
 
 /* ====== ESTILO GENERAL ====== */
 body {
     background: var(--fondo-general);
-    font-family: 'DM Sans', sans-serif; /* Tipografía unificada del ecosistema */
+    font-family: 'DM Sans', sans-serif;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
 }
 
-/* ====== HEADER (Hace juego con el menú principal) ====== */
+/* ====== HEADER ====== */
 .header {
     background: linear-gradient(135deg, #081C15 0%, #1B4332 60%, #2D6A4F 100%);
     color: var(--fondo-general);
@@ -30,10 +30,9 @@ body {
 .header h1 {
     margin: 0;
     font-size: 32px;
-    font-weight: 800; /* Extra bold para verse imponente */
+    font-weight: 800;
     letter-spacing: -0.5px;
 }
-
 .header p {
     margin: 4px 0 0;
     font-size: 14px;
@@ -49,7 +48,7 @@ body {
 /* ====== TARJETA LIMPIA ====== */
 .card-clean {
     background: var(--blanco-puro);
-    border-radius: 20px; /* Bordes suaves modernos */
+    border-radius: 20px;
     padding: 24px;
     border: 1px solid rgba(27, 67, 50, 0.08);
     box-shadow: 0 4px 16px rgba(8, 28, 21, 0.03);
@@ -61,7 +60,6 @@ body {
     border-collapse: collapse;
 }
 
-/* ESPACIADO CELDAS */
 #tablaAnimales td {
     padding: 14px;
     vertical-align: middle;
@@ -69,7 +67,6 @@ body {
     font-size: 15px;
 }
 
-/* QUITAR LÍNEAS VERTICALES */
 #tablaAnimales td,
 #tablaAnimales th {
     border-left: none !important;
@@ -77,13 +74,12 @@ body {
     border-bottom: 1px solid rgba(27, 67, 50, 0.06);
 }
 
-/* HOVER FILAS (Sutil verde claro al pasar el cursor) */
 #tablaAnimales tbody tr:hover td {
     background-color: rgba(45, 106, 79, 0.05) !important;
     transition: background-color 0.2s ease;
 }
 
-/* ====== BOTÓN REGRESAR GHOST ELEGANTE ====== */
+/* ====== BOTÓN REGRESAR ====== */
 .btn-back {
     display: inline-flex;
     align-items: center;
@@ -101,15 +97,14 @@ body {
 .btn-back:hover {
     background: rgba(34, 82, 61, 0.08);
     color: var(--texto-oscuro);
-    transform: translateX(-3px); /* Pequeño empuje dinámico hacia la izquierda */
+    transform: translateX(-3px);
 }
 
-/* ====== DATATABLES ====== */
+/* ====== DATATABLES - LAYOUT ====== */
 .dataTables_wrapper {
     padding-top: 10px;
 }
 
-/* INPUTS DE BÚSQUEDA Y SELECCIÓN */
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
     border: 1px solid rgba(34, 82, 61, 0.25);
@@ -126,16 +121,15 @@ body {
     box-shadow: 0 0 8px rgba(45, 106, 79, 0.15);
 }
 
-/* BUSCAR MÁS ANCHO */
 .dataTables_wrapper .dataTables_filter input {
     width: 260px !important;
 }
 
-/* ====== ENCABEZADO DE TABLA VERDE BOSQUE ====== */
+/* ====== ENCABEZADO TABLA ====== */
 table.dataTable > thead > tr > th,
 table.dataTable thead th,
 table.dataTable thead td {
-    background-color: var(--color-consultas) !important; /* Mismo color alto del menú */
+    background-color: var(--color-consultas) !important;
     color: var(--blanco-puro) !important;
     font-weight: 700;
     text-transform: uppercase;
@@ -146,7 +140,6 @@ table.dataTable thead td {
     border-bottom: none !important;
 }
 
-/* COLUMNAS DE ORDENAMIENTO DE DATATABLES */
 table.dataTable thead .sorting,
 table.dataTable thead .sorting_asc,
 table.dataTable thead .sorting_desc {
@@ -154,18 +147,19 @@ table.dataTable thead .sorting_desc {
     color: var(--blanco-puro) !important;
 }
 
-/* QUITAR LÍNEAS VERTICALES GLOBAL */
 table.dataTable td,
 table.dataTable th {
     border-left: none !important;
     border-right: none !important;
 }
 
-/* TRUCO: Oculta el "Buscar:" nativo de Bootstrap y pone "Buscar " */
+/* ====== TRUCO BUSCAR ====== */
 .dataTables_filter label {
     color: transparent !important;
     font-size: 0 !important;
     font-weight: 700;
+    display: flex;
+    align-items: center;
 }
 
 .dataTables_filter label::before {
@@ -181,24 +175,88 @@ table.dataTable th {
     display: inline-block !important;
 }
 
-/* PAGINACIÓN CONFIGURADA PARA BOOTSTRAP 5 */
-.dataTables_wrapper .pagination .page-item.active .page-link {
-    background-color: var(--color-crud) !important; /* Color de transición elegante */
+/* ====== PAGINACIÓN - VERDE (máxima especificidad) ====== */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: var(--color-crud) !important;
+    background-color: var(--color-crud) !important;
     border-color: var(--color-crud) !important;
     color: var(--blanco-puro) !important;
     font-weight: 700;
+    border-radius: 6px;
 }
 
-/* Color verde al pasar el mouse por encima de los otros números */
-.dataTables_wrapper .pagination .page-link:hover {
-    color: var(--texto-oscuro) !important;
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: rgba(34, 82, 61, 0.08) !important;
     background-color: rgba(34, 82, 61, 0.08) !important;
+    border-color: rgba(34, 82, 61, 0.2) !important;
+    color: var(--texto-oscuro) !important;
+    border-radius: 6px;
 }
 
-/* Color para los números que no están seleccionados */
-.dataTables_wrapper .pagination .page-link {
+.dataTables_wrapper .dataTables_paginate .paginate_button {
     color: var(--color-reportes) !important;
     font-weight: 500;
-    border: 1px solid rgba(45, 106, 79, 0.15);
-    box-shadow: none !important; /* Elimina el foco azul por defecto de Bootstrap */
+    border-radius: 6px;
+    border: 1px solid rgba(45, 106, 79, 0.15) !important;
+    margin: 0 2px;
 }
+
+/* Bootstrap 5 pagination override por si acaso */
+.dataTables_wrapper .pagination .page-item.active .page-link {
+    background-color: var(--color-crud) !important;
+    border-color: var(--color-crud) !important;
+    color: var(--blanco-puro) !important;
+    font-weight: 700;
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper .pagination .page-item .page-link {
+    color: var(--color-reportes) !important;
+    font-weight: 500;
+    border-color: rgba(45, 106, 79, 0.15) !important;
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper .pagination .page-item .page-link:hover {
+    color: var(--texto-oscuro) !important;
+    background-color: rgba(34, 82, 61, 0.08) !important;
+    border-color: var(--color-crud) !important;
+}
+
+/* Elimina outline azul de Bootstrap en focus */
+.dataTables_wrapper .pagination .page-link:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Sobreescribir variables de Bootstrap para paginación */
+.pagination {
+    --bs-pagination-active-bg: #22523D !important;
+    --bs-pagination-active-border-color: #22523D !important;
+    --bs-pagination-active-color: #ffffff !important;
+    --bs-pagination-color: #2D6A4F !important;
+    --bs-pagination-hover-color: #081C15 !important;
+    --bs-pagination-hover-bg: rgba(34, 82, 61, 0.08) !important;
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(34, 82, 61, 0.25) !important;
+    --bs-pagination-border-color: rgba(45, 106, 79, 0.15) !important;
+    --bs-pagination-hover-border-color: #22523D !important;
+}
+
+#tablaAnimales {
+    width: 100% !important;
+}
+
+#tablaAnimales th,
+#tablaAnimales td {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+table.dataTable thead th {
+    white-space: nowrap;
+}
+
+table.dataTable {
+    width: 100% !important;
+} 
