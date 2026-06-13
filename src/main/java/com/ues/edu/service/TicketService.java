@@ -21,6 +21,16 @@ public class TicketService {
     }
 
     public void registrarTicket(Ticket p) {
+
+        String tipoNormalizado = p.getTipo().trim().toLowerCase();
+
+        Ticket existente = dao.buscarPorTipo(tipoNormalizado);
+
+        if (existente != null) {
+            throw new RuntimeException("Ya existe un ticket registrado con ese nombre");
+        }
+
+        p.setTipo(tipoNormalizado); // guardas todo normalizado
         dao.guardar(p);
     }
 

@@ -1,98 +1,161 @@
-console.log("JS nNUEVO CARGADO");
+console.log("JS NUEVO CARGADO");
+
+let tickets = [];
+let paginaActual = 1;
+const size = 5;
+
 document.addEventListener("DOMContentLoaded", function () {
 
     cargarTickets();
 
     document.getElementById("formTicket")
-            .addEventListener("submit", function (e) {
+        .addEventListener("submit", function (e) {
 
-                e.preventDefault();
+            e.preventDefault();
 
-                let id = document.getElementById("idTicket").value;
+            let id = document.getElementById("idTicket").value;
 
-                let ticket = {
-                    id: id === "" ? null : parseInt(id),
-                    tipo: document.getElementById("tipoTicket").value,
-                    precio: parseFloat(document.getElementById("precio").value),
-                    estado: "Activo"
-                };
+            let ticket = {
+                id: id === "" ? null : parseInt(id),
+                tipo: document.getElementById("tipoTicket").value,
+                precio: parseFloat(document.getElementById("precio").value),
+                estado: "Activo"
+            };
 
-                let metodo = id === "" ? "POST" : "PUT";
+            let metodo = id === "" ? "POST" : "PUT";
 
-                fetch("/ProyectoFinalZoo/TicketServlet", {
-                    method: metodo,
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(ticket)
-                })
-                        .then(response => response.json())
-                        .then(data => {
+            fetch("/ProyectoFinalZoo/TicketServlet", {
+                method: metodo,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(ticket)
+            })
+            .then(async response => {
+                const data = await response.json();
 
-                            Swal.fire({
-                                icon: "success",
-                                title: id ? "Actualizado" : "Agregado",
-                                text: data.mensaje,
-                                confirmButtonColor: "#3f5b4b"
-                            });
+                if (!response.ok) {
+                    throw new Error(data.error || "Ocurrió un error en la operación");
+                }
 
-                            limpiarFormulario();
-                            cargarTickets();
-                        })
-                        .catch(error => {
+                return data;
+            })
+            .then(data => {
 
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error",
-                                text: error.message,
-                                confirmButtonColor: "#b05d4d"
-                            });
-                        });
+                Swal.fire({
+                    icon: "success",
+                    title: id ? "Actualizado" : "Agregado",
+                    text: data.mensaje,
+                    confirmButtonColor: "#3f5b4b"
+                });
 
+                limpiarFormulario();
+                cargarTickets();
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: "warning",
+                    title: "No se puede guardar",
+                    text: error.message,
+                    confirmButtonColor: "#b05d4d"
+                });
             });
+
+        });
 
 });
 
 function cargarTickets() {
 
     fetch("/ProyectoFinalZoo/TicketServlet?accion=listar")
-            .then(response => response.json())
-            .then(data => {
+        .then(response => response.json())
+        .then(data => {
 
-                let tbody = document.querySelector("#tablaTickets tbody");
+            tickets = data; // 🔥 IMPORTANTE PARA PAGINACIÓN
 
-                tbody.innerHTML = "";
+            renderTabla();
+            renderPaginacion();
+        })
+        .catch(error => console.error("Error al cargar tickets:", error));
+}
 
-                data.forEach(ticket => {
+function renderTabla() {
 
-                    tbody.innerHTML += `
-                    <tr>
-                        <td>${ticket.id}</td>
-                        <td>${ticket.tipo}</td>
-                        <td>$${ticket.precio}</td>
-                        <td>${ticket.estado}</td>
+    let tbody = document.querySelector("#tablaTickets tbody");
+    tbody.innerHTML = "";
 
-                        <td class="acciones">
+    let inicio = (paginaActual - 1) * size;
+    let fin = inicio + size;
 
-                            <button class="btnEditar"
-                                onclick="editarTicket(${ticket.id}, '${ticket.tipo}', ${ticket.precio})">
-                                <i class="ti ti-edit"></i>
-                            </button>
+    let paginaDatos = tickets.slice(inicio, fin);
 
-                            <button class="${ticket.estado === 'Activo' ? 'btnEliminar' : 'btnHabilitar'}"
-    onclick="${ticket.estado === 'Activo'
+    paginaDatos.forEach(ticket => {
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${ticket.id}</td>
+                <td>${ticket.tipo}</td>
+                <td>$${ticket.precio}</td>
+                <td>${ticket.estado}</td>
+
+                <td class="acciones">
+
+                    <button class="btnEditar"
+                        onclick="editarTicket(${ticket.id}, \`${ticket.tipo}\`, ${ticket.precio})">
+                        <i class="ti ti-edit"></i>
+                    </button>
+
+                    <button class="${ticket.estado === 'Activo' ? 'btnEliminar' : 'btnHabilitar'}"
+                        onclick="${ticket.estado === 'Activo'
                             ? `deshabilitarTicket(${ticket.id})`
                             : `habilitarTicket(${ticket.id})`}">
-    <i class="ti ${ticket.estado === 'Activo' ? 'ti-ban' : 'ti-circle-check'}"></i>
-</button>
+                        <i class="ti ${ticket.estado === 'Activo' ? 'ti-ban' : 'ti-circle-check'}"></i>
+                    </button>
 
-                        </td>
-                    </tr>
-                `;
-                });
+                </td>
+            </tr>
+        `;
+    });
+}
 
-            })
-            .catch(error => console.error("Error al cargar tickets:", error));
+function renderPaginacion() {
+
+    const pagContenedor = document.getElementById("paginacion");
+    if (!pagContenedor) return;
+
+    let totalPaginas = Math.ceil(tickets.length / size);
+
+    pagContenedor.innerHTML = `
+        <button onclick="anterior()">
+            <i class="ti ti-chevron-left"></i>
+        </button>
+
+        Página ${paginaActual} de ${totalPaginas}
+
+        <button onclick="siguiente()">
+            <i class="ti ti-chevron-right"></i>
+        </button>
+    `;
+}
+
+function siguiente() {
+
+    let totalPaginas = Math.ceil(tickets.length / size);
+
+    if (paginaActual < totalPaginas) {
+        paginaActual++;
+        renderTabla();
+        renderPaginacion();
+    }
+}
+
+function anterior() {
+
+    if (paginaActual > 1) {
+        paginaActual--;
+        renderTabla();
+        renderPaginacion();
+    }
 }
 
 function editarTicket(id, tipo, precio) {
@@ -101,6 +164,8 @@ function editarTicket(id, tipo, precio) {
     document.getElementById("tipoTicket").value = tipo;
     document.getElementById("precio").value = precio;
 
+    document.querySelector(".guardar").textContent = "Actualizar";
+
     window.scrollTo({
         top: 0,
         behavior: "smooth"
@@ -108,6 +173,7 @@ function editarTicket(id, tipo, precio) {
 }
 
 function deshabilitarTicket(id) {
+
     Swal.fire({
         title: "¿Deshabilitar ticket?",
         text: "Ya no aparecerá en nuevas visitas",
@@ -118,46 +184,42 @@ function deshabilitarTicket(id) {
         confirmButtonText: "Sí, deshabilitar",
         cancelButtonText: "Cancelar"
     }).then((result) => {
-        if (!result.isConfirmed)
-            return;
+
+        if (!result.isConfirmed) return;
 
         fetch(`/ProyectoFinalZoo/TicketServlet?id=${id}`, {
             method: "DELETE"
         })
-                .then(async response => {
-                    const texto = await response.text();
-                    if (!response.ok)
-                        throw new Error(texto);
-                    return JSON.parse(texto);
-                })
-                .then(data => {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Deshabilitado",
-                        text: data.mensaje,
-                        confirmButtonColor: "#3f5b4b"
-                    });
-                    cargarTickets();
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: error.message,
-                        confirmButtonColor: "#b05d4d"
-                    });
-                });
+        .then(async response => {
+            const texto = await response.text();
+            if (!response.ok) throw new Error(texto);
+            return JSON.parse(texto);
+        })
+        .then(data => {
+
+            Swal.fire({
+                icon: "success",
+                title: "Deshabilitado",
+                text: data.mensaje,
+                confirmButtonColor: "#3f5b4b"
+            });
+
+            cargarTickets();
+        })
+        .catch(error => {
+
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message,
+                confirmButtonColor: "#b05d4d"
+            });
+        });
     });
 }
 
-
-function limpiarFormulario() {
-    document.getElementById("formTicket").reset();
-    document.getElementById("idTicket").value = "";
-
-}
-
 function habilitarTicket(id) {
+
     Swal.fire({
         title: "¿Habilitar ticket?",
         text: "Volverá a aparecer en nuevas visitas",
@@ -168,35 +230,45 @@ function habilitarTicket(id) {
         confirmButtonText: "Sí, habilitar",
         cancelButtonText: "Cancelar"
     }).then((result) => {
-        if (!result.isConfirmed)
-            return;
+
+        if (!result.isConfirmed) return;
 
         fetch(`/ProyectoFinalZoo/TicketServlet?id=${id}`, {
             method: "PUT",
-            headers: {"X-Accion": "habilitar"}
+            headers: { "X-Accion": "habilitar" }
         })
-                .then(async response => {
-                    const texto = await response.text();
-                    if (!response.ok)
-                        throw new Error(texto);
-                    return JSON.parse(texto);
-                })
-                .then(data => {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Habilitado",
-                        text: data.mensaje,
-                        confirmButtonColor: "#3f5b4b"
-                    });
-                    cargarTickets();
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: error.message,
-                        confirmButtonColor: "#b05d4d"
-                    });
-                });
+        .then(async response => {
+            const texto = await response.text();
+            if (!response.ok) throw new Error(texto);
+            return JSON.parse(texto);
+        })
+        .then(data => {
+
+            Swal.fire({
+                icon: "success",
+                title: "Habilitado",
+                text: data.mensaje,
+                confirmButtonColor: "#3f5b4b"
+            });
+
+            cargarTickets();
+        })
+        .catch(error => {
+
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message,
+                confirmButtonColor: "#b05d4d"
+            });
+        });
     });
+}
+
+function limpiarFormulario() {
+
+    document.getElementById("formTicket").reset();
+    document.getElementById("idTicket").value = "";
+
+    document.querySelector(".guardar").textContent = "Guardar Ticket";
 }

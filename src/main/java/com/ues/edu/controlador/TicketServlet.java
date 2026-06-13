@@ -54,61 +54,75 @@ public class TicketServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // 1. Forzamos a que la respuesta sea SIEMPRE JSON desde el inicio
+        response.setContentType("application/json;charset=UTF-8");
+
+        try {
+            Ticket ticket = gson.fromJson(request.getReader(), Ticket.class);
+
+            String error = validarTicket(ticket);
+            if (error != null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"" + error + "\"}");
+                return;
+            }
+
+            // Aquí se ejecuta tu servicio (el cual puede lanzar el RuntimeException)
+            ticketService.registrarTicket(ticket);
+
+            response.getWriter().write("{\"mensaje\":\"Ticket guardado\"}");
+
+        } catch (RuntimeException e) {
+            // 🔥 ESTE CATCH ES EL QUE SALVA EL DÍA:
+            // Capta la frase "Ya existe un ticket registrado con ese nombre" del servicio
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+
+        } catch (Exception e) {
+            // Para cualquier otro error inesperado de base de datos
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error interno del servidor\"}");
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        String accion = request.getHeader("X-Accion");
+
+        System.out.println("ACCION RECIBIDA: " + accion);
+
+        if ("habilitar".equals(accion)) {
+            Integer id = Integer.valueOf(request.getParameter("id"));
+            ticketService.habilitar(id);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"mensaje\":\"Ticket habilitado\"}");
+            return;
+        }
+
         Ticket ticket = gson.fromJson(request.getReader(), Ticket.class);
-
         String error = validarTicket(ticket);
-
         if (error != null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"" + error + "\"}");
             return;
         }
-
-        ticketService.registrarTicket(ticket);
-
+        ticketService.actualizarTicket(ticket);
         response.setContentType("application/json");
-        response.getWriter().write("{\"mensaje\":\"Ticket guardado\"}");
+        response.getWriter().write("{\"mensaje\":\"Ticket actualizado\"}");
     }
 
-@Override
-protected void doPut(HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
-
-    String accion = request.getHeader("X-Accion");
-    
-    System.out.println("ACCION RECIBIDA: " + accion);
-
-    if ("habilitar".equals(accion)) {
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         Integer id = Integer.valueOf(request.getParameter("id"));
-        ticketService.habilitar(id);
+        ticketService.deshabilitar(id);
         response.setContentType("application/json");
-        response.getWriter().write("{\"mensaje\":\"Ticket habilitado\"}");
-        return;
+        response.getWriter().write("{\"mensaje\":\"Ticket deshabilitado\"}");
     }
-
-    Ticket ticket = gson.fromJson(request.getReader(), Ticket.class);
-    String error = validarTicket(ticket);
-    if (error != null) {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentType("application/json");
-        response.getWriter().write("{\"error\":\"" + error + "\"}");
-        return;
-    }
-    ticketService.actualizarTicket(ticket);
-    response.setContentType("application/json");
-    response.getWriter().write("{\"mensaje\":\"Ticket actualizado\"}");
-}
-
-
-@Override
-protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
-    Integer id = Integer.valueOf(request.getParameter("id"));
-    ticketService.deshabilitar(id);
-    response.setContentType("application/json");
-    response.getWriter().write("{\"mensaje\":\"Ticket deshabilitado\"}");
-}
 
     private String validarTicket(Ticket t) {
 

@@ -46,8 +46,9 @@
                         <p class="card-label">Consultas</p>
                         <p class="card-desc">Visualiza información del sistema</p>
                         <div class="divider div-consultas"></div>
-                        
-                        <a href="ConsultaAnimalCategoria.jsp" class="btn-action-main btn-consultas">Ver categorías</a>
+
+                        <a href="ConsultaAnimalCategoria.jsp" class="btn-action-main btn-consultas">
+                            <i class="ti ti-category"></i> Ver categorías</a>
                         <a href="ConsultaCuidadorAnimal.jsp" class="btn-ghost gh-consultas">
                             <i class="ti ti-user"></i> Ver cuidador
                         </a>
@@ -57,9 +58,7 @@
                         <a href="MostrarHistorialMedico.jsp" class="btn-ghost gh-consultas">
                             <i class="ti ti-file-text"></i> Historial médico
                         </a>
-                        <a href="MostrarHistorialMedico.jsp" class="btn-ghost gh-consultas">
-                            <i class="ti ti-file-text"></i> PRUEBA
-                        </a>
+
                     </div>
                 </div>
 
@@ -72,7 +71,9 @@
                         <p class="card-desc">Gestiona registros del sistema</p>
                         <div class="divider div-crud"></div>
 
-                        <a href="Empleado.jsp" class="btn-action-main btn-crud">Empleados</a>
+                        <a href="Empleado.jsp" class="btn-action-main btn-crud">
+                            <i class="ti ti-briefcase"></i> Empleados
+                             </a>
                         <a href="Usuarios.jsp" class="btn-ghost gh-crud">
                             <i class="ti ti-users"></i> Usuarios
                         </a>
@@ -83,16 +84,21 @@
                             <i class="ti ti-list-details"></i> Visitas
                         </a>
                         <a href="Animal.jsp" class="btn-ghost gh-crud">
-                            <i class="ti ti-tag"></i> Animal
+                            <i class="ti ti-paw"></i> Animal
                         </a>
+
                         <a href="Habitat.jsp" class="btn-ghost gh-crud">
-                            <i class="ti ti-tag"></i> Habitat
+                            <i class="ti ti-home-eco"></i> Hábitat
                         </a>
+
                         <a href="Alimentacion.jsp" class="btn-ghost gh-crud">
-                            <i class="ti ti-tag"></i> Alimentacion
+                            <i class="ti ti-salad"></i> Alimentación
+                        </a>
+                        <a href="HistorialMedico.jsp" class="btn-ghost gh-crud">
+                            <i class="ti ti-salad"></i> Historial Medico
                         </a>
                         <a href="HabitatCuidador.jsp" class="btn-ghost gh-crud">
-                            <i class="ti ti-tag"></i> Habitat-cuiador
+                            <i class="ti ti-user-heart"></i> Asignar cuidador
                         </a>
                     </div>
                 </div>
@@ -105,11 +111,26 @@
                         <p class="card-label">Reportes</p>
                         <p class="card-desc">Estadísticas del zoológico</p>
                         <div class="divider div-reportes"></div>
-
-                        <a href="reportes.jsp" class="btn-action-main btn-reportes">Ver reportes</a>
-                        <a href="reportes.jsp" class="btn-ghost gh-reportes">
-                            <i class="ti ti-chart-line"></i> Ver estadísticas
+                        <a href="ReporteTicket.jsp" target="_blank" class="btn-action-main btn-reportes">
+                            <i class="ti ti-ticket"></i> Ticket más vendido
                         </a>
+
+                        <a href="ReporteAnimalesHabitat.jsp" target="_blank" class="btn-ghost gh-reportes">
+                            <i class="ti ti-home-eco"></i> Animales por hábitat
+                        </a>
+
+                        <a href="ReporteAtencionesVeterinario.jsp" target="_blank" class="btn-ghost gh-reportes">
+                            <i class="ti ti-stethoscope"></i> Atención por veterinario
+                        </a>
+
+                        <a href="ReporteVentasEmpleado.jsp" target="_blank" class="btn-ghost gh-reportes">
+                            <i class="ti ti-trophy"></i> Más ventas
+                        </a>
+
+                        <a href="ReporteVisitasFecha.jsp" target="_blank" class="btn-ghost gh-reportes">
+                            <i class="ti ti-calendar-event"></i> Fechas más visitadas
+                        </a>
+
                     </div>
                 </div>
 
@@ -119,13 +140,13 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
-          window.addEventListener("load", function () {
-    const usuario = sessionStorage.getItem("usuarioLogueado");
+            window.addEventListener("load", function () {
+                const usuario = sessionStorage.getItem("usuarioLogueado");
 
-    if (usuario) {
-        document.getElementById("usuarioActivo").textContent = `Bienvenido, ${usuario}`;
-    }
-});
+                if (usuario) {
+                    document.getElementById("usuarioActivo").textContent = `Bienvenido, ${usuario}`;
+                }
+            });
         </script>
 
     </body>

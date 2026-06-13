@@ -210,27 +210,38 @@ public class EmpleadoServlet extends HttpServlet {
         }
     }
 
-    // VALIDACIÓN
+    // VALIDACIÓN MODIFICADA
     private String validarEmpleado(Empleado e) {
 
         if (e == null) {
             return "Empleado inválido";
         }
 
+        // 1. Validar presencia y longitud del Nombre
         if (e.getNombre() == null || e.getNombre().trim().length() < 3) {
             return "Nombre mínimo 3 caracteres";
         }
+        
+        // 🔥 VALIDACIÓN: Que el nombre NO contenga números (Solo letras y espacios)
+        if (!e.getNombre().matches("^[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+$")) {
+            return "El nombre no debe contener números ni caracteres especiales";
+        }
 
+        // 2. Validar presencia y longitud del Apellido
         if (e.getApellido() == null || e.getApellido().trim().length() < 3) {
             return "Apellido mínimo 3 caracteres";
         }
+        
+        // 🔥 VALIDACIÓN: Que el apellido NO contenga números (Solo letras y espacios)
+        if (!e.getApellido().matches("^[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+$")) {
+            return "El apellido no debe contener números ni caracteres especiales";
+        }
 
-        if (e.getDui() == null
-                || !e.getDui().matches("^\\d{8}-\\d$")) {
-
+        // 3. Validar formato de DUI
+        if (e.getDui() == null || !e.getDui().matches("^\\d{8}-\\d$")) {
             return "El DUI debe tener el formato ########-#";
         }
 
-        return null;
+        return null; // Si todo está bien, retorna null
     }
 }

@@ -83,7 +83,8 @@
                     </tbody>
                 </table>
 
-<div id="paginacion" class="paginacion"></div>                
+                <div id="paginacion" class="paginacion"></div>   
+
                 <div style="margin-top: 24px; text-align: right;">
                     <a href="index.html" class="btn-back">
                         <i class="ti ti-arrow-left"></i> 
