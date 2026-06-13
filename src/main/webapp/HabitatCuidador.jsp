@@ -1,113 +1,101 @@
 <%-- 
-    Document   : Cuidador
-    Created on : 31 may. 2026, 16:18:47
+    Document   : Categoria
+    Created on : 16 may. 2026, 21:31:56
     Author     : coc44
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
-<html lang="es">
+<html>    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WILD ZOO MK - Gestión de Empleados</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/Crud.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <body>
 
-    <title>WILD ZOO MK - Gestión de Hábitats y Cuidadores</title>
+        <div class="contenedor">
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/Crud.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+            <div class="header">
+                <h1>WILD ZOO MK</h1>
+                <p>Sistema de Gestión de Categorías</p>
+            </div>
 
-<body>
+            <div class="contenido">
 
-    <div class="contenedor">
+                <form id="formCategoria">
 
-        <div class="header">
-            <h1>WILD ZOO MK</h1>
-            <p>Gestión de Hábitats y Cuidadores</p>
-        </div>
+                    <input type="hidden" id="idCategoria">
 
-        <div class="contenido">
+                    <div class="formulario">
 
-            <form id="formCategoriaCuidador">
+                        <div class="campo">
+                            <label>Nombre Categoría</label>
 
-                <input type="hidden" id="idAsignacionOculta">
+                            <input type="text"
+                                   id="nombreCategoria"
+                                   placeholder="Ingrese categoría"
+                                   required>
+                        </div>
 
-                <div class="formulario">
+                        <div class="campo">
+                            <label>Descripción</label>
 
-                    <div class="campo">
-                        <label for="idHabitatSelect">Hábitat</label>
-                        <select id="idHabitatSelect" required>
-                            <option value="">
-                                Seleccione un hábitat
-                            </option>
-                        </select>
-                    </div>
+                            <textarea id="descripcion"
+                                      placeholder="Ingrese descripción"
+                                      required>
+                            </textarea>
+                        </div>
 
-                    <div class="campo">
-                        <label for="idEmpleadoSelect">Cuidador</label>
-                        <select id="idEmpleadoSelect" required>
-                            <option value="">
-                                Seleccione un cuidador
-                            </option>
-                        </select>
-                    </div>
+                        <div class="botones">
 
-                    <div class="botones">
+                            <button type="submit" class="guardar">
+                                Guardar Categoría
+                            </button>
 
-                        <button type="submit"
-                                id="btnGuardar"
-                                class="guardar">
-                            Guardar Asignación
-                        </button>
+                            <button type="button"
+                                    class="cancelar"
+                                    onclick="limpiarFormulario()">
+                                Cancelar
+                            </button>
 
-                        <button type="button"
-                                class="cancelar"
-                                onclick="limpiarFormulario()">
-                            Cancelar
-                        </button>
+                        </div>
 
                     </div>
 
+                </form>
+
+                <table id="tablaCategorias">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tbodyCategorias">
+
+                    </tbody>
+
+                </table>
+
+                <div style="margin-top: 24px; text-align: right;">
+                    <a href="index.html" class="btn-back">
+                        <i class="ti ti-arrow-left"></i> 
+                    </a>
                 </div>
 
-            </form>
-
-            <div id="mensajeError"></div>
-
-            <table id="tablaCategoriaCuidador">
-
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Hábitat</th>
-                        <th>Cuidadores Responsables</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody id="tbodyCategoriaCuidador">
-                </tbody>
-
-            </table>
-
-            <div id="paginacion" class="paginacion"></div>
-
-            <div style="margin-top: 24px; text-align: right;">
-                <a href="${pageContext.request.contextPath}/index.html"
-                   class="btn-back">
-                    <i class="ti ti-arrow-left"></i>
-                </a>
             </div>
 
         </div>
 
-    </div>
+        <script src="${pageContext.request.contextPath}/js/Categoria.js"></script>
 
-    <script src="${pageContext.request.contextPath}/js/HabitatCuidador.js"></script>
-
-</body>
-
+    </body>
 </html>

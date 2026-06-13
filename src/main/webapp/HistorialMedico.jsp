@@ -5,106 +5,218 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
+<html>
+    <head>
+        <title>Gestión de Historial Médico</title>
 
-<html lang="es">
+        <style>
+            :root{
+                --verde-oscuro:#1b4332;
+                --verde-medio:#2d6a4f;
+                --verde-claro:#52b788;
+                --verde-suave:#d8f3dc;
+                --blanco:#ffffff;
+                --gris:#f4f4f4;
+                --rojo:#d62828;
+                --azul:#40916c;
+            }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            body{
+                font-family: Arial, Helvetica, sans-serif;
+                background: linear-gradient(135deg, #d8f3dc, #95d5b2);
+                min-height:100vh;
+                padding:40px;
+            }
 
-<title>WILD ZOO MK - Gestión de Historial Médico</title>
+            .contenedor{
+                max-width:1200px;
+                margin:auto;
+                background:var(--blanco);
+                border-radius:20px;
+                overflow:hidden;
+                box-shadow:0 10px 25px rgba(0,0,0,0.2);
+            }
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/Crud.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            .header{
+                background:linear-gradient(90deg, var(--verde-oscuro), var(--verde-medio));
+                color:white;
+                padding:35px;
+                text-align:center;
+            }
 
-</head>
+            .header h1{
+                font-size:40px;
+                margin-bottom:10px;
+                letter-spacing:2px;
+            }
 
-<body>
+            .header p{
+                font-size:18px;
+                opacity:0.9;
+            }
 
-```
-<div class="contenedor">
+            .contenido{
+                padding:35px;
+            }
 
-    <div class="header">
-        <h1>WILD ZOO MK</h1>
-        <p>Gestión de Historial Médico</p>
-    </div>
+            .formulario{
+                display:grid;
+                grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+                gap:20px;
+                margin-bottom:40px;
+            }
 
-    <div class="contenido">
+            .campo{
+                display:flex;
+                flex-direction:column;
+            }
 
-        <form id="formHistorial">
+            .campo label{
+                margin-bottom:8px;
+                font-weight:bold;
+                color:var(--verde-oscuro);
+            }
 
-            <input type="hidden" id="idHistorial">
+            .campo input,
+            .campo select{
+                padding:14px;
+                border:2px solid #cce3de;
+                border-radius:12px;
+                font-size:15px;
+                transition:0.3s;
+                background:#f8fff9;
+                width:90%;
+            }
 
-            <div class="formulario">
+            .botones{
+                grid-column:1/-1;
+                display:flex;
+                gap:15px;
+                margin-top:10px;
+            }
 
-                <div class="campo">
-                    <label for="fecha">Fecha</label>
-                    <input type="date"
-                           id="fecha"
-                           required>
-                </div>
+            .guardar{
+                background:var(--verde-medio);
+                color:white;
+                padding:14px 25px;
+                border:none;
+                border-radius:12px;
+                cursor:pointer;
+                font-weight:bold;
+            }
 
-                <div class="campo">
-                    <label for="diagnostico">Diagnóstico</label>
-                    <input type="text"
-                           id="diagnostico"
-                           placeholder="Ingrese diagnóstico"
-                           required>
-                </div>
+            .cancelar{
+                background:#b7e4c7;
+                color:var(--verde-oscuro);
+                padding:14px 25px;
+                border:none;
+                border-radius:12px;
+                cursor:pointer;
+                font-weight:bold;
+            }
 
-                <div class="campo">
-                    <label for="tratamiento">Tratamiento</label>
-                    <input type="text"
-                           id="tratamiento"
-                           placeholder="Ingrese tratamiento"
-                           required>
-                </div>
+            table{
+                width:100%;
+                border-collapse:collapse;
+                overflow:hidden;
+                border-radius:15px;
+            }
 
-                <div class="campo">
-                    <label for="idAnimal">Animal</label>
-                    <select id="idAnimal" required>
-                        <option value="">
-                            Seleccione un animal...
-                        </option>
-                    </select>
-                </div>
+            thead{
+                background:var(--verde-medio);
+                color:white;
+            }
 
-                <div class="campo">
-                    <label for="idVeterinario">Veterinario</label>
-                    <select id="idVeterinario" required>
-                        <option value="">
-                            Seleccione un veterinario...
-                        </option>
-                    </select>
-                </div>
+            th, td{
+                padding:16px;
+                text-align:center;
+                border-bottom:1px solid #ddd;
+            }
 
-                <div class="botones">
+            tbody tr:nth-child(even){
+                background:var(--verde-suave);
+            }
 
-                    <button type="submit"
-                            id="btnGuardar"
-                            class="guardar">
-                        Guardar Historial
-                    </button>
+            .acciones{
+                display:flex;
+                justify-content:center;
+                gap:10px;
+            }
 
-                    <button type="button"
-                            class="cancelar"
-                            onclick="limpiarFormularioHistorial()">
-                        Cancelar
-                    </button>
+            .btnEditar{
+                background:var(--azul);
+                color:white;
+                border:none;
+                padding:10px 14px;
+                border-radius:8px;
+                cursor:pointer;
+                font-weight:bold;
+            }
 
-                </div>
+            .btnEliminar{
+                background:var(--rojo);
+                color:white;
+                border:none;
+                padding:10px 14px;
+                border-radius:8px;
+                cursor:pointer;
+                font-weight:bold;
+            }
+        </style>
+    </head>
 
+    <body>
+        <div class="contenedor">
+            <div class="header">
+                <h1>WILD ZOO MK</h1>
+                <p>Sistema de Gestión de Historial Médico</p>
             </div>
 
+            <div class="contenido">
+                <form id="formHistorial">
+                    <input type="hidden" id="idHistorial">
+
+                    <div class="formulario">
+                        <div class="campo">
+                            <label>Fecha</label>
+                            <input type="date" id="fecha" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Diagnóstico</label>
+                            <input type="text" id="diagnostico" placeholder="Ingrese diagnóstico" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Tratamiento</label>
+                            <input type="text" id="tratamiento" placeholder="Ingrese tratamiento" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Animal</label>
+                            <select id="idAnimal" required>
+                                <option value="">Seleccione un animal...</option>
+                            </select>
+                        </div>
+
+                    <div class="campo">
+                        <label>Veterinario</label>
+                        <select id="idVeterinario" required>
+                            <option value="">Seleccione un veterinario</option>
+                        </select>
+                    </div>
+
+                    <div class="botones">
+                        <button type="submit" class="guardar">Guardar</button>
+                        <button type="button" class="cancelar" onclick="limpiarFormularioHistorial()">Cancelar</button>
+                    </div>
+            </div>
         </form>
 
-        <div id="mensajeError"></div>
+        <br><br>
 
-        <table id="tablaHistorial">
-
+        <table>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -117,27 +229,13 @@
                     <th>Acciones</th>
                 </tr>
             </thead>
-
             <tbody id="tbodyHistoriales">
             </tbody>
-
         </table>
-
-        <div id="paginacion" class="paginacion"></div>
-
-        <div style="margin-top: 24px; text-align: right;">
-            <a href="${pageContext.request.contextPath}/index.html"
-               class="btn-back">
-                <i class="ti ti-arrow-left"></i>
-            </a>
-        </div>
-
     </div>
-
 </div>
 
+<%-- Opción recomendada y segura en Jakarta EE / Servlets --%>
 <script src="${pageContext.request.contextPath}/js/HistorialMedico.js"></script>
-
 </body>
-
 </html>

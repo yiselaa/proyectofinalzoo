@@ -1,44 +1,67 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package com.ues.edu.entidades;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- *
- * @author MINED
- */
 public class TestBase {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
- 
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("profinalPU");
-    EntityManager em = emf.createEntityManager();
-    
-    // 2. Prueba rápida: Crear una categoría
-    Habitat h = new Habitat();
-    h.setTipoTerreno("Selva");
-    h.setCapacidad(20);
-   
-    
-    try {
-        em.getTransaction().begin();
-        em.persist(h);
-        em.getTransaction().commit();
-        System.out.println("¡Base de datos y tablas creadas exitosamente!");
-    } catch (Exception e) {
-        System.err.println("Error al crear la base: " + e.getMessage());
-    } finally {
-        em.close();
-        emf.close();
+
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("profinalPU");
+        EntityManager em = emf.createEntityManager();
+
+        try {
+
+            em.getTransaction().begin();
+
+            // Crear empleados
+            Empleado e1 = new Empleado();
+            e1.setNombre("Juan");
+            e1.setApellido("Pérez");
+            e1.setDui("12345678-9");
+            e1.setRol("Cuidador");
+
+            Empleado e2 = new Empleado();
+            e2.setNombre("María");
+            e2.setApellido("López");
+            e2.setDui("98765432-1");
+            e2.setRol("Cuidador");
+
+            em.persist(e1);
+            em.persist(e2);
+
+            // Crear hábitat
+            Habitat habitat = new Habitat();
+            habitat.setTipoTerreno("Selva");
+            habitat.setCapacidad(20);
+
+            List<Empleado> cuidadores = new ArrayList<>();
+            cuidadores.add(e1);
+            cuidadores.add(e2);
+
+            habitat.setCuidadores(cuidadores);
+
+            em.persist(habitat);
+
+            em.getTransaction().commit();
+
+            System.out.println("Datos guardados correctamente");
+
+        } catch (Exception e) {
+
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+
+            e.printStackTrace();
+
+        } finally {
+
+            em.close();
+            emf.close();
+        }
     }
 }
-    }
-    

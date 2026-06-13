@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     html += `
                         <tr>
-                            <td>${item.especie}</td>
+                            <td>${item.nombre_animal}</td>
                             <td>${item.tipo_alimento}</td>
                             <td>${item.cantidad}</td>
                             <td>${item.horario}</td>
