@@ -9,8 +9,8 @@ import com.ues.edu.entidades.Empleado;
 import com.ues.edu.entidades.HistorialMedico;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
-
 import java.util.Date;
 import java.util.List;
 
@@ -21,8 +21,8 @@ import java.util.List;
 
 public class HistorialMedicoDao {
 
-  private EntityManagerFactory emf = JPAUtil.getEMF();
-
+    private EntityManagerFactory emf =
+            Persistence.createEntityManagerFactory("profinalPU");
 
     // ==========================
     // GUARDAR
@@ -34,7 +34,6 @@ public class HistorialMedicoDao {
         Animal animalReal = em.find(Animal.class, historial.getAnimal().getId());
         Empleado veterinarioReal = em.find(Empleado.class, historial.getVeterinario().getId());
         
-        // 2. Se los inyectamos al historial (reemplazando los "esqueletos" que venían de JS)
         historial.setAnimal(animalReal);
         historial.setVeterinario(veterinarioReal);
        em.merge(historial);
@@ -44,7 +43,7 @@ public class HistorialMedicoDao {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e; // Lanzamos el error para que el Servlet lo atrape
+            throw e; 
         } finally {
             em.close();
         }
@@ -58,15 +57,12 @@ public class HistorialMedicoDao {
     try {
         em.getTransaction().begin();
         
-        // 1. Igual que en el guardar, rescatamos los objetos reales de la DB
         Animal animalReal = em.find(Animal.class, historial.getAnimal().getId());
         Empleado veterinarioReal = em.find(Empleado.class, historial.getVeterinario().getId());
         
-        // 2. Se los inyectamos al historial para que no se pierdan sus datos
         historial.setAnimal(animalReal);
         historial.setVeterinario(veterinarioReal);
         
-        // 3. ¡AQUÍ ESTÁ EL CAMBIO! Para editar se usa MERGE, no persist
         em.merge(historial);
         
         em.getTransaction().commit();

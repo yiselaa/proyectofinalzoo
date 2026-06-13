@@ -1,23 +1,25 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+/* * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
 // Asegurar que todo cargue al iniciar la página
 document.addEventListener("DOMContentLoaded", function () {
     cargarComponentes();
-    listarAsignaciones(); // <--- Esta es la función clave que te faltaba llamar
+    listarAsignaciones(); 
 
     // Escuchar el evento del formulario para Guardar/Editar
     document.getElementById("formCategoriaCuidador").addEventListener("submit", guardarOEditar);
 });
 
 // ==========================================
-// CARGAR SELECTORES DESDE LA BD (Ya lo tenías)
+// CARGAR SELECTORES DESDE LA BD
 // ==========================================
 function cargarComponentes() {
     fetch("EmpleadoServlet")
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+        })
         .then(empleados => {
             let html = `<option value="">Seleccione cuidador...</option>`;
             if (Array.isArray(empleados)) {
@@ -34,7 +36,10 @@ function cargarComponentes() {
         .catch(err => console.error("Error cargando empleados:", err));
 
     fetch("HabitatServlet")
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+        })
         .then(habitats => {
             let html = `<option value="">Seleccione hábitat...</option>`;
             if (Array.isArray(habitats)) {
@@ -50,31 +55,37 @@ function cargarComponentes() {
 }
 
 // ==========================================
-// TRER DATOS DEL SERVLET Y PINTAR LA TABLA
+// TRAER DATOS DEL SERVLET Y PINTAR LA TABLA
 // ==========================================
 function listarAsignaciones() {
     fetch("HabitatCuidadorServlet")
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Error al consultar las asignaciones.");
+            return res.json();
+        })
         .then(data => {
             let html = "";
             if (Array.isArray(data)) {
                 data.forEach(h => {
-                    // Extraer los nombres de los cuidadores mapeados en tu Servlet
                     let nombresCuidadores = "Sin cuidadores asignados";
                     if (h.cuidadores && h.cuidadores.length > 0) {
                         nombresCuidadores = h.cuidadores
-                            .map(c => `${c.nombre} ${c.apellido}`)
-                            .join(", ");
+                                .map(c => `${c.nombre} ${c.apellido}`)
+                                .join(", ");
                     }
 
                     html += `
                         <tr>
                             <td>${h.id}</td>
-                            <td>${h.tipo_terreno} (Capacidad: ${h.capacidad})</td>
-                            <td><strong>${nombresCuidadores}</strong></td>
+                            <td>${h.tipo_terreno || h.tipoTerreno || "—"} (Capacidad: ${h.capacidad ?? 0})</td>
+                            <td>${nombresCuidadores}</td>
                             <td class="acciones">
-                                <button type="button" class="btnEditar" onclick="cargarParaEditar(${h.id})">Editar</button>
-                                <button type="button" class="btnEliminar" onclick="eliminarAsignacion(${h.id})">Eliminar</button>
+                                <button class="btnEditar" onclick="cargarParaEditar(${h.id})">
+                                    <i class="ti ti-edit"></i>
+                                </button>
+                                <button class="btnEliminar" onclick="eliminarAsignacion(${h.id})">
+                                    <i class="ti ti-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     `;
@@ -82,7 +93,10 @@ function listarAsignaciones() {
             }
             document.getElementById("tbodyCategoriaCuidador").innerHTML = html;
         })
-        .catch(err => console.error("Error al listar la tabla:", err));
+        .catch(err => {
+            console.error("Error al listar la tabla:", err);
+            mostrarAlertaError("No se pudo cargar la lista de asignaciones.");
+        });
 }
 
 // ==========================================
@@ -93,14 +107,19 @@ function guardarOEditar(e) {
 
     const idHabitat = document.getElementById("idHabitatSelect").value;
     const selectEmpleado = document.getElementById("idEmpleadoSelect");
-    
-    // Obtener todos los IDs seleccionados (por si usas selección múltiple)
+
+    if (!idHabitat) {
+        mostrarAlertaError("Por favor, seleccione un hábitat.");
+        return;
+    }
+
+    // Obtener todos los IDs seleccionados
     const idsEmpleados = Array.from(selectEmpleado.selectedOptions)
-                              .map(option => parseInt(option.value))
-                              .filter(val => !isNaN(val));
+            .map(option => parseInt(option.value))
+            .filter(val => !isNaN(val));
 
     if (idsEmpleados.length === 0) {
-        alert("Por favor, seleccione al menos un cuidador.");
+        mostrarAlertaError("Por favor, seleccione al menos un cuidador.");
         return;
     }
 
@@ -115,16 +134,38 @@ function guardarOEditar(e) {
 
     fetch(url, {
         method: metodo,
-        headers: { "Content-Type": "application/json;charset=UTF-8" },
+        headers: {"Content-Type": "application/json;charset=UTF-8"},
         body: JSON.stringify(payload)
     })
-    .then(res => res.json())
+    .then(async res => {
+        const text = await res.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            throw new Error(text || "Error interno del servidor");
+        }
+
+        if (!res.ok) {
+            throw new Error(data.error || "Error al procesar la asignación.");
+        }
+        return data;
+    })
     .then(res => {
-        alert(res.mensaje || "Operación realizada con éxito");
         limpiarFormulario();
         listarAsignaciones();
+
+        Swal.fire({
+            icon: "success",
+            title: esEdicion ? "Asignación Actualizada" : "Asignación Exitosa",
+            text: res.mensaje || "Operación realizada con éxito.",
+            confirmButtonColor: "#3f5b4b"
+        });
     })
-    .catch(err => console.error("Error al procesar asignación:", err));
+    .catch(err => {
+        console.error("Error al procesar asignación:", err);
+        mostrarAlertaError(err.message);
+    });
 }
 
 // ==========================================
@@ -132,9 +173,11 @@ function guardarOEditar(e) {
 // ==========================================
 function cargarParaEditar(idHabitat) {
     fetch(`HabitatCuidadorServlet?id=${idHabitat}`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("No se pudo obtener la información de la asignación.");
+            return res.json();
+        })
         .then(habitat => {
-            // Bloqueamos o asignamos el ID del hábitat
             document.getElementById("idHabitatSelect").value = habitat.id;
             document.getElementById("idAsignacionOculta").value = habitat.id;
 
@@ -146,25 +189,77 @@ function cargarParaEditar(idHabitat) {
                 let option = selectEmpleado.options[i];
                 option.selected = idsAsignados.includes(option.value);
             }
+
+            // Cambiar el texto del botón de guardar de forma dinámica si existe
+            let btnGuardar = document.getElementById("btnGuardarAsignacion") || document.getElementById("btnGuardar");
+            if (btnGuardar) {
+                btnGuardar.textContent = "Actualizar Asignación";
+            }
+
+            // Subir la pantalla suavemente al formulario
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
         })
-        .catch(err => console.error("Error al buscar asignación:", err));
+        .catch(err => {
+            console.error("Error al buscar asignación:", err);
+            mostrarAlertaError("Error al recuperar los datos para edición.");
+        });
 }
 
 // ==========================================
 // ACCIÓN: ELIMINAR ASIGNACIÓN
 // ==========================================
 function eliminarAsignacion(idHabitat) {
-    if (confirm("¿Está seguro de eliminar los cuidadores de este hábitat?")) {
+    Swal.fire({
+        title: "¿Está seguro de eliminar los cuidadores de este hábitat?",
+        text: "El hábitat se quedará temporalmente sin personal asignado.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#b05d4d",
+        cancelButtonColor: "#3f5b4b",
+        confirmButtonText: "Sí, desasignar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (!result.isConfirmed) {
+            return;
+        }
+
         fetch(`HabitatCuidadorServlet?id=${idHabitat}`, {
             method: "DELETE"
         })
-        .then(res => res.json())
-        .then(res => {
-            alert(res.mensaje);
-            listarAsignaciones();
+        .then(async res => {
+            const text = await res.text();
+            if (!res.ok) {
+                throw new Error(text || "No se pudo remover la asignación.");
+            }
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                return { mensaje: text };
+            }
         })
-        .catch(err => console.error("Error al eliminar:", err));
-    }
+        .then(res => {
+            Swal.fire({
+                icon: "success",
+                title: "Asignación Eliminada",
+                text: res.mensaje || "Los cuidadores fueron removidos de este hábitat.",
+                confirmButtonColor: "#3f5b4b"
+            });
+            listarAsignaciones();
+            limpiarFormulario();
+        })
+        .catch(err => {
+            console.error("Error al eliminar:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Error al borrar",
+                text: err.message,
+                confirmButtonColor: "#b05d4d"
+            });
+        });
+    });
 }
 
 // ==========================================
@@ -173,4 +268,19 @@ function eliminarAsignacion(idHabitat) {
 function limpiarFormulario() {
     document.getElementById("formCategoriaCuidador").reset();
     document.getElementById("idAsignacionOculta").value = "";
+
+    let btnGuardar = document.getElementById("btnGuardarAsignacion") || document.getElementById("btnGuardar");
+    if (btnGuardar) {
+        btnGuardar.textContent = "Guardar Asignación";
+    }
+}
+
+// Helper para alertas rápidas de error
+function mostrarAlertaError(mensaje) {
+    Swal.fire({
+        icon: "error",
+        title: "Error detectado",
+        text: mensaje,
+        confirmButtonColor: "#b05d4d"
+    });
 }
