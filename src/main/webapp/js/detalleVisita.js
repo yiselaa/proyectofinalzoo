@@ -2,6 +2,14 @@
  * detalleVisita.js
  * ============================================================= */
 
+console.log("JS NUEVO CARGADO");
+
+
+let detalleVisita = [];
+let gruposVisita = [];
+let paginaActual = 1;
+const size = 5;
+
 // =========================
 // ESTADO GLOBAL
 // =========================
@@ -186,7 +194,8 @@ function guardarRegistro(e) {
             })
             .then(() => {
 
-                document.getElementById("mensajeError").innerHTML = "";
+                let msgErr = document.getElementById("mensajeError");
+                if (msgErr) msgErr.innerHTML = "";
                 idsOriginales = [];
                 cargarTabla();
                 limpiarFormulario();
@@ -202,7 +211,8 @@ function guardarRegistro(e) {
             })
             .catch(error => {
 
-                document.getElementById("mensajeError").innerHTML = "";
+                let msgErr = document.getElementById("mensajeError");
+                if (msgErr) msgErr.innerHTML = "";
 
                 Swal.fire({
                     icon: "error",
@@ -260,34 +270,11 @@ function mostrarTabla(lista) {
         grupos[clave].total += d.subtotal;
     });
 
-    let html = "";
+    gruposVisita = Object.values(grupos);
+    paginaActual = 1;
 
-    Object.values(grupos).forEach(g => {
-        html += `
-            <tr>
-                <td>${g.id}</td>
-                <td>${g.nombre}</td>
-                <td>${g.telefono}</td>
-                <td>${g.fecha}</td>
-                <td>${g.tickets.join("<br>")}</td>
-                <td>$${g.total.toFixed(2)}</td>
-                <td>
-                    <div class="acciones">
-                        <button class="btnEditar"
-                                onclick="editarVisita('${g.nombre}', '${g.telefono}', '${g.fecha}')">
-                            <i class="ti ti-edit"></i>
-                        </button>
-                        <button class="btnEliminar"
-                                onclick="eliminar('${g.nombre}', '${g.telefono}', '${g.fecha}')">
-                            <i class="ti ti-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-
-    document.querySelector("#tablaDetalleVisita tbody").innerHTML = html;
+    renderTablaPaginada();
+    renderPaginacion();
 }
 
 // =========================
@@ -363,8 +350,8 @@ function editarVisita(nombre, telefono, fecha) {
                             : d.fechaVisita;
 
                     return d.nombreVisitante === nombre &&
-                            d.telefono === telefono &&
-                            fechaD === fecha;
+                             d.telefono === telefono &&
+                             fechaD === fecha;
                 });
 
                 if (registros.length === 0)
@@ -391,6 +378,101 @@ function editarVisita(nombre, telefono, fecha) {
             });
 }
 
+// ===================================
+// RENDER TABLA CON FILAS PAGINADAS
+// ===================================
+function renderTablaPaginada() {
+
+    let tbody = document.querySelector("#tablaDetalleVisita tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    let inicio = (paginaActual - 1) * size;
+    let fin = inicio + size;
+
+    let pagina = gruposVisita.slice(inicio, fin);
+
+    if (pagina.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align:center;">
+                    No hay registros de visitas
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    let html = "";
+
+    pagina.forEach(g => {
+        html += `
+            <tr>
+                <td>${g.id}</td>
+                <td>${g.nombre}</td>
+                <td>${g.telefono}</td>
+                <td>${g.fecha}</td>
+                <td>${g.tickets.join("<br>")}</td>
+                <td>$${g.total.toFixed(2)}</td>
+                <td>
+                    <div class="acciones">
+                        <button class="btnEditar"
+                                onclick="editarVisita('${g.nombre}', '${g.telefono}', '${g.fecha}')">
+                            <i class="ti ti-edit"></i>
+                        </button>
+                        <button class="btnEliminar"
+                                onclick="eliminar('${g.nombre}', '${g.telefono}', '${g.fecha}')">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// =========================
+// RENDER CONTROLES PAGINACIÓN  ← ÚNICO CAMBIO
+// =========================
+function renderPaginacion() {
+
+    const pagContenedor = document.getElementById("paginacion");
+    if (!pagContenedor) return;
+
+    pagContenedor.innerHTML = `
+        <button type="button" onclick="anterior()">
+            <i class="ti ti-chevron-left"></i>
+        </button>
+        Página ${paginaActual}
+        <button type="button" onclick="siguiente()">
+            <i class="ti ti-chevron-right"></i>
+        </button>
+    `;
+}
+
+function siguiente() {
+
+    let totalPaginas = Math.ceil(gruposVisita.length / size);
+
+    if (paginaActual < totalPaginas) {
+        paginaActual++;
+        renderTablaPaginada();
+        renderPaginacion();
+    }
+}
+
+function anterior() {
+
+    if (paginaActual > 1) {
+        paginaActual--;
+        renderTablaPaginada();
+        renderPaginacion();
+    }
+}
+
 // =========================
 // LIMPIAR FORMULARIO
 // =========================
@@ -398,7 +480,10 @@ function limpiarFormulario() {
     document.getElementById("formDetalleVisita").reset();
     document.getElementById("idDetalleVisita").value = "";
     document.getElementById("errorTicket").style.display = "none";
-    document.getElementById("mensajeError").innerHTML = "";
+
+    let msgErr = document.getElementById("mensajeError");
+    if (msgErr) msgErr.innerHTML = "";
+
     document.querySelector(".guardar").textContent = "Guardar";
     idsOriginales = [];
     tickets = [];

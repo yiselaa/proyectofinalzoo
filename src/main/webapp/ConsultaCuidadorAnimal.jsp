@@ -23,11 +23,14 @@
 
                 <div class="table-responsive">
                     <table id="tablaAC" class="table table-hover">
-                        <thead>
-                        <th>Animal</th>
-                        <th>Empleado</th>
+                        <thead> 
+                        <th>ID</th>
+                        <th>Nombre Animal</th>
+                        <th>Especie</th>
+                        <th>Nombre Empleado</th>
                         <th>Apellido</th>
                         <th>DUI</th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -41,8 +44,13 @@
 
         </div>
 
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
+
+        <!-- jQuery -->
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+        <!-- DataTables core + Bootstrap 5 -->
+        <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
 
         <script src="js/ConsultaCuidadorAnimal.js"></script>
 

@@ -10,16 +10,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,5 +60,35 @@ public class Animal {
     @ManyToOne
     @JoinColumn(name = "idhabitat")
     private Habitat habitat;
+
+   @Transient
+public String getEdad() {
+
+    if (fechaNacimiento == null) {
+        return "";
+    }
+
+    LocalDate nacimiento = new java.sql.Date(
+            fechaNacimiento.getTime()
+    ).toLocalDate();
+
+    Period edad = Period.between(nacimiento, LocalDate.now());
+
+    if (edad.getYears() > 0) {
+        return edad.getYears() == 1
+                ? "1 año"
+                : edad.getYears() + " años";
+    }
+
+    if (edad.getMonths() > 0) {
+        return edad.getMonths() == 1
+                ? "1 mes"
+                : edad.getMonths() + " meses";
+    }
+
+    return edad.getDays() == 1
+            ? "1 día"
+            : edad.getDays() + " días";
+}
 
 }

@@ -9,9 +9,11 @@
         <meta charset="UTF-8">
         <title>WILD ZOO MK - Gestión de detalle de visitas</title>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/Crud.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ticket.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     </head>
 
     <body>
@@ -64,9 +66,9 @@
                                         for (Ticket t : tickets) {
                                             if ("Activo".equals(t.getEstado())) {
                                     %>
-                                    <option value="<%= t.getTipo() %>"
-                                            data-precio="<%= t.getPrecio() %>">
-                                        <%= t.getTipo() %> - $<%= t.getPrecio() %>
+                                    <option value="<%= t.getTipo()%>"
+                                            data-precio="<%= t.getPrecio()%>">
+                                        <%= t.getTipo()%> - $<%= t.getPrecio()%>
                                     </option>
                                     <%
                                             }
@@ -116,8 +118,11 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaBody"></tbody>
+                    <tbody>
+                    </tbody>
                 </table>
+
+                <div id="paginacion" class="paginacion"></div>   
 
                 <div style="margin-top: 24px; text-align: right;">
                     <a href="${pageContext.request.contextPath}/index.html" class="btn-back">

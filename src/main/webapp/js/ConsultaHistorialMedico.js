@@ -35,44 +35,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
         fetch("/ProyectoFinalZoo/HistorialMedicoConsuServlet")
 
-                .then(res => res.json())
+            .then(res => res.json())
 
-                .then(data => {
+            .then(data => {
 
-                    let html = "";
+                let html = "";
 
-                    data.forEach(item => {
+                data.forEach(item => {
 
-                        html += `
+                    html += `
                         <tr>
                             <td>${item.nombre_animal}</td>
-                            <td>${item.especie}</td>
                             <td>${item.diagnostico}</td>
                             <td>${item.tratamiento}</td>
                             <td>${item.fecha}</td>
                             <td>${item.veterinario} ${item.apellido}</td>
                         </tr>
                     `;
-                    });
-
-                    tbody.innerHTML = html;
-
-                    // Inicializar DataTable
-                    if (!$.fn.DataTable.isDataTable("#tablaHistorial")) {
-
-                        initDataTable();
-
-                    } else {
-
-                        table.destroy();
-                        initDataTable();
-                    }
-                })
-
-                .catch(error => {
-
-                    console.log(error);
                 });
+
+                tbody.innerHTML = html;
+
+                // Inicializar DataTable
+                if (!$.fn.DataTable.isDataTable("#tablaHistorial")) {
+
+                    initDataTable();
+
+                } else {
+
+                    table.destroy();
+                    initDataTable();
+                }
+            })
+
+            .catch(error => {
+
+                console.log(error);
+            });
     }
 
     cargar();

@@ -37,7 +37,7 @@
                     <tr>
                         <th>Animal</th>
                         <th>Tipo de Alimento</th>
-                        <th>Cantidad</th>
+                        <th>Cantidad (KG)</th>
                         <th>Horario</th>
                     </tr>
                 </thead>

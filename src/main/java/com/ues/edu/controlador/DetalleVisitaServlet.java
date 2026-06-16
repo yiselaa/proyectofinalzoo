@@ -10,7 +10,6 @@ import com.ues.edu.entidades.Ticket;
 import com.ues.edu.entidades.Usuario;
 import com.ues.edu.service.DetalleVisitaService;
 import com.ues.edu.service.TicketService;
-import com.ues.edu.util.LocalDateAdapter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -207,24 +206,33 @@ public class DetalleVisitaServlet extends HttpServlet {
             return "Datos inválidos";
         }
 
+        // 1. Validar longitud del nombre
         if (d.getNombreVisitante() == null
                 || d.getNombreVisitante().trim().length() < 3) {
             return "Nombre mínimo 3 caracteres";
         }
 
+        // 🔥 VALIDACIÓN NUEVA: Bloquear números y caracteres especiales (Solo letras y espacios)
+        if (!d.getNombreVisitante().matches("^[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+$")) {
+            return "El nombre del visitante solo debe contener letras, sin números";
+        }
+
+        // 2. Validar teléfono (8 dígitos)
         if (d.getTelefono() == null
                 || !d.getTelefono().matches("\\d{8}")) {
             return "Teléfono debe tener 8 dígitos";
         }
 
+        // 3. Validar cantidad mayor a 0
         if (d.getCantidad() == null || d.getCantidad() <= 0) {
             return "Cantidad debe ser mayor que 0";
         }
 
+        // 4. Validar que seleccionó un ticket
         if (d.getTicket() == null) {
             return "Debe seleccionar un ticket";
         }
 
-        return null;
+        return null; // Todo está perfecto
     }
 }

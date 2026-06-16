@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteTickets" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a37bd190-82d2-4a4b-80f0-27424846c365">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="BaseZoo"/>
+	<style name="encabezado_col" forecolor="#FFFFFF" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="dato_texto" forecolor="#2D3A2E" fontName="DejaVu Sans" fontSize="11"/>
+	<style name="dato_numero" forecolor="#1B4332" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="footer_texto" forecolor="#74857A" fontName="DejaVu Sans" fontSize="9"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+    t.tipo AS tipo_ticket,
+    SUM(dv.subtotal) AS total_ingresos
+FROM public.visita dv
+JOIN public.ticket t ON dv.idticket = t.id
+GROUP BY t.tipo
+ORDER BY total_ingresos DESC]]>
+	</queryString>
+	<field name="tipo_ticket" class="java.lang.String"/>
+	<field name="total_ingresos" class="java.lang.Double"/>
+	<variable name="GRAND_TOTAL" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_ingresos}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="90" forecolor="#1B4332" backcolor="#1B4332" uuid="f4a4a493-76d0-494b-9d1d-a303b531b7d4"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="5" height="90" forecolor="#52B788" backcolor="#52B788" uuid="6612127a-4000-4c0c-b160-407d59dbff3a"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="18" y="10" width="500" height="38" forecolor="#FFFFFF" uuid="842faa2a-d8e1-4e38-850b-c6b9bee4a1c2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="26" isBold="true"/>
+				</textElement>
+				<text><![CDATA[WILD ZOO MK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="52" width="500" height="22" forecolor="#95D5B2" uuid="bd749ab4-09ff-465a-94a7-3f29c2c84cbc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="12"/>
+				</textElement>
+				<text><![CDATA[Reporte de ingreso de tickets]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="560" y="36" width="240" height="18" forecolor="#B7E4C7" uuid="589df454-6c02-4afe-9689-21f92315af4b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Generado: " + new java.text.SimpleDateFormat("dd/MM/yyyy h:mma").format(new java.util.Date())]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="8" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="36" forecolor="#2D6A4F" backcolor="#2D6A4F" uuid="e3804a95-3a1e-4ed5-8172-e3c7d82f6057"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement style="encabezado_col" x="10" y="0" width="391" height="36" uuid="56098108-a2ce-4f00-8372-d0dd43aad8f3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo de ticket]]></text>
+			</staticText>
+			<line>
+				<reportElement x="401" y="6" width="1" height="24" forecolor="#52B788" uuid="cb435f5e-ef87-47a3-b193-44e2aca214e6"/>
+			</line>
+			<staticText>
+				<reportElement style="encabezado_col" x="411" y="0" width="381" height="36" uuid="6921e3ec-a547-475a-9a72-5ea2ebda67d4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total de ingresos ($)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="34" forecolor="#D8F3DC" backcolor="#D8F3DC" uuid="9e1312c8-2d1d-4663-9bd0-f323ae2ae3f1">
+					<printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="802" height="34" forecolor="#F0FFF4" backcolor="#F0FFF4" uuid="0c9c6372-e2a3-4c67-9138-7b0ce7f6ed49">
+					<printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 != 0]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<line>
+				<reportElement x="0" y="33" width="802" height="1" forecolor="#B7E4C7" uuid="ebce39fc-85bc-4187-97e3-43dd40b14b51"/>
+			</line>
+			<textField>
+				<reportElement style="dato_texto" x="10" y="0" width="391" height="34" uuid="f150ea1b-bc13-46fe-a475-c0d855f0718e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tipo_ticket}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="401" y="4" width="1" height="26" forecolor="#B7E4C7" uuid="5fbe8ef4-b87f-4c7f-a462-6bd1efdda4ed"/>
+			</line>
+			<textField pattern="$#,##0.00">
+				<reportElement style="dato_numero" x="411" y="0" width="381" height="34" uuid="50d380bc-477d-4121-8dbe-65a09c619d18"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total_ingresos}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="36" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="802" height="1" forecolor="#2D6A4F" uuid="19a5f910-8821-4862-88f7-f8095a111d3f"/>
+			</line>
+			<staticText>
+				<reportElement x="10" y="6" width="391" height="24" forecolor="#1B4332" uuid="2d6a5b79-3184-414e-a1b9-561c6b9c0cb5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL GENERAL]]></text>
+			</staticText>
+			<textField pattern="$#,##0.00">
+				<reportElement x="411" y="6" width="381" height="24" forecolor="#1B4332" uuid="165c72b4-15e6-4fc0-85a3-4e145c03fdc5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GRAND_TOTAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="28" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="802" height="1" forecolor="#B7E4C7" uuid="0fd34538-695d-4360-bced-80c907e37269"/>
+			</line>
+			<staticText>
+				<reportElement style="footer_texto" x="0" y="5" width="400" height="18" uuid="09495da1-ad1f-4a2e-9056-a4fa3cdf32e0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="9"/>
+				</textElement>
+				<text><![CDATA[© Wild Zoo MK — Reporte de ingreso de tickets]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="footer_texto" x="402" y="5" width="400" height="18" uuid="ecf2a082-bb84-4cb4-87d8-17df0184a18c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="220" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="8" width="802" height="22" forecolor="#1B4332" uuid="a1b2c3d4-e5f6-7890-abcd-ef1234567890"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Comparativa de ingresos por tipo de ticket]]></text>
+			</staticText>
+			<barChart>
+				<chart evaluationTime="Report" theme="default">
+					<reportElement x="0" y="34" width="802" height="180" uuid="79e6a79f-e69c-4b3f-99f3-feed72ef3356"/>
+					<chartTitle position="Top">
+						<titleExpression><![CDATA[""]]></titleExpression>
+					</chartTitle>
+					<chartSubtitle/>
+					<chartLegend textColor="#2D3A2E" position="Bottom">
+						<font fontName="DejaVu Sans" size="9"/>
+					</chartLegend>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Ingresos"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{tipo_ticket}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{total_ingresos}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot isShowTickLabels="true" isShowTickMarks="true">
+					<plot labelRotation="0.0">
+						<seriesColor seriesOrder="0" color="#2D6A4F"/>
+						<seriesColor seriesOrder="1" color="#52B788"/>
+						<seriesColor seriesOrder="2" color="#95D5B2"/>
+						<seriesColor seriesOrder="3" color="#1B4332"/>
+						<seriesColor seriesOrder="4" color="#74C69D"/>
+					</plot>
+					<itemLabel color="#1B4332" backgroundColor="#F0FFF4">
+						<font fontName="DejaVu Sans" size="9" isBold="true"/>
+					</itemLabel>
+					<categoryAxisFormat labelRotation="0.0">
+						<axisFormat tickLabelColor="#2D3A2E" verticalTickLabels="false" axisLineColor="#2D6A4F">
+							<labelFont>
+								<font fontName="DejaVu Sans" size="9" isBold="true"/>
+							</labelFont>
+							<tickLabelFont>
+								<font fontName="DejaVu Sans" size="8"/>
+							</tickLabelFont>
+						</axisFormat>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat tickLabelColor="#2D3A2E" tickLabelMask="$#,##0.00" axisLineColor="#2D6A4F">
+							<labelFont>
+								<font fontName="DejaVu Sans" size="9" isBold="true"/>
+							</labelFont>
+							<tickLabelFont>
+								<font fontName="DejaVu Sans" size="8"/>
+							</tickLabelFont>
+						</axisFormat>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>

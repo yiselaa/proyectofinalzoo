@@ -30,6 +30,7 @@ public class Empleado {
     private String nombre;
 
     @NotBlank
+    @Expose
     @Column(name = "apellido", nullable = false, length = 70)
     private String apellido;
 
@@ -49,7 +50,7 @@ public class Empleado {
     private Usuario usuario;
 
     @ManyToMany(mappedBy = "cuidadores")
-    private List<Habitat> habitatAsignadas;
+    private List<Habitat> habitatsAsignados;
 
     @OneToMany(mappedBy = "veterinario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HistorialMedico> historiales;

@@ -79,12 +79,13 @@ public class AnimalCuidadorConsultaServlet extends HttpServlet {
                 for (Object[] a : datos) {
 
                     JSONObject obj = new JSONObject();
-
-                    obj.put("nombre_animal", a[0] != null ? a[0].toString() : "");
-                    obj.put("nombre_empleado", a[1] != null ? a[1].toString() : "");
-                    obj.put("apellido", a[2] != null ? a[2].toString() : "");
-                    obj.put("numero_dui", a[3] != null ? a[3].toString() : "");
-
+                    
+                    obj.put("id", a[0] != null ? a[0].toString() : "");
+                    obj.put("nombre_animal", a[1] != null ? a[1].toString() : "");
+                    obj.put("especie", a[2] != null ? a[2].toString() : "");
+                    obj.put("nombre_empleado", a[3] != null ? a[3].toString() : "");
+                    obj.put("apellido", a[4] != null ? a[4].toString() : "");
+                    obj.put("numero_dui", a[5] != null ? a[5].toString() : "");
                     jsonArray.put(obj);
                 }
             }
