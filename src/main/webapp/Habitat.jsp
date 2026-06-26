@@ -1,5 +1,5 @@
 <%-- 
-    Document   : Categoria
+    Document   : Habitat
     Created on : 16 may. 2026, 21:31:56
     Author     : coc44
 --%>
@@ -56,8 +56,8 @@
                     <div class="botones">
 
                         <button type="submit"
-                                id="btnGuardar"
-                                class="guardar">
+                                 id="btnGuardar"
+                                 class="guardar">
                             Guardar Hábitat
                         </button>
 
@@ -65,6 +65,14 @@
                                 class="cancelar"
                                 onclick="limpiarFormularioHabitat()">
                             Cancelar
+                        </button>
+                        
+                        <button type="button" 
+                                id="btnVolverHabitat" 
+                                class="cancelar" 
+                                style="display: none;" 
+                                onclick="limpiarFormularioHabitat()">
+                            Volver / Cancelar Edición
                         </button>
 
                     </div>
@@ -91,7 +99,7 @@
 
             </table>
 
-            <div id="paginacion" class="paginacion"></div>
+            <div id="paginacionHabitats" class="paginacion"></div>
 
             <div style="margin-top: 24px; text-align: right;">
                 <a href="${pageContext.request.contextPath}/index.html" class="btn-back">

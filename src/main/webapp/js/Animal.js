@@ -1,6 +1,5 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
+/* * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
 /* * Animales.js
@@ -9,7 +8,8 @@
 console.log("JS ANIMALES CARGADO");
 
 let paginaActual = 1;
-const size = 5;
+const size = 5; // 🌟 Límite estricto de 5 registros por página
+let datosCompletos = []; // Aquí guardaremos la lista global que viene del servidor
 
 // ===============================
 // INICIO
@@ -30,7 +30,7 @@ function formatearFecha(fecha) {
 }
 
 // ===============================
-// BUSCAR ANIMALES
+// BUSCAR ANIMALES (CORREGIDO)
 // ===============================
 function buscarAnimales(pagina = 1) {
     paginaActual = pagina;
@@ -42,8 +42,13 @@ function buscarAnimales(pagina = 1) {
             return response.json();
         })
         .then(data => {
-            console.log(data);
-            mostrarAnimales(data);
+            console.log("Datos recibidos del servidor:", data);
+            datosCompletos = data; // Guardamos el array completo de la BD
+            
+            if (Array.isArray(datosCompletos)) {
+                // Forzar el redibujado segmentado en la página solicitada
+                redibujarTablaLocal();
+            }
         })
         .catch(error => {
             console.error("Error:", error);
@@ -111,6 +116,56 @@ function cargarHabitats() {
         });
 }
 
+// ==========================================================
+// RENDERIZAR CONTROLES DE PAGINACIÓN (SÍNCRO CON EL DOM)
+// ==========================================================
+function renderPaginacion(totalRegistros) {
+    const pagContenedor = document.getElementById("paginacion");
+    if (!pagContenedor) return;
+
+    // Calcular cuántas páginas existen en total basándonos en los datos reales
+    const totalPaginas = Math.ceil(totalRegistros / size) || 1;
+
+    pagContenedor.innerHTML = `
+        <button onclick="anterior()" ${paginaActual === 1 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+            <i class="ti ti-chevron-left"></i>
+        </button>
+        <span style="margin: 0 10px; font-weight: bold;">Página ${paginaActual} de ${totalPaginas}</span>
+        <button onclick="siguiente()" ${paginaActual === totalPaginas ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+            <i class="ti ti-chevron-right"></i>
+        </button>
+    `;
+}
+
+// ==========================================================
+// LÓGICAS DE NAVEGACIÓN LOCAL (EL MOTOR DEL RECORTE)
+// ==========================================================
+function anterior() {
+    if (paginaActual > 1) {
+        paginaActual--;
+        redibujarTablaLocal();
+    }
+}
+
+function siguiente() {
+    const totalPaginas = Math.ceil(datosCompletos.length / size);
+    if (paginaActual < totalPaginas) {
+        paginaActual++;
+        redibujarTablaLocal();
+    }
+}
+
+function redibujarTablaLocal() {
+    // 🧠 Aquí se hace la magia matemática para cortar el arreglo
+    const inicio = (paginaActual - 1) * size;
+    const fin = inicio + size;
+    const registrosSegmentados = datosCompletos.slice(inicio, fin);
+    
+    // Mandamos a pintar únicamente los 5 registros seleccionados
+    mostrarAnimales(registrosSegmentados);
+    renderPaginacion(datosCompletos.length);
+}
+
 // ===============================
 // EDITAR ANIMAL
 // ===============================
@@ -131,13 +186,11 @@ function editarAnimal(id) {
             document.getElementById("habitat").value =
                 a.habitat ? a.habitat.id : "";
 
-            // Cambiar dinámicamente el texto del botón de guardar si existe
             let btnGuardar = document.getElementById("btnGuardarAnimal") || document.getElementById("btnGuardar");
             if (btnGuardar) {
                 btnGuardar.textContent = "Actualizar Animal";
             }
 
-            // Desplazamiento suave al formulario
             window.scrollTo({
                 top: 0,
                 behavior: "smooth"
@@ -196,13 +249,11 @@ document.getElementById("formAnimal")
             return data;
         })
         .then(data => {
-            console.log(data);
-            
             let msgError = document.getElementById("mensajeErrorAnimal") || document.getElementById("mensajeError");
             if (msgError) msgError.innerHTML = "";
 
             limpiarFormularioAnimal();
-            buscarAnimales();
+            buscarAnimales(paginaActual); 
 
             Swal.fire({
                 icon: "success",
@@ -267,7 +318,7 @@ function eliminarAnimal(id) {
                 text: data.mensaje || "El animal ha sido removido.",
                 confirmButtonColor: "#3f5b4b"
             });
-            buscarAnimales();
+            buscarAnimales(paginaActual);
         })
         .catch(error => {
             Swal.fire({
@@ -281,31 +332,26 @@ function eliminarAnimal(id) {
 }
 
 // ===============================
-// 🛠️ MODIFICADO: CALCULAR EDAD DINÁMICA
+// CALCULAR EDAD DINÁMICA
 // ===============================
 function calcularEdad(fechaNacimiento) {
     if (!fechaNacimiento) return "—";
     
-    // Normalizar la fecha quitando la hora si existe
     const soloFecha = fechaNacimiento.substring(0, 10);
     const partes = soloFecha.split("-");
     
     const hoy = new Date();
-    // Forzamos las fechas a las 00:00:00 para que el cálculo de los días sea matemático exacto
     const fechaHoyCero = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
     const nacimiento = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
     
-    // Diferencia en milisegundos y cálculo neto de días totales
     const diferenciaMilisegundos = fechaHoyCero - nacimiento;
     const diasTotales = Math.floor(diferenciaMilisegundos / (1000 * 60 * 60 * 24));
 
-    // Casos para cachorros recién nacidos o de pocos días
     if (diasTotales < 0) return "No nacido aún";
     if (diasTotales === 0) return "Recién nacido";
     if (diasTotales === 1) return "1 día";
     if (diasTotales < 30) return `${diasTotales} días`;
 
-    // Calcular diferencia formal en Años y Meses
     let años = hoy.getFullYear() - nacimiento.getFullYear();
     let meses = hoy.getMonth() - nacimiento.getMonth();
     
@@ -314,7 +360,6 @@ function calcularEdad(fechaNacimiento) {
         meses += 12;
     }
     
-    // Si tiene menos de 1 año, devolvemos el tiempo en meses
     if (años === 0) {
         if (meses === 0 && hoy.getDate() < nacimiento.getDate()) {
             return `${diasTotales} días`;
@@ -322,10 +367,8 @@ function calcularEdad(fechaNacimiento) {
         return meses === 1 ? "1 mes" : `${meses} meses`;
     }
 
-    // Para animales de 1 año o más
     let textoEdad = años === 1 ? "1 año" : `${años} años`;
     
-    // Opcional: Agregar el residuo de meses si no es un año cerrado (ej: "2 años y 3 meses")
     if (meses > 0) {
         textoEdad += meses === 1 ? " y 1 mes" : ` y ${meses} meses`;
     }
@@ -346,7 +389,6 @@ function limpiarFormularioAnimal() {
     }
 }
 
-// Helper para alertas rápidas de error
 function mostrarAlertaError(mensaje) {
     Swal.fire({
         icon: "error",
@@ -355,4 +397,3 @@ function mostrarAlertaError(mensaje) {
         confirmButtonColor: "#b05d4d"
     });
 }
-

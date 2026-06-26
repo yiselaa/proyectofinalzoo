@@ -94,6 +94,7 @@
                         <th>Horario</th>
                         <th>Cantidad (kg)</th>
                         <th>Animal</th>
+                        <th>Cuidador</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>

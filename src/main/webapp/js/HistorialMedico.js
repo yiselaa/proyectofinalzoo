@@ -5,9 +5,15 @@
 /* * HistorialMedico.js
  */
 
-console.log("JS HISTORIAL MÉDICO CARGADO - CORREGIDO PARA TU JSP REAL");
+console.log("JS HISTORIAL MÉDICO CARGADO - CORREGIDO CON SESIÓN GLOBAL AUTOMÁTICA");
 
 let mapaAnimalesEspecies = {};
+let paginaActual = 1;
+const size = 5; // 🌟 Límite estricto de 5 registros por página
+let datosCompletos = []; // Almacén global para segmentar los historiales médicos
+
+// 🌟 VARIABLE GLOBAL: Guarda el ID del veterinario logueado para que no se pierda al limpiar o editar el formulario
+let idVeterinarioSesion = null; 
 
 // ===============================
 // INICIO
@@ -23,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function formatearFecha(fecha) {
     if (!fecha) return "";
     const solo = fecha.substring(0, 10);
-    const partes = solo.split("-"); // El servlet corregido responde con guiones (yyyy-MM-dd)
+    const partes = solo.split("-");
     if (partes.length < 3) return fecha;
     return `${parseInt(partes[2])}/${parseInt(partes[1])}/${partes[0]}`;
 }
@@ -73,26 +79,39 @@ function cargarVeterinarios() {
                     select.innerHTML += `<option value="${emp.id}">${emp.nombre} ${emp.apellido}</option>`;
                 }
             });
+            
+            // Mapeamos al veterinario que está usando el sistema actualmente
+            autocompletarVeterinario();
         })
         .catch(error => console.error("Error cargando veterinarios:", error));
 }
 
 // ===============================
-// BUSCAR HISTORIALES
+// BUSCAR HISTORIALES (CORREGIDO)
 // ===============================
-function buscarHistoriales() {
+function buscarHistoriales(pagina = 1) {
+    paginaActual = pagina;
+
     fetch(`/ProyectoFinalZoo/HistorialMedicoServlet?_=${new Date().getTime()}`)
         .then(response => response.json())
-        .then(data => mostrarHistoriales(data))
+        .then(data => {
+            console.log("Datos de historial recibidos:", data);
+            datosCompletos = data; // Guardamos el array completo de la BD
+            
+            if (Array.isArray(datosCompletos)) {
+                // Forzar el redibujado segmentado local
+                redibujarTablaLocal();
+            }
+        })
         .catch(error => {
             console.error(error);
             mostrarAlertaError("No se pudo cargar la lista de historiales médicos.");
         });
 }
 
-// ===============================
+// ==========================================================
 // MOSTRAR HISTORIALES EN TABLA
-// ===============================
+// ==========================================================
 function mostrarHistoriales(lista) {
     if (!Array.isArray(lista)) return;
     let html = "";
@@ -113,9 +132,6 @@ function mostrarHistoriales(lista) {
                     <button class="btnEditar" onclick="editarHistorial(${h.id})">
                         <i class="ti ti-edit"></i>
                     </button>
-                    <button class="btnEliminar" onclick="eliminarHistorial(${h.id})">
-                        <i class="ti ti-trash"></i>
-                    </button>
                 </td>
             </tr>
         `;
@@ -123,9 +139,61 @@ function mostrarHistoriales(lista) {
     document.getElementById("tbodyHistoriales").innerHTML = html;
 }
 
-// ===========================================
-// EDITAR HISTORIAL (Sincronizado con tus IDs)
-// ===========================================
+// ==========================================================
+// RENDERIZAR CONTROLES DE PAGINACIÓN (SÍNCRO TOTAL)
+// ==========================================================
+function renderPaginacion(totalRegistros) {
+    const pagContenedor = document.getElementById("paginacion");
+    if (!pagContenedor) return;
+
+    const totalPaginas = Math.ceil(totalRegistros / size) || 1;
+
+    pagContenedor.innerHTML = `
+        <button onclick="anterior()" ${paginaActual === 1 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+            <i class="ti ti-chevron-left"></i>
+        </button>
+        <span style="margin: 0 10px; font-weight: bold;">Página ${paginaActual} de ${totalPaginas}</span>
+        <button onclick="siguiente()" ${paginaActual === totalPaginas ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+            <i class="ti ti-chevron-right"></i>
+        </button>
+    `;
+}
+
+// ==========================================================
+// LÓGICAS DE NAVEGACIÓN LOCAL (EL MOTOR DEL RECORTE)
+// ==========================================================
+function anterior() {
+    if (paginaActual > 1) {
+        paginaActual--;
+        redibujarTablaLocal();
+    }
+}
+
+function siguiente() {
+    const totalPaginas = Math.ceil(datosCompletos.length / size);
+    if (paginaActual < totalPaginas) {
+        paginaActual++;
+        redibujarTablaLocal();
+    }
+}
+
+function redibujarTablaLocal() {
+    // 🧠 Segmentamos matemáticamente la lista en bloques de 5
+    const inicio = (paginaActual - 1) * size;
+    const fin = inicio + size;
+    const registrosSegmentados = datosCompletos.slice(inicio, fin);
+    
+    mostrarHistoriales(registrosSegmentados);
+    renderPaginacion(datosCompletos.length);
+}
+
+function cambiarPagina(nuevaPagina) {
+    buscarHistoriales(nuevaPagina);
+}
+
+// ==========================================================
+// EDITAR HISTORIAL
+// ==========================================================
 function editarHistorial(id) {
     fetch(`/ProyectoFinalZoo/HistorialMedicoServlet?id=${id}`)
         .then(response => {
@@ -133,21 +201,27 @@ function editarHistorial(id) {
             return response.json();
         })
         .then(h => {
-            // Mapeo exacto basado en el HTML de tu JSP
             document.getElementById("idHistorial").value = h.id;
             document.getElementById("fecha").value = h.fecha ? h.fecha.substring(0, 10) : "";
             document.getElementById("diagnostico").value = h.diagnostico ?? "";
             document.getElementById("tratamiento").value = h.tratamiento || h.treatment || "";
             document.getElementById("idAnimal").value = h.animal ? h.animal.id : "";
-            document.getElementById("idVeterinario").value = h.veterinario ? h.veterinario.id : "";
+            
+            // 🛡️ Sincronizamos el veterinario que ya poseía el registro en BD para que no viaje nulo
+            if (h.veterinario && h.veterinario.id) {
+                let selectVet = document.getElementById("idVeterinario");
+                if (selectVet) selectVet.value = h.veterinario.id;
+                idVeterinarioSesion = h.veterinario.id; // Asegura la persistencia global
+            } else if (idVeterinarioSesion) {
+                let selectVet = document.getElementById("idVeterinario");
+                if (selectVet) selectVet.value = idVeterinarioSesion;
+            }
 
-            // Cambiar texto de tu botón real id="btnGuardar"
             let btnGuardar = document.getElementById("btnGuardar");
             if (btnGuardar) {
                 btnGuardar.textContent = "Actualizar Historial";
             }
 
-            // Subir la pantalla suavemente hacia el formulario
             window.scrollTo({ top: 0, behavior: "smooth" });
         })
         .catch(error => {
@@ -156,19 +230,27 @@ function editarHistorial(id) {
         });
 }
 
-// ===========================================
+// ==========================================================
 // GUARDAR O ACTUALIZAR
-// ===========================================
+// ==========================================================
 document.getElementById("formHistorial").addEventListener("submit", function (event) {
     event.preventDefault();
 
     let id = document.getElementById("idHistorial").value;
     let idAnimalRaw = document.getElementById("idAnimal").value;
-    let idVeterinarioRaw = document.getElementById("idVeterinario").value;
+    let selectVet = document.getElementById("idVeterinario");
+    
+    // 🛡️ Prioridad de captura de datos infalible para evitar nulos en el objeto
+    let idVeterinarioRaw = idVeterinarioSesion || (selectVet ? selectVet.value : "");
+
+    if (!idVeterinarioRaw && selectVet) {
+        idVeterinarioRaw = selectVet.value; 
+    }
 
     let historial = {
         fecha: document.getElementById("fecha").value,
         diagnostico: document.getElementById("diagnostico").value,
+        treatment: document.getElementById("tratamiento").value,
         tratamiento: document.getElementById("tratamiento").value,
         animal: idAnimalRaw ? { id: parseInt(idAnimalRaw) } : null,
         veterinario: idVeterinarioRaw ? { id: parseInt(idVeterinarioRaw) } : null
@@ -193,12 +275,11 @@ document.getElementById("formHistorial").addEventListener("submit", function (ev
         return data;
     })
     .then(data => {
-        // Limpiamos tu div real id="mensajeError"
         let msgError = document.getElementById("mensajeError");
         if (msgError) msgError.innerHTML = "";
 
         limpiarFormularioHistorial();
-        buscarHistoriales();
+        buscarHistoriales(paginaActual);
 
         Swal.fire({
             icon: "success",
@@ -214,42 +295,6 @@ document.getElementById("formHistorial").addEventListener("submit", function (ev
 });
 
 // ===============================
-// ELIMINAR HISTORIAL
-// ===============================
-function eliminarHistorial(id) {
-    Swal.fire({
-        title: "¿Eliminar historial clínico?",
-        text: "Esta acción no se puede deshacer.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#b05d4d",
-        cancelButtonColor: "#3f5b4b",
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar"
-    }).then((result) => {
-        if (!result.isConfirmed) return;
-
-        fetch(`/ProyectoFinalZoo/HistorialMedicoServlet?id=${id}`, { method: "DELETE" })
-        .then(async response => {
-            if (!response.ok) throw new Error("No se pudo eliminar el registro clínico.");
-            return response.json();
-        })
-        .then(data => {
-            Swal.fire({
-                icon: "success",
-                title: "Eliminado",
-                text: data.mensaje || "El reporte ha sido borrado.",
-                confirmButtonColor: "#3f5b4b"
-            });
-            buscarHistoriales();
-        })
-        .catch(error => {
-            mostrarAlertaError(error.message);
-        });
-    });
-}
-
-// ===============================
 // LIMPIAR FORMULARIO
 // ===============================
 function limpiarFormularioHistorial() {
@@ -260,6 +305,12 @@ function limpiarFormularioHistorial() {
     if (btnGuardar) {
         btnGuardar.textContent = "Guardar Historial";
     }
+    
+    // Restablecemos el ID en el select oculto para las siguientes inserciones
+    let selectVet = document.getElementById("idVeterinario");
+    if (selectVet && idVeterinarioSesion) {
+        selectVet.value = idVeterinarioSesion;
+    }
 }
 
 function mostrarAlertaError(mensaje) {
@@ -269,4 +320,32 @@ function mostrarAlertaError(mensaje) {
         text: mensaje,
         confirmButtonColor: "#b05d4d"
     });
+}
+
+// ===================================================
+// AUTOCOMPLETAR Y OCULTAR EL SELECTOR DESDE LA SESIÓN
+// ===================================================
+function autocompletarVeterinario() {
+    fetch("/ProyectoFinalZoo/HistorialMedicoServlet?accion=obtenerSesion")
+        .then(response => {
+            if (!response.ok) throw new Error("No hay una sesión de veterinario activa.");
+            return response.json();
+        })
+        .then(empleado => {
+            idVeterinarioSesion = empleado.id; 
+            
+            let selectVet = document.getElementById("idVeterinario");
+            if (selectVet) {
+                selectVet.value = empleado.id; 
+                selectVet.disabled = true;     
+                
+                let contenedorPadre = selectVet.parentElement;
+                if (contenedorPadre) {
+                    contenedorPadre.style.display = "none";
+                }
+            }
+        })
+        .catch(error => {
+            console.log("Aviso de Sesión:", error.message);
+        });
 }

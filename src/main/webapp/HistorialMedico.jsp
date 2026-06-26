@@ -72,14 +72,6 @@
                     </select>
                 </div>
 
-                <div class="campo">
-                    <label for="idVeterinario">Veterinario</label>
-                    <select id="idVeterinario" required>
-                        <option value="">
-                            Seleccione un veterinario...
-                        </option>
-                    </select>
-                </div>
 
                 <div class="botones">
 

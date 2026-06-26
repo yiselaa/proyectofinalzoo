@@ -39,6 +39,7 @@
                         <th>Tipo de Alimento</th>
                         <th>Cantidad (KG)</th>
                         <th>Horario</th>
+                        <th>Cuidador</th>
                     </tr>
                 </thead>
 

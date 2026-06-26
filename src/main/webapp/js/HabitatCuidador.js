@@ -2,6 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
+let paginaActual = 1;
+const size = 5; // 🌟 Límite estricto de 5 registros por página
+let datosCompletos = []; // Almacén global para segmentar las asignaciones de la BD
+
 // Asegurar que todo cargue al iniciar la página
 document.addEventListener("DOMContentLoaded", function () {
     cargarComponentes();
@@ -55,48 +59,113 @@ function cargarComponentes() {
 }
 
 // ==========================================
-// TRAER DATOS DEL SERVLET Y PINTAR LA TABLA
+// TRAER DATOS DEL SERVLET (CORREGIDO)
 // ==========================================
-function listarAsignaciones() {
+function listarAsignaciones(pagina = 1) {
+    paginaActual = pagina;
+
     fetch("HabitatCuidadorServlet")
         .then(res => {
             if (!res.ok) throw new Error("Error al consultar las asignaciones.");
             return res.json();
         })
         .then(data => {
-            let html = "";
-            if (Array.isArray(data)) {
-                data.forEach(h => {
-                    let nombresCuidadores = "Sin cuidadores asignados";
-                    if (h.cuidadores && h.cuidadores.length > 0) {
-                        nombresCuidadores = h.cuidadores
-                                .map(c => `${c.nombre} ${c.apellido}`)
-                                .join(", ");
-                    }
-
-                    html += `
-                        <tr>
-                            <td>${h.id}</td>
-                            <td>${h.tipo_terreno || h.tipoTerreno || "—"} (Capacidad: ${h.capacidad ?? 0})</td>
-                            <td>${nombresCuidadores}</td>
-                            <td class="acciones">
-                                <button class="btnEditar" onclick="cargarParaEditar(${h.id})">
-                                    <i class="ti ti-edit"></i>
-                                </button>
-                                <button class="btnEliminar" onclick="eliminarAsignacion(${h.id})">
-                                    <i class="ti ti-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
+            console.log("Datos de asignaciones recibidos:", data);
+            datosCompletos = data; // Almacenamos el array completo de la BD
+            
+            if (Array.isArray(datosCompletos)) {
+                // Forzamos el renderizado segmentado
+                redibujarTablaLocal();
             }
-            document.getElementById("tbodyCategoriaCuidador").innerHTML = html;
         })
         .catch(err => {
             console.error("Error al listar la tabla:", err);
             mostrarAlertaError("No se pudo cargar la lista de asignaciones.");
         });
+}
+
+// ==========================================
+// MOSTRAR ASIGNACIONES EN TABLA
+// ==========================================
+function mostrarAsignacionesEnTabla(lista) {
+    let html = "";
+    lista.forEach(h => {
+        let nombresCuidadores = "Sin cuidadores asignados";
+        if (h.cuidadores && h.cuidadores.length > 0) {
+            nombresCuidadores = h.cuidadores
+                    .map(c => `${c.nombre} ${c.apellido}`)
+                    .join(", ");
+        }
+
+        html += `
+            <tr>
+                <td>${h.id}</td>
+                <td>${h.tipo_terreno || h.tipoTerreno || "—"} (Capacidad: ${h.capacidad ?? 0})</td>
+                <td>${nombresCuidadores}</td>
+                <td class="acciones">
+                    <button class="btnEditar" onclick="cargarParaEditar(${h.id})">
+                        <i class="ti ti-edit"></i>
+                    </button>
+                    <button class="btnEliminar" onclick="eliminarAsignacion(${h.id})">
+                        <i class="ti ti-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    document.getElementById("tbodyCategoriaCuidador").innerHTML = html;
+}
+
+// ==========================================
+// RENDERIZAR CONTROLES DE PAGINACIÓN (UNIFICADO)
+// ==========================================
+function renderPaginacion(totalRegistros) {
+    const pagContenedor = document.getElementById("paginacion");
+    if (!pagContenedor) return;
+
+    const totalPaginas = Math.ceil(totalRegistros / size) || 1;
+
+    pagContenedor.innerHTML = `
+        <button onclick="anterior()" ${paginaActual === 1 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+            <i class="ti ti-chevron-left"></i>
+        </button>
+        <span style="margin: 0 10px; font-weight: bold;">Página ${paginaActual} de ${totalPaginas}</span>
+        <button onclick="siguiente()" ${paginaActual === totalPaginas ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+            <i class="ti ti-chevron-right"></i>
+        </button>
+    `;
+}
+
+// ==========================================
+// LÓGICAS DE NAVEGACIÓN LOCAL (EL MOTOR DEL RECORTE)
+// ==========================================
+function anterior() {
+    if (paginaActual > 1) {
+        paginaActual--;
+        redibujarTablaLocal();
+    }
+}
+
+function siguiente() {
+    const totalPaginas = Math.ceil(datosCompletos.length / size);
+    if (paginaActual < totalPaginas) {
+        paginaActual++;
+        redibujarTablaLocal();
+    }
+}
+
+function redibujarTablaLocal() {
+    // 🧠 Matemática para recortar la lista en bloques de 5
+    const inicio = (paginaActual - 1) * size;
+    const fin = inicio + size;
+    const registrosSegmentados = datosCompletos.slice(inicio, fin);
+    
+    mostrarAsignacionesEnTabla(registrosSegmentados);
+    renderPaginacion(datosCompletos.length);
+}
+
+function cambiarPagina(nuevaPagina) {
+    listarAsignaciones(nuevaPagina);
 }
 
 // ==========================================
@@ -113,7 +182,6 @@ function guardarOEditar(e) {
         return;
     }
 
-    // Obtener todos los IDs seleccionados
     const idsEmpleados = Array.from(selectEmpleado.selectedOptions)
             .map(option => parseInt(option.value))
             .filter(val => !isNaN(val));
@@ -153,7 +221,7 @@ function guardarOEditar(e) {
     })
     .then(res => {
         limpiarFormulario();
-        listarAsignaciones();
+        listarAsignaciones(paginaActual);
 
         Swal.fire({
             icon: "success",
@@ -181,7 +249,6 @@ function cargarParaEditar(idHabitat) {
             document.getElementById("idHabitatSelect").value = habitat.id;
             document.getElementById("idAsignacionOculta").value = habitat.id;
 
-            // Seleccionar los cuidadores actuales en el select
             const selectEmpleado = document.getElementById("idEmpleadoSelect");
             const idsAsignados = habitat.cuidadores.map(c => c.id.toString());
 
@@ -190,13 +257,11 @@ function cargarParaEditar(idHabitat) {
                 option.selected = idsAsignados.includes(option.value);
             }
 
-            // Cambiar el texto del botón de guardar de forma dinámica si existe
             let btnGuardar = document.getElementById("btnGuardarAsignacion") || document.getElementById("btnGuardar");
             if (btnGuardar) {
                 btnGuardar.textContent = "Actualizar Asignación";
             }
 
-            // Subir la pantalla suavemente al formulario
             window.scrollTo({
                 top: 0,
                 behavior: "smooth"
@@ -247,7 +312,7 @@ function eliminarAsignacion(idHabitat) {
                 text: res.mensaje || "Los cuidadores fueron removidos de este hábitat.",
                 confirmButtonColor: "#3f5b4b"
             });
-            listarAsignaciones();
+            listarAsignaciones(paginaActual);
             limpiarFormulario();
         })
         .catch(err => {
@@ -275,7 +340,6 @@ function limpiarFormulario() {
     }
 }
 
-// Helper para alertas rápidas de error
 function mostrarAlertaError(mensaje) {
     Swal.fire({
         icon: "error",

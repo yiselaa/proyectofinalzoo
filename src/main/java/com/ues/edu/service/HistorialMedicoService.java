@@ -12,8 +12,7 @@ import java.util.List;
  *
  * @author coc44
  */
-    
-    public class HistorialMedicoService {
+public class HistorialMedicoService {
 
     private HistorialMedicoDao dao = new HistorialMedicoDao();
 
@@ -25,8 +24,15 @@ import java.util.List;
         dao.actualizar(h);
     }
 
+    // ===================================================
+    // 🚫 DESHABILITADO POR REGLA DE NEGOCIO (AUDITORÍA)
+    // ===================================================
     public void eliminarHistorial(int id) {
-        dao.eliminar(id);
+        // Bloqueado para mantener la integridad de los registros clínicos del zoológico.
+        throw new UnsupportedOperationException("La eliminación de registros médicos está deshabilitada por auditoría clínica.");
+        
+        /* dao.eliminar(id);
+        */
     }
 
     public List<HistorialMedico> obtenerHistoriales() {
@@ -56,6 +62,5 @@ import java.util.List;
     public List<HistorialMedico> listarPaginado(int pagina, int size) {
         return dao.listarPaginado(pagina, size);
     }
-}
-    
+}  
 

@@ -27,7 +27,7 @@ private EntityManagerFactory emf = JPAUtil.getEMF();
         return lista;
     }
 
-    // ← SOLO este, borra el de long
+    // â† SOLO este, borra el de long
     public Usuario buscarPorId(int id) {
         EntityManager em = emf.createEntityManager();
         Usuario u = em.find(Usuario.class, id);
@@ -35,24 +35,41 @@ private EntityManagerFactory emf = JPAUtil.getEMF();
         return u;
     }
 
+    
     public void guardar(Usuario usuario) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        try {
-            if (usuario.getEmpleado() != null && usuario.getEmpleado().getId() != null) {
-                Empleado emp = em.find(Empleado.class, usuario.getEmpleado().getId());
-                usuario.setEmpleado(emp);
-            }
-            em.persist(usuario);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw new RuntimeException("Error al guardar usuario", e);
-        } finally {
-            em.close();
+    EntityManager em = emf.createEntityManager();
+    em.getTransaction().begin();
+    try {
+        // 🌟 IMPRIMIR PARA DEPURAR (Verifica qué está llegando a NetBeans)
+        if (usuario.getEmpleado() != null) {
+            System.out.println("ID del Empleado recibido en el DAO: " + usuario.getEmpleado().getId());
+        } else {
+            System.out.println("El objeto Empleado llegó completamente NULL al DAO");
         }
-    }
 
+        // 🌟 CONDICIÓN CORREGIDA: Asegurar que el ID sea válido (mayor a cero)
+        if (usuario.getEmpleado() != null && usuario.getEmpleado().getId() != null && usuario.getEmpleado().getId() > 0) {
+            Empleado emp = em.find(Empleado.class, usuario.getEmpleado().getId());
+            
+            if (emp != null) {
+                usuario.setEmpleado(emp); // Le inyectamos el empleado real recuperado de la BD
+            } else {
+                throw new RuntimeException("El ID de empleado " + usuario.getEmpleado().getId() + " no existe en la BD.");
+            }
+        } else {
+            throw new RuntimeException("No se puede guardar el usuario porque no contiene un ID de Empleado válido.");
+        }
+
+        em.persist(usuario);
+        em.getTransaction().commit();
+    } catch (Exception e) {
+        em.getTransaction().rollback();
+        throw new RuntimeException("Error al guardar usuario", e);
+    } finally {
+        em.close();
+    }
+}
+    
     public void actualizar(Usuario usuario) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();

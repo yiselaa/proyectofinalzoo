@@ -7,6 +7,7 @@ package com.ues.edu.controlador;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ues.edu.entidades.HistorialMedico;
+import com.ues.edu.entidades.Usuario;
 import com.ues.edu.service.HistorialMedicoService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -78,6 +79,7 @@ public class HistorialMedicoServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
     @Override
 protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
@@ -85,34 +87,49 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
 
+    // 🌟 1. CAPTURAR SI EL FRONTEND PIDE LA SESIÓN
+    String accion = request.getParameter("accion");
+    if ("obtenerSesion".equals(accion)) {
+        // Obtenemos la sesión actual (sin crear una nueva si no existe)
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        
+        if (session != null && session.getAttribute("usuario") != null) {
+            Usuario userLogueado = (Usuario) session.getAttribute("usuario");
+            
+            // Si el usuario tiene un empleado asociado, lo enviamos al JS
+            if (userLogueado.getEmpleado() != null) {
+                response.getWriter().write(gson.toJson(userLogueado.getEmpleado()));
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"error\":\"El usuario no tiene un empleado/veterinario asignado\"}");
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"No hay una sesión activa\"}");
+        }
+        return; // Detiene la ejecución aquí para que no intente listar todo lo demás
+    }
+
+    // --- FLUJO NORMAL DE TU SERVLET QUE YA TENÍAS ---
     String idParam = request.getParameter("id");
 
     if (idParam != null && !idParam.isEmpty()) {
-
         int id = Integer.parseInt(idParam);
-
         HistorialMedico h = historialService.buscarHistorial(id);
 
         if (h == null) {
-
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-            response.getWriter().write(
-                "{\"mensaje\":\"Historial no encontrado\"}"
-            );
-
+            response.getWriter().write("{\"mensaje\":\"Historial no encontrado\"}");
             return;
         }
-
         response.getWriter().write(gson.toJson(h));
         return;
     }
 
-    List<HistorialMedico> historiales =
-            historialService.obtenerHistoriales();
-
+    List<HistorialMedico> historiales = historialService.obtenerHistoriales();
     response.getWriter().write(gson.toJson(historiales));
 }
+        
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -180,16 +197,14 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     }
     
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-
-        int id = Integer.parseInt(request.getParameter("id"));
-
-        historialService.eliminarHistorial(id);
-
-        response.setContentType("application/json");
-        response.getWriter().write("{\"mensaje\":\"Historial eliminado\"}");
-    }
+protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+    
+    // 🚫 Bloqueado por reglas de negocio clínicas
+    response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+    response.setContentType("application/json;charset=UTF-8");
+    response.getWriter().write("{\"error\":\"Por normativa de auditoría, los historiales médicos no pueden ser eliminados del sistema.\"}");
+}
 
     // ===============================
     // VALIDACIÓN

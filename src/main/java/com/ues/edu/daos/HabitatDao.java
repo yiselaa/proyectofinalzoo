@@ -15,7 +15,6 @@ import java.util.List;
  *
  * @author coc44
  */
-
 public class HabitatDao {
 
     private EntityManagerFactory emf =
@@ -37,7 +36,6 @@ public class HabitatDao {
         if (existente != null) {
             existente.setTipoTerreno(habitat.getTipoTerreno());
             existente.setCapacidad(habitat.getCapacidad());
-            
         }
 
         em.getTransaction().commit();
@@ -57,10 +55,14 @@ public class HabitatDao {
         em.close();
     }
 
+    // ==========================================================
+    // LISTAR TODOS (Corregido: Fijos en su sitio por ID)
+    // ==========================================================
     public List<Habitat> listar() {
         EntityManager em = emf.createEntityManager();
+        // 🌟 Agregamos ORDER BY h.id ASC
         TypedQuery<Habitat> query =
-                em.createQuery("SELECT h FROM Habitat h", Habitat.class);
+                em.createQuery("SELECT h FROM Habitat h ORDER BY h.id ASC", Habitat.class);
         List<Habitat> lista = query.getResultList();
         em.close();
         return lista;
@@ -73,11 +75,14 @@ public class HabitatDao {
         return h;
     }
 
+    // ==========================================================
+    // BUSCAR POR TIPO TERRENO (Corregido con orden)
+    // ==========================================================
     public List<Habitat> buscarPorTipoTerreno(String tipoTerreno) {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Habitat> query =
                 em.createQuery(
-                        "SELECT h FROM Habitat h WHERE LOWER(h.tipoTerreno) LIKE LOWER(:tipo)",
+                        "SELECT h FROM Habitat h WHERE LOWER(h.tipoTerreno) LIKE LOWER(:tipo) ORDER BY h.id ASC",
                         Habitat.class
                 );
         query.setParameter("tipo", "%" + tipoTerreno + "%");
@@ -86,11 +91,14 @@ public class HabitatDao {
         return lista;
     }
 
+    // ==========================================================
+    // FILTRAR POR CAPACIDAD MÍNIMA (Corregido con orden)
+    // ==========================================================
     public List<Habitat> filtrarPorCapacidadMinima(int capacidad) {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Habitat> query =
                 em.createQuery(
-                        "SELECT h FROM Habitat h WHERE h.capacidad >= :capacidad",
+                        "SELECT h FROM Habitat h WHERE h.capacidad >= :capacidad ORDER BY h.id ASC",
                         Habitat.class
                 );
         query.setParameter("capacidad", capacidad);
@@ -99,10 +107,14 @@ public class HabitatDao {
         return lista;
     }
 
+    // ==========================================================
+    // PAGINADO (Corregido con orden)
+    // ==========================================================
     public List<Habitat> listarPaginado(int pagina, int size) {
         EntityManager em = emf.createEntityManager();
+        // 🌟 Es vital mantener el orden aquí para no duplicar datos en las páginas
         TypedQuery<Habitat> query =
-                em.createQuery("SELECT h FROM Habitat h", Habitat.class);
+                em.createQuery("SELECT h FROM Habitat h ORDER BY h.id ASC", Habitat.class);
         query.setFirstResult((pagina - 1) * size);
         query.setMaxResults(size);
         List<Habitat> lista = query.getResultList();
@@ -110,4 +122,3 @@ public class HabitatDao {
         return lista;
     }
 }
-

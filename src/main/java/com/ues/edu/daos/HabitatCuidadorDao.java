@@ -98,13 +98,16 @@ public class HabitatCuidadorDao {
         }
     }
 
-    // Listar los hábitats trayendo de forma inmediata (Fetch) sus cuidadores
+    // ==========================================================
+    // LISTAR TODOS (Corregido: Igual a las demás tablas por ID)
+    // ==========================================================
     public List<Habitat> listar() {
         EntityManager em = emf.createEntityManager();
         List<Habitat> lista = null;
         try {
+            // 🌟 Agregamos ORDER BY h.id ASC al final de la consulta JPQL
             TypedQuery<Habitat> query = em.createQuery(
-                "SELECT DISTINCT h FROM Habitat h LEFT JOIN FETCH h.cuidadores",
+                "SELECT DISTINCT h FROM Habitat h LEFT JOIN FETCH h.cuidadores ORDER BY h.id ASC",
                 Habitat.class
             );
             lista = query.getResultList();
@@ -129,4 +132,3 @@ public class HabitatCuidadorDao {
         return habitat;
     }
 }
-
