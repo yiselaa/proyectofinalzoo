@@ -126,10 +126,26 @@ public class DetalleVisitaServlet extends HttpServlet {
             return;
         }
         // Usuario que inició sesión
-        Usuario usuarioLogueado
-                = (Usuario) request.getSession().getAttribute("usuario");
+        // 1. Recuperamos la sesión activa (usando false para no crear una vacía artificialmente)
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        Usuario usuarioLogueado = null;
 
+        if (session != null) {
+            // 🌟 CORRECCIÓN: Buscamos "usuarioSesion" que es el nombre real en tu Login
+            usuarioLogueado = (Usuario) session.getAttribute("usuarioSesion");
+        }
+
+        // 2. Escudo de seguridad: Si no hay usuario en sesión, respondemos con error JSON en lugar de un 500 HTML
+        if (usuarioLogueado == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Error 401
+            response.getWriter().write("{\"error\":\"Sesión inválida o expirada. Por favor, vuelva a iniciar sesión.\"}");
+            return;
+        }
+
+        // 3. El empleado se asigna directo desde el objeto recuperado
         detalleVisita.setEmpleado(usuarioLogueado.getEmpleado());
+        
+        // 4. Guardamos el registro con éxito
         service.guardarDetalleVisita(detalleVisita);
         response.getWriter().write("{\"mensaje\":\"Visita guardada\"}");
     }

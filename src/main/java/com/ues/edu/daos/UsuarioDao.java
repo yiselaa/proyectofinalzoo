@@ -5,6 +5,7 @@
 package com.ues.edu.daos;
 
 import com.ues.edu.entidades.Empleado;
+import com.ues.edu.entidades.Rol;
 import com.ues.edu.entidades.Usuario;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class UsuarioDao {
 
-private EntityManagerFactory emf = JPAUtil.getEMF();
+    private EntityManagerFactory emf = JPAUtil.getEMF();
 
     public List<Usuario> listar() {
         EntityManager em = emf.createEntityManager();
@@ -39,10 +40,23 @@ private EntityManagerFactory emf = JPAUtil.getEMF();
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         try {
+
+            System.out.println(">>> ROL: " + usuario.getRol());
+            System.out.println(">>> ROL ID: " + (usuario.getRol() != null ? usuario.getRol().getId() : "NULL"));
+            System.out.println(">>> EMPLEADO: " + usuario.getEmpleado());
+            System.out.println(">>> EMPLEADO ID: " + (usuario.getEmpleado() != null ? usuario.getEmpleado().getId() : "NULL"));
+            // Resolver Empleado (ya lo tenías)
             if (usuario.getEmpleado() != null && usuario.getEmpleado().getId() != null) {
                 Empleado emp = em.find(Empleado.class, usuario.getEmpleado().getId());
                 usuario.setEmpleado(emp);
             }
+
+            // ✅ AGREGAR ESTO - Resolver Rol desde la BD
+            if (usuario.getRol() != null && usuario.getRol().getId() != null) {
+                Rol rol = em.find(Rol.class, usuario.getRol().getId());
+                usuario.setRol(rol);
+            }
+
             em.persist(usuario);
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -57,10 +71,18 @@ private EntityManagerFactory emf = JPAUtil.getEMF();
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         try {
+            // Resolver Empleado (ya lo tenías)
             if (usuario.getEmpleado() != null && usuario.getEmpleado().getId() != null) {
                 Empleado emp = em.find(Empleado.class, usuario.getEmpleado().getId());
                 usuario.setEmpleado(emp);
             }
+
+            // ✅ AGREGAR ESTO también aquí
+            if (usuario.getRol() != null && usuario.getRol().getId() != null) {
+                Rol rol = em.find(Rol.class, usuario.getRol().getId());
+                usuario.setRol(rol);
+            }
+
             em.merge(usuario);
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -71,22 +93,22 @@ private EntityManagerFactory emf = JPAUtil.getEMF();
         }
     }
 
-   public void eliminar(int id) {
-    EntityManager em = emf.createEntityManager();
-    try {
-        em.getTransaction().begin();
-        
-        em.createNativeQuery("DELETE FROM usuario WHERE id = :id")
-          .setParameter("id", id)
-          .executeUpdate();
-        
-        em.getTransaction().commit();
-        
-    } catch (Exception e) {
-        em.getTransaction().rollback();
-        throw new RuntimeException("Error al eliminar", e);
-    } finally {
-        em.close();
+    public void eliminar(int id) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            em.createNativeQuery("DELETE FROM usuario WHERE id = :id")
+                    .setParameter("id", id)
+                    .executeUpdate();
+
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            throw new RuntimeException("Error al eliminar", e);
+        } finally {
+            em.close();
+        }
     }
-}
 }

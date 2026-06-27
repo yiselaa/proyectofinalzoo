@@ -35,4 +35,10 @@ public class Usuario {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idempleado")
     private Empleado empleado;
+    
+    // NUEVO: Asociación con el Rol del usuario
+    @Expose
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idrol", nullable = false)
+    private Rol rol;
 }

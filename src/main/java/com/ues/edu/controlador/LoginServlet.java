@@ -7,12 +7,12 @@ package com.ues.edu.controlador;
 import com.google.gson.Gson;
 import com.ues.edu.entidades.Usuario;
 import com.ues.edu.service.LoginService;
-import com.ues.edu.service.UsuariosService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -65,7 +65,21 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        String accion = request.getParameter("accion");
+
+        if ("logout".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.removeAttribute("usuarioSesion"); // Limpiamos el objeto de sesión
+                session.invalidate(); // Destruimos la sesión en Tomcat
+            }
+            //  Redirigimos al usuario de vuelta a la pantalla de entrada
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        response.sendRedirect("login.jsp");
     }
 
     /**
@@ -79,40 +93,40 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
+        try {
+            Usuario login = gson.fromJson(request.getReader(), Usuario.class);
 
-        Usuario login
-                = gson.fromJson(request.getReader(),
-                        Usuario.class);
-
-        Usuario usuario
-                = service.login(
-                        login.getNombreUsuario(),
-                        login.getContrasena()
-                );
-
-        if (usuario == null) {
-
-            response.setStatus(
-                    HttpServletResponse.SC_UNAUTHORIZED);
-
-            response.getWriter().write(
-                    "{\"error\":\"Usuario o contraseña incorrectos\"}"
+            Usuario usuario = service.login(
+                    login.getNombreUsuario(),
+                    login.getContrasena()
             );
 
-            return;
+            if (usuario != null) {
+
+                request.getSession().setAttribute("usuarioSesion", usuario);
+
+                String json = String.format(
+                        "{\"redirect\":\"index.jsp\",\"nombreUsuario\":\"%s\"}",
+                        usuario.getNombreUsuario()
+                );
+
+                response.getWriter().write(json);
+                return; 
+            }
+
+            
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"Usuario o contraseña incorrectos.\"}");
+
+        } catch (Exception e) {
+          
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error interno en el servidor: " + e.getMessage() + "\"}");
         }
-
-        request.getSession()
-                .setAttribute("usuario", usuario);
-
-        String json = String.format(
-                "{\"redirect\":\"index.html\",\"nombreUsuario\":\"%s\"}",
-                usuario.getNombreUsuario()
-        );
-
-        response.getWriter().write(json);
     }
 
     /**

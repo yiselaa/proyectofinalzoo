@@ -36,8 +36,6 @@ public class EmpleadoDao {
             existente.setNombre(empleado.getNombre());
             existente.setApellido(empleado.getApellido());
             existente.setDui(empleado.getDui());
-            existente.setRol(empleado.getRol());
-            // ✅ NO tocamos historiales, usuario ni animalesAsignados
         }
 
         em.getTransaction().commit();
@@ -59,7 +57,6 @@ public class EmpleadoDao {
             throw new RuntimeException("Empleado no encontrado");
         }
 
-        // Quitar empleado de todos los hábitats
         if (e.getHabitatsAsignados() != null) {
 
             for (Habitat h : e.getHabitatsAsignados()) {
@@ -117,66 +114,6 @@ public class EmpleadoDao {
         return e;
     }
 
-//    public List<Empleado> buscarPorNombre(String nombre) {
-//
-//        EntityManager em = emf.createEntityManager();
-//
-//        TypedQuery<Empleado> query =
-//                em.createQuery(
-//                        "SELECT e FROM Empleado e "
-//                        + "WHERE LOWER(e.nombre) LIKE LOWER(:nombre)",
-//                        Empleado.class
-//                );
-//
-//        query.setParameter("nombre", "%" + nombre + "%");
-//
-//        List<Empleado> lista = query.getResultList();
-//
-//        em.close();
-//
-//        return lista;
-//    }
-    public List<Empleado> filtrarPorRol(String rol) {
-
-        EntityManager em = emf.createEntityManager();
-
-        TypedQuery<Empleado> query
-                = em.createQuery(
-                        "SELECT e FROM Empleado e "
-                        + "WHERE e.rol = :rol",
-                        Empleado.class
-                );
-
-        query.setParameter("rol", rol);
-
-        List<Empleado> lista = query.getResultList();
-
-        em.close();
-
-        return lista;
-    }
-
-    public List<Empleado> listarPaginado(int pagina, int size) {
-
-        EntityManager em = emf.createEntityManager();
-
-        TypedQuery<Empleado> query
-                = em.createQuery(
-                        "SELECT e FROM Empleado e",
-                        Empleado.class
-                );
-
-        query.setFirstResult((pagina - 1) * size);
-
-        query.setMaxResults(size);
-
-        List<Empleado> lista = query.getResultList();
-
-        em.close();
-
-        return lista;
-    }
-    
     public boolean existeDui(String dui) {
 
     EntityManager em = emf.createEntityManager();

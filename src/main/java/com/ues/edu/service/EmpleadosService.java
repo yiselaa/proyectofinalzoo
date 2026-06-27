@@ -16,7 +16,6 @@ public class EmpleadosService {
     
    private EmpleadoDao dao = new EmpleadoDao();
 
-    // CREAR
     public void crearEmpleado(Empleado e) {
 
     if (dao.existeDui(e.getDui())) {
@@ -26,7 +25,6 @@ public class EmpleadosService {
     dao.guardar(e);
 }
 
-    // ACTUALIZAR
     public void editarEmpleado(Empleado e) {
         dao.actualizar(e);
     }
@@ -36,12 +34,11 @@ public class EmpleadosService {
         dao.eliminar(id);
     }
 
-    // LISTAR TODOS
+   
     public List<Empleado> obtenerEmpleados() {
         return dao.listar();
     }
 
-    // BUSCAR POR ID
     public Empleado buscarEmpleado(int id) {
         return dao.buscarPorId(id);
     }

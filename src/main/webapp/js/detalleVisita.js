@@ -1,6 +1,4 @@
-/* =============================================================
- * detalleVisita.js
- * ============================================================= */
+
 
 console.log("JS NUEVO CARGADO");
 
@@ -10,9 +8,7 @@ let gruposVisita = [];
 let paginaActual = 1;
 const size = 5;
 
-// =========================
-// ESTADO GLOBAL
-// =========================
+
 let tickets = [];
 let idsOriginales = [];
 const precios = {};
@@ -25,9 +21,7 @@ const colores = [
     "badge-rosa"
 ];
 
-// =========================
-// INICIALIZACIÓN
-// =========================
+
 document.addEventListener("DOMContentLoaded", function () {
 
     cargarTabla();
@@ -55,16 +49,10 @@ document.addEventListener("DOMContentLoaded", function () {
     renderTickets();
 });
 
-// =========================
-// TOTAL
-// =========================
 function calcTotal() {
     return tickets.reduce((a, t) => a + t.subtotal, 0);
 }
 
-// =========================
-// RENDER TICKETS
-// =========================
 function renderTickets() {
 
     let lista = document.getElementById("ticketLista");
@@ -85,9 +73,7 @@ function renderTickets() {
             tickets.length > 0 ? "$" + total.toFixed(2) : "";
 }
 
-// =========================
-// AGREGAR TICKET
-// =========================
+
 function agregarTicket() {
 
     let select = document.getElementById("idTicket");
@@ -118,17 +104,15 @@ function agregarTicket() {
     renderTickets();
 }
 
-// =========================
-// QUITAR TICKET
-// =========================
+
 function quitarTicket(i) {
     tickets.splice(i, 1);
     renderTickets();
 }
 
-// =========================
+
 // GUARDAR / ACTUALIZAR
-// =========================
+
 function guardarRegistro(e) {
 
     e.preventDefault();
@@ -225,9 +209,9 @@ function guardarRegistro(e) {
             });
 }
 
-// =========================
+
 // CARGAR TABLA
-// =========================
+
 function cargarTabla() {
     fetch("DetalleVisitaServlet")
             .then(res => res.json())
@@ -235,9 +219,9 @@ function cargarTabla() {
             .catch(error => console.error(error));
 }
 
-// =========================
+
 // MOSTRAR TABLA
-// =========================
+
 function mostrarTabla(lista) {
 
     if (!Array.isArray(lista)) {
@@ -277,9 +261,7 @@ function mostrarTabla(lista) {
     renderPaginacion();
 }
 
-// =========================
-// ELIMINAR
-// =========================
+
 function eliminar(nombre, telefono, fecha) {
 
     Swal.fire({
@@ -332,9 +314,7 @@ function eliminar(nombre, telefono, fecha) {
     });
 }
 
-// =========================
-// EDITAR
-// =========================
+
 function editarVisita(nombre, telefono, fecha) {
 
     fetch("DetalleVisitaServlet")
@@ -378,9 +358,7 @@ function editarVisita(nombre, telefono, fecha) {
             });
 }
 
-// ===================================
-// RENDER TABLA CON FILAS PAGINADAS
-// ===================================
+
 function renderTablaPaginada() {
 
     let tbody = document.querySelector("#tablaDetalleVisita tbody");
@@ -434,9 +412,7 @@ function renderTablaPaginada() {
     tbody.innerHTML = html;
 }
 
-// =========================
-// RENDER CONTROLES PAGINACIÓN  ← ÚNICO CAMBIO
-// =========================
+
 function renderPaginacion() {
 
     const pagContenedor = document.getElementById("paginacion");
@@ -473,9 +449,7 @@ function anterior() {
     }
 }
 
-// =========================
-// LIMPIAR FORMULARIO
-// =========================
+
 function limpiarFormulario() {
     document.getElementById("formDetalleVisita").reset();
     document.getElementById("idDetalleVisita").value = "";

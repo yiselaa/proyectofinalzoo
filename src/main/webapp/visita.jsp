@@ -83,7 +83,7 @@
                 </table>
                 
                  <div style="margin-top: 24px; text-align: right;">
-                    <a href="index.html" class="btn-back">
+                    <a href="index.jsp" class="btn-back">
                         <i class="ti ti-arrow-left"></i> 
                     </a>
                 </div>

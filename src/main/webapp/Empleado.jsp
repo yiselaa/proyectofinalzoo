@@ -44,16 +44,6 @@
                             <input type="text" id="numeroDui" placeholder="00000000-0" required>
                         </div>
 
-                        <div class="campo">
-                            <label for="rol">Rol</label>
-                            <select id="rol" required>
-                                <option value="">Seleccione rol</option>
-                                <option value="ADMIN">ADMIN</option>
-                                <option value="CUIDADOR">CUIDADOR</option>
-                                <option value="VETERINARIO">VETERINARIO</option>
-                            </select>
-                        </div>
-
                         <div class="botones">
                             <button type="submit" class="guardar">
                                 Guardar Empleado
@@ -75,7 +65,6 @@
                             <th>Nombre</th>
                             <th>Apellido</th>
                             <th>DUI</th>
-                            <th>Rol</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -86,7 +75,7 @@
                 <div id="paginacion" class="paginacion"></div>   
 
                 <div style="margin-top: 24px; text-align: right;">
-                    <a href="index.html" class="btn-back">
+                    <a href="index.jsp" class="btn-back">
                         <i class="ti ti-arrow-left"></i> 
                     </a>
                 </div>

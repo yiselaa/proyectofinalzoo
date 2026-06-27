@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="mt-3 text-end">
-                    <a href="index.html" class="btn-back">← </a>
+                    <a href="index.jsp" class="btn-back">← </a>
                 </div>
 
             </div>
