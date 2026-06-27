@@ -50,7 +50,7 @@
 
         <!-- BOTÓN -->
         <div class="mt-4 text-end">
-            <a href="index.jsp" class="btn-back">
+            <a href="index.html" class="btn-back">
                 ← Volver al inicio
             </a>
         </div>

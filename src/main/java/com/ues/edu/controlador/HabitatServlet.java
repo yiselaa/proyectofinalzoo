@@ -84,7 +84,6 @@ public class HabitatServlet extends HttpServlet {
         
    String idParam = request.getParameter("id");
 
-        // 🔥 BUSCAR POR ID
         if (idParam != null && !idParam.isEmpty()) {
             long id = Long.parseLong(idParam);
             Habitat habitat = habitatService.buscarHabitat(id);
@@ -100,7 +99,6 @@ public class HabitatServlet extends HttpServlet {
             return;
         }
 
-        // 🔥 LISTAR TODOS
         List<Habitat> habitats = habitatService.obtenerHabitats();
         response.setContentType("application/json");
         response.getWriter().write(gson.toJson(habitats));

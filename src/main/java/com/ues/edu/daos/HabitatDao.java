@@ -37,7 +37,7 @@ public class HabitatDao {
         if (existente != null) {
             existente.setTipoTerreno(habitat.getTipoTerreno());
             existente.setCapacidad(habitat.getCapacidad());
-            // ✅ No tocamos listaAnimales ni cuidadores aquí
+            
         }
 
         em.getTransaction().commit();
@@ -110,4 +110,3 @@ public class HabitatDao {
         return lista;
     }
 }
-
