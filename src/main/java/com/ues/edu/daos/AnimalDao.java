@@ -67,13 +67,14 @@ public class AnimalDao {
         em.close();
     }
 
-    // ==========================
-    // LISTAR TODOS (con hábitat)
-    // ==========================
+    // ==========================================================
+    // LISTAR TODOS (Corregido: Fijos en su sitio por ID)
+    // ==========================================================
     public List<Animal> listar() {
         EntityManager em = emf.createEntityManager();
+        // 🌟 Agregamos ORDER BY a.id ASC para mantener el orden espacial
         TypedQuery<Animal> query =
-                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.habitat", Animal.class);
+                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.habitat ORDER BY a.id ASC", Animal.class);
         List<Animal> lista = query.getResultList();
         em.close();
         return lista;
@@ -104,7 +105,7 @@ public class AnimalDao {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Animal> query =
                 em.createQuery(
-                        "SELECT a FROM Animal a JOIN FETCH a.habitat WHERE LOWER(a.nombre) LIKE LOWER(:nombre)",
+                        "SELECT a FROM Animal a JOIN FETCH a.habitat WHERE LOWER(a.nombre) LIKE LOWER(:nombre) ORDER BY a.id ASC",
                         Animal.class
                 );
         query.setParameter("nombre", "%" + nombre + "%");
@@ -120,7 +121,7 @@ public class AnimalDao {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Animal> query =
                 em.createQuery(
-                        "SELECT a FROM Animal a JOIN FETCH a.habitat WHERE a.habitat.id = :idHabitat",
+                        "SELECT a FROM Animal a JOIN FETCH a.habitat WHERE a.habitat.id = :idHabitat ORDER BY a.id ASC",
                         Animal.class
                 );
         query.setParameter("idHabitat", idHabitat);
@@ -129,13 +130,14 @@ public class AnimalDao {
         return lista;
     }
 
-    // ==========================
-    // PAGINACIÓN (con hábitat)
-    // ==========================
+    // ==========================================================
+    // PAGINACIÓN (Corregido: Indispensable ordenar aquí también)
+    // ==========================================================
     public List<Animal> listarPaginado(int pagina, int size) {
         EntityManager em = emf.createEntityManager();
+        // 🌟 Agregamos ORDER BY a.id ASC para que la paginación no duplique registros al recargar
         TypedQuery<Animal> query =
-                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.habitat", Animal.class);
+                em.createQuery("SELECT a FROM Animal a JOIN FETCH a.habitat ORDER BY a.id ASC", Animal.class);
         query.setFirstResult((pagina - 1) * size);
         query.setMaxResults(size);
         List<Animal> lista = query.getResultList();

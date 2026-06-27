@@ -46,8 +46,8 @@ public class Empleado {
     @Column(name = "rol", nullable = false, length = 70)
     private String rol;
 
-    @OneToOne(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Usuario usuario;
+   @OneToOne(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
+private transient Usuario usuario; // 🌟 Evita el bucle de regreso a Usuario
 
     @ManyToMany(mappedBy = "cuidadores")
     private List<Habitat> habitatsAsignados;

@@ -7,7 +7,9 @@ package com.ues.edu.controlador;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ues.edu.entidades.Alimentacion;
+import com.ues.edu.entidades.Empleado;
 import com.ues.edu.service.AlimentacionService;
+import com.ues.edu.service.EmpleadosService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -23,9 +25,11 @@ import java.util.List;
  */
 @WebServlet(name = "AlimentacionServlet", urlPatterns = {"/AlimentacionServlet"})
 public class AlimentacionServlet extends HttpServlet {
-    
-    private AlimentacionService alimentacionService =
-            new AlimentacionService();
+
+    private AlimentacionService alimentacionService
+            = new AlimentacionService();
+
+    private EmpleadosService empleadosService = new EmpleadosService();
 
     private Gson gson = new GsonBuilder()
             .excludeFieldsWithModifiers(
@@ -88,45 +92,69 @@ public class AlimentacionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-    String idParam = request.getParameter("id");
 
-        // 🔥 BUSCAR POR ID
-        if (idParam != null && !idParam.isEmpty()) {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-            int id = Integer.parseInt(idParam);
+        try {
+            // 🌟 NUEVO: CAPTURAR EL PARÁMETRO DE ACCIÓN PARA LA SESIÓN (MEJORADO)
+            String accion = request.getParameter("accion");
+            if ("obtenerSesion".equals(accion)) {
+                jakarta.servlet.http.HttpSession session = request.getSession(false);
 
-            Alimentacion alimentacion =
-                    alimentacionService.buscarAlimentacion(id);
+                Object logueado = null;
+                if (session != null) {
+                    // Probamos los nombres de atributos más comunes que podrías haber usado en tu LoginServlet:
+                    logueado = session.getAttribute("usuarioLogueado");
+                    if (logueado == null) {
+                        logueado = session.getAttribute("empleadoLogueado");
+                    }
+                    if (logueado == null) {
+                        logueado = session.getAttribute("usuario");
+                    }
+                    if (logueado == null) {
+                        logueado = session.getAttribute("empleado");
+                    }
+                }
 
-            if (alimentacion == null) {
+                if (logueado != null) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write(this.gson.toJson(logueado));
+                } else {
+                    // Si sigue saliendo null, es porque no hay sesión o el nombre del atributo en el login es diferente
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"error\":\"No hay sesión activa en el servidor.\"}");
+                }
+                return; // Detiene la ejecución
+            }
 
-                response.setStatus(
-                        HttpServletResponse.SC_NOT_FOUND);
+            String idParam = request.getParameter("id");
 
-                response.getWriter().write(
-                        "{\"mensaje\":\"Registro no encontrado\"}"
-                );
+            // 🔥 BUSCAR POR ID
+            if (idParam != null && !idParam.isEmpty()) {
+                int id = Integer.parseInt(idParam);
+                Alimentacion alimentacion = alimentacionService.buscarAlimentacion(id);
 
+                if (alimentacion == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"mensaje\":\"Registro no encontrado\"}");
+                    return;
+                }
+
+                response.getWriter().write(this.gson.toJson(alimentacion));
                 return;
             }
 
-            response.setContentType("application/json");
+            // 🔥 LISTAR TODOS
+            List<Alimentacion> lista = alimentacionService.obtenerAlimentaciones();
+            response.getWriter().write(this.gson.toJson(lista));
 
-            response.getWriter().write(
-                    gson.toJson(alimentacion));
-
-            return;
+        } catch (Exception e) {
+            System.out.println("ERROR EN DOGET DE ALIMENTACION: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error en el servidor: " + e.getMessage() + "\"}");
         }
-
-        // 🔥 LISTAR TODOS
-        List<Alimentacion> lista =
-                alimentacionService.obtenerAlimentaciones();
-
-        response.setContentType("application/json");
-
-        response.getWriter().write(
-                gson.toJson(lista));
     }
 
     /**
@@ -141,74 +169,72 @@ public class AlimentacionServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-    Alimentacion alimentacion =
-                gson.fromJson(
-                        request.getReader(),
-                        Alimentacion.class
-                );
-
-        String error =
-                validarAlimentacion(alimentacion);
-
-        if (error != null) {
-
-            response.setStatus(
-                    HttpServletResponse.SC_BAD_REQUEST);
-
-            response.setContentType("application/json");
-
-            response.getWriter().write(
-                    "{\"error\":\"" + error + "\"}"
-            );
-
-            return;
-        }
-
-        alimentacionService.crearAlimentacion(alimentacion);
-
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        response.getWriter().write(
-                "{\"mensaje\":\"Alimentación guardada\"}"
-        );
+        try {
+            // 1. Leemos el JSON que viene desde el JavaScript
+            Alimentacion alimentacion = gson.fromJson(request.getReader(), Alimentacion.class);
+
+            // 2. Validamos que los campos obligatorios vengan llenos
+            String error = validarAlimentacion(alimentacion);
+            if (error != null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"" + error + "\"}");
+                return;
+            }
+
+            // 3. Guardamos directamente en la Base de Datos (El DAO asociará al animal y cuidador)
+            alimentacionService.crearAlimentacion(alimentacion);
+
+            // 4. Respondemos éxito al JavaScript
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("{\"mensaje\":\"Alimentación registrada bajo tu usuario correctamente.\"}");
+
+        } catch (Throwable e) {
+            System.out.println("=== ERROR REAL AL GUARDAR ALIMENTACION ===");
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error en el servidor: " + e.getMessage() + "\"}");
+        }
     }
-
-    // ==========================
-    // PUT
-    // ==========================
     @Override
-    protected void doPut(HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        Alimentacion alimentacion =
-                gson.fromJson(
-                        request.getReader(),
-                        Alimentacion.class
-                );
+        try {
+            Alimentacion alimentacion = gson.fromJson(request.getReader(), Alimentacion.class);
 
-        String error =
-                validarAlimentacion(alimentacion);
+            String error = validarAlimentacion(alimentacion);
+            if (error != null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"" + error + "\"}");
+                return;
+            }
 
-        if (error != null) {
+            // 🌟 RUTA DIRECTA E INFALIBLE PARA EL PUT
+            if (alimentacion.getCuidador() != null && alimentacion.getCuidador().getId() != null) {
+                int idEmpleado = alimentacion.getCuidador().getId();
 
-            response.setStatus(
-                    HttpServletResponse.SC_BAD_REQUEST);
+                // Instanciamos el servicio con su ruta completa aquí también
+                com.ues.edu.service.EmpleadosService servicioTemp = new com.ues.edu.service.EmpleadosService();
+                Empleado empReal = servicioTemp.buscarEmpleado((long) idEmpleado);
 
-            response.getWriter().write(
-                    "{\"error\":\"" + error + "\"}"
-            );
+                alimentacion.setCuidador(empReal);
+            }
 
-            return;
+            alimentacionService.editarAlimentacion(alimentacion);
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("{\"mensaje\":\"Alimentación actualizada correctamente\"}");
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error al actualizar: " + e.getMessage() + "\"}");
         }
-
-        alimentacionService.editarAlimentacion(alimentacion);
-
-        response.getWriter().write(
-                "{\"mensaje\":\"Alimentación actualizada\"}"
-        );
     }
 
     // ==========================
@@ -262,7 +288,6 @@ public class AlimentacionServlet extends HttpServlet {
 
         return null;
     }
-
 
     /**
      * Returns a short description of the servlet.

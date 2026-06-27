@@ -24,27 +24,31 @@ import java.util.List;
 @WebServlet(name = "UssuarioServlet", urlPatterns = {"/UssuarioServlet"})
 public class UssuarioServlet extends HttpServlet {
 
-    UsuariosService usuarioService = new UsuariosService();
+    private final UsuariosService usuarioService = new UsuariosService();
 
-    // Añade esta línea configurando el GsonBuilder:
+    // 🌟 Instancia global de Gson configurada con estrategia de exclusión segura
     private final Gson gson = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation() // Evita el ciclo infinito (Requiere @Expose en la entidad)
-            .create();
+        .addSerializationExclusionStrategy(new com.google.gson.ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(com.google.gson.FieldAttributes f) {
+                // Cortamos de raíz los bucles circulares y colecciones perezosas de las relaciones
+                return f.getName().equals("usuario") 
+                    || f.getName().equals("historiales")
+                    || f.getName().equals("cuidadores")
+                    || f.getName().equals("animalesAsignados")
+                    || f.getName().equals("listaAnimales")
+                    || f.getName().equals("habitatAsignada");
+            }
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) { return false; }
+        })
+        .setDateFormat("yyyy-MM-dd") 
+        .create();
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -57,14 +61,8 @@ public class UssuarioServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -73,38 +71,40 @@ public class UssuarioServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        String idParam = request.getParameter("id");
+        try {
+            String idParam = request.getParameter("id");
 
-        // BUSCAR POR ID
-        if (idParam != null && !idParam.isEmpty()) {
+            // BUSCAR POR ID (Cuando das clic en Editar)
+            if (idParam != null && !idParam.isEmpty()) {
+                int id = Integer.parseInt(idParam);
+                Usuario usuario = usuarioService.buscarUsuario(id);
 
-            int id = Integer.parseInt(idParam);
+                if (usuario == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"mensaje\":\"Usuario no encontrado\"}");
+                    return;
+                }
 
-            Usuario usuario = usuarioService.buscarUsuario(id);
-
-            if (usuario == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write("{\"mensaje\":\"Usuario no encontrado\"}");
+                // 🌟 CORREGIDO: Se usa "this.gson" seguro en lugar de la instancia vacía
+                response.getWriter().write(this.gson.toJson(usuario));
                 return;
             }
 
-            response.getWriter().write(gson.toJson(usuario));
-            return;
+            // LISTAR TODOS (Cuando carga la tabla)
+            List<Usuario> usuarios = usuarioService.mostrarUsuarios();
+            // 🌟 CORREGIDO: Se usa "this.gson" para formatear la lista sin bucles infinitos
+            response.getWriter().write(this.gson.toJson(usuarios));
+
+        } catch (Exception e) {
+            System.out.println("ERROR EN DO_GET: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error al obtener datos: " + e.getMessage() + "\"}");
         }
-
-        // LISTAR TODOS
-        List<Usuario> usuarios = usuarioService.mostrarUsuarios();
-
-        response.getWriter().write(gson.toJson(usuarios));
     }
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -113,97 +113,134 @@ public class UssuarioServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        Usuario usuario = gson.fromJson(request.getReader(), Usuario.class);
+        try {
+            // 1. Leer el cuerpo de la petición como texto plano
+            java.io.BufferedReader reader = request.getReader();
+            StringBuilder sb = new StringBuilder();
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                sb.append(linea);
+            }
+            String jsonRaw = sb.toString();
+            
+            System.out.println("JSON recibido en bruto: " + jsonRaw);
 
-        String error = validarUsuario(usuario, false);
+            // 2. 🌟 CORREGIDO: Deserializar el JSON entrante usando de forma coherente "this.gson"
+            Usuario usuario = this.gson.fromJson(jsonRaw, Usuario.class);
 
-        if (error != null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"error\":\"" + error + "\"}");
-            return;
+            // 3. Validar los datos esenciales del usuario
+            String error = validarUsuario(usuario, false);
+            if (error != null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"" + error + "\"}");
+                return;
+            }
+
+            // 4. Mandar a guardar usando el servicio
+            usuarioService.crearUsuario(usuario);
+
+            // 5. Responder con JSON de éxito genuino
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("{\"mensaje\":\"Usuario guardado exitosamente\"}");
+
+        } catch (Exception e) {
+            System.out.println("ERROR CRÍTICO EN DO_POST: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error interno en el servidor: " + e.getMessage() + "\"}");
         }
-
-        System.out.println("=================================");
-        System.out.println("Usuario: " + usuario.getNombreUsuario());
-        System.out.println("Password: " + usuario.getContrasena());
-        System.out.println("=================================");
-
-        usuarioService.crearUsuario(usuario); // ← solo UNA vez
-
-        response.getWriter().write("{\"mensaje\":\"Usuario guardado\"}"); // ← solo UNA vez
     }
-
+    
+    /**
+     * Handles the HTTP <code>PUT</code> method.
+     */
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {  // ← agrega ServletException
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        int id = Integer.parseInt(request.getParameter("id"));
+        try {
+            // 🌟 CORREGIDO: Mapear usando la configuración de exclusión global
+            Usuario usuario = this.gson.fromJson(request.getReader(), Usuario.class);
 
-        System.out.println("DELETE ID = " + id);
-        usuarioService.eliminarUsuario(id);
-        System.out.println("SERVICIO ELIMINAR EJECUTADO");
+            // Validar los datos para actualizar
+            String error = validarUsuario(usuario, true);
+            if (error != null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"" + error + "\"}");
+                return;
+            }
 
-        response.getWriter().write("{\"mensaje\":\"usuario eliminado\"}");
-    }
+            usuarioService.actualizarUsuario(usuario);
 
-    @Override
-protected void doPut(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {  // ← agrega ServletException
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("{\"mensaje\":\"Usuario actualizado con éxito\"}");
 
-        Usuario usuario = gson.fromJson(request.getReader(), Usuario.class);
-
-        String error = validarUsuario(usuario, true);
-
-        if (error != null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\":\"" + error + "\"}");
-            return;
+        } catch (Exception e) {
+            System.out.println("ERROR EN DO_PUT: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error al actualizar: " + e.getMessage() + "\"}");
         }
-
-        usuarioService.actualizarUsuario(usuario);
-
-        response.setContentType("application/json");
-        response.getWriter().write("{\"mensaje\":\"Ticket actualizado\"}");
     }
 
     /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
+     * Handles the HTTP <code>DELETE</code> method.
      */
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            String idParam = request.getParameter("id");
+            if (idParam == null || idParam.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Falta el ID del usuario\"}");
+                return;
+            }
+
+            int id = Integer.parseInt(idParam);
+            System.out.println("DELETE ID = " + id);
+            
+            usuarioService.eliminarUsuario(id);
+            System.out.println("SERVICIO ELIMINAR EJECUTADO");
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("{\"mensaje\":\"Usuario deshabilitado exitosamente\"}");
+
+        } catch (Exception e) {
+            System.out.println("ERROR EN DO_DELETE: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Error al eliminar: " + e.getMessage() + "\"}");
+        }
+    }
+
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
-//    public static boolean validarContraseña(String contraseñaPlana, String contraseñaEncriptada) {
-//        return BCrypt.checkpw(contraseñaPlana, contraseñaEncriptada);
-//    }
     private String validarUsuario(Usuario u, boolean esActualizacion) {
-
         if (u == null) {
             return "Usuario inválido";
         }
 
-        if (u.getNombreUsuario() == null
-                || u.getNombreUsuario().trim().length() < 7) {
-
+        if (u.getNombreUsuario() == null || u.getNombreUsuario().trim().length() < 7) {
             return "El nombre de usuario debe tener mínimo 7 caracteres";
         }
 
         if (!esActualizacion) {
-
-            if (u.getContrasena() == null
-                    || u.getContrasena().trim().length() < 6) {
-
-                return "La contraseña debe tener mínimo 6caracteres";
+            if (u.getContrasena() == null || u.getContrasena().trim().length() < 6) {
+                return "La contraseña debe tener mínimo 6 caracteres";
             }
         }
-
         return null;
     }
 }

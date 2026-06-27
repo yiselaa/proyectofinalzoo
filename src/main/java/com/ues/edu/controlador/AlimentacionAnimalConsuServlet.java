@@ -86,6 +86,8 @@ public class AlimentacionAnimalConsuServlet extends HttpServlet {
                     obj.put("tipo_alimento", a[1] != null ? a[1].toString() : "");
                     obj.put("cantidad", a[2] != null ? a[2].toString() : "");
                     obj.put("horario", a[3] != null ? a[3].toString() : "");
+                    // 🌟 NUEVO: Agregamos el cuidador al JSON
+                    obj.put("cuidador", a[4] != null ? a[4].toString() : "—"); 
 
                     jsonArray.put(obj);
                 }
